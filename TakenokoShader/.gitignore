@@ -104,3 +104,15 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+/[Aa]ssets/Scenes
+/Scene.meta
+/[Aa]ssets/SerializedUdonPrograms
+/SerializedUdonPrograms.meta
+/[Aa]ssets/UdonSharp
+/UdonSharp.meta
+/[Aa]ssets/XR
+/XR.meta
+
+/Packages/com.vrchat.base
+/Packages/com.vrchat.worlds
