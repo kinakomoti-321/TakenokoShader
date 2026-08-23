@@ -3,6 +3,7 @@
 
 #include "../Core/Takenoko_Lightmap.hlsl"
 #include "../Core/Takenoko_Hash.hlsl"
+#include "../Core/Takenoko_Noise.hlsl"
 #include "../Core/Takenoko_Lighting.hlsl"
 
 #include "Takenoko_StandardDefinition.hlsl"
@@ -342,6 +343,18 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float2 parallaxOffset = ParallaxOffset(texcoord, viewTS, 1.0);
     texcoord += parallaxOffset;
 
+    float wetness = 0.0;
+    float3 wetnessNoise = 0.0;
+    if (_Wetness > 0.5)
+    {
+        if (i.positionWS.y < _WetnessHeight)
+        {
+            wetnessNoise = Cyclic(float3(i.positionWS.xz * 5.0, _Time.y), 1.0, 1.0);
+            wetness = saturate((-i.positionWS.y + _WetnessHeight) * 10.0);
+            texcoord += wetnessNoise.xy * 0.005 * wetness;
+        }
+    }
+
     MaterialData materialData = GetMaterialData(texcoord, i.positionWS, n);
 
     #if defined(_ALPHATEST_ON)
@@ -349,7 +362,22 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     #endif
 
     float3 shadingNormal = normalize(mul(materialData.normalTS, tbn));
+    //---------------------------------------------------
+    // Pre-Effect
+    //---------------------------------------------------
+    if (wetness > 0.0)
+    {
+        if (i.positionWS.y < _WetnessHeight)
+        {
+            materialData.basecolor = lerp(materialData.basecolor, materialData.basecolor * _WetnessColor, wetness);
+            materialData.roughness = lerp(materialData.roughness, 0.1, wetness);
+            shadingNormal = normalize(float3(0, 1, 0) + (2.0 * wetnessNoise - 1.0) * 0.01);
+        }
+    }
 
+    //---------------------------------------------------
+    // Lighting
+    //---------------------------------------------------
     UnityLightData lightData = GetUnityLightData(i);
 
     LightingData lightingData;

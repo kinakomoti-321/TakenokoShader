@@ -63,6 +63,10 @@ float _FilterResultHueShift;
 float _FilterResultSaturateShift;
 float _FilterResultValueShift;
 
+float _Wetness;
+float3 _WetnessColor;
+float _WetnessHeight;
+
 float _SkyboxFog;
 float _SkyboxFogStrength;
 float _SkyboxFogDistance;
@@ -72,41 +76,15 @@ float4 _SkyboxFogSphereCenter;
 float _SkyboxFogSphereRadius;
 
 #if defined(_VRC_AREALIGHT_ON)
-
-    TAKENOKO_TEXTURE2D(_UdonLtcLut);
-
-    Texture2D _UdonFresnelLut;
-
     #if defined(_AREA_LIGHT_MASK_ON)
         TAKENOKO_TEXTURE2D(_AreaLightMask1);
         TAKENOKO_TEXTURE2D(_AreaLightMask2);
     #endif
 
-    float _UdonEnableLtcSystem;
-
-    float _UdonLightVertex1[12]; // 4 vertices * 3 components
-    Texture2D _UdonLightTexture1;
-    float4 _UdonLightEmission1;
     float _AreaLightIntensity1;
-
-    float _UdonLightVertex2[12]; // 4 vertices * 3 components
-    Texture2D _UdonLightTexture2;
-    float4 _UdonLightEmission2;
     float _AreaLightIntensity2;
-
-    float _UdonLightVertex3[12]; // 4 vertices * 3 components
-    Texture2D _UdonLightTexture3;
-    float4 _UdonLightEmission3;
     float _AreaLightIntensity3;
-
-    float _UdonLightVertex4[12]; // 4 vertices * 3 components
-    Texture2D _UdonLightTexture4;
-    float4 _UdonLightEmission4;
     float _AreaLightIntensity4;
-
-    float _UdonLightVertex5[12]; // 4 vertices * 3 components
-    Texture2D _UdonLightTexture5;
-    float4 _UdonLightEmission5;
     float _AreaLightIntensity5;
 #endif
 

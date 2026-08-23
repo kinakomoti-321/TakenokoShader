@@ -160,6 +160,10 @@ public enum ShaderProps
     FilterResultSaturateShift,
     [Description("_FilterResultValueShift")]
     FilterResultValueShift,
+    [Description("_Wetness")]
+    Wetness,
+    [Description("_WetnessColor")]
+    WetnessColor,
     [Description("_SkyboxFog")]
     SkyboxFog,
     [Description("_SkyboxFogStrength")]
@@ -260,6 +264,8 @@ public static class ShaderPropsName
         { ShaderProps.FilterResultHueShift, "_FilterResultHueShift" },
         { ShaderProps.FilterResultSaturateShift, "_FilterResultSaturateShift" },
         { ShaderProps.FilterResultValueShift, "_FilterResultValueShift" },
+        { ShaderProps.Wetness, "_Wetness" },
+        { ShaderProps.WetnessColor, "_WetnessColor" },
         { ShaderProps.SkyboxFog, "_SkyboxFog" },
         { ShaderProps.SkyboxFogStrength, "_SkyboxFogStrength" },
         { ShaderProps.SkyboxFogMode, "_SkyboxFogMode" },

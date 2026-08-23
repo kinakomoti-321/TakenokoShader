@@ -310,6 +310,19 @@ namespace Takenoko.Standard
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
+                        materialEditor.ShaderProperty(props[ShaderProps.Wetness], new GUIContent("Wetness"));
+                        bool useWetness = Cast(props[ShaderProps.Wetness].floatValue);
+                        if (useWetness)
+                        {
+                            using (new VerticalScope(TempuraGui.borderBox))
+                            {
+                                materialEditor.ShaderProperty(props[ShaderProps.WetnessColor], new GUIContent("Wetness Color"));
+                            }
+                        }
+                    }
+
+                    using (new VerticalScope(TempuraGui.borderBox))
+                    {
                         materialEditor.ShaderProperty(props[ShaderProps.MaskLightProbe], new GUIContent("Mask Light Probe"));
                         materialEditor.ShaderProperty(props[ShaderProps.MaskLightmap], new GUIContent("Mask Lightmap"));
                     }

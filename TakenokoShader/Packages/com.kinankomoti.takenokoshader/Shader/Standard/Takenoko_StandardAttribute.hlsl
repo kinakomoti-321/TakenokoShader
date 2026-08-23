@@ -17,7 +17,7 @@ struct Attribute
     float2 texcoord1 : TEXCOORD1; // Lightmap UV
     float2 texcoord2 : TEXCOORD2;
     float2 texcoord3 : TEXCOORD3;
-    float4 colro : COLOR0;
+    float4 color : COLOR0;
     
     UNITY_VERTEX_INPUT_INSTANCE_ID
 };

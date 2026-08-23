@@ -119,6 +119,9 @@ Shader "Takenoko/Standard"
         _FilterResultSaturateShift ("Saturate", Range(-1, 1)) = 0.0
         _FilterResultValueShift ("Value", Range(-1, 1)) = 0.0
 
+        [Toggle] _Wetness ("Wetness", Int) = 0
+        _WetnessColor ("Wetness Color", Color) = (1, 1, 1, 0)
+
         [Toggle] _SkyboxFog ("Skybox Fog", Int) = 0
         _SkyboxFogStrength ("Skybox Strength", Range(0, 1)) = 0.5
         [Enum(Distance, 0, Box, 1, Sphere, 2)] _SkyboxFogMode ("Skybox Fog Mode", Int) = 0
