@@ -452,6 +452,9 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
         #elif defined(_SKYBOXFOG_SPHERE)
             float3 sphereCenter = _SkyboxFogSphereCenter.xyz;
             float sphereRadius = _SkyboxFogSphereRadius;
+            float d = length(positionWS - sphereCenter) - sphereRadius;
+
+            fogFactor = smoothstep(-100 * _SkyboxFogStrength, 0.0, d);
         #endif
 
         result = lerp(result, skybox, fogFactor);
