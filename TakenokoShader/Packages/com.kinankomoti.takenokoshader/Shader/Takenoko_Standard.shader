@@ -5,8 +5,8 @@ Shader "Takenoko/Standard"
         //------------
         // Error Massage
         //------------
-        _ErrorMessage_JPN ("これはエラーメッセージです。これが表示されている場合、何かしらのEditor拡張が壊れている可能性があります。", Int) = 0
-        _ErrorMessage_ENG ("This is an error message. If you see this, it is likely that some editor extension is broken.", Int) = 0
+        _ErrorMessageJPN ("これはエラーメッセージです。これが表示されている場合、何かしらのEditor拡張が壊れている可能性があります。", Int) = 0
+        _ErrorMessageENG ("This is an error message. If you see this, it is likely that some editor extension is broken.", Int) = 0
 
         //------------
         // Pipeline
@@ -19,7 +19,7 @@ Shader "Takenoko/Standard"
         _UnityZWrite ("Z write", Float) = 0.0
         _UnitySrcBlend ("Alpha Src", Float) = 0.0
         _UnityDstBlend ("Alpha Dst", Float) = 0.0
-        _UnityCullMode ("Cull Mode", Float) = 0.0
+        _UnityCullMode ("Cull Mode", Float) = 2.0
         _UnityAlphaToMask ("AlphaToMask", Float) = 0.0
 
         //------------
@@ -27,14 +27,14 @@ Shader "Takenoko/Standard"
         //------------
         [Enum(Simple, 0, HexTiling, 1)] _MainTexTilingMode ("Tiling Mode", Int) = 0
         [Enum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _MainTexcoord ("Tiling Channel", Int) = 0
-        _MaintexOffset ("Tilling Offset", Vector) = (0, 0, 1, 1)
-        _MaintexScale ("Tilling Offset", Vector) = (1, 1, 1, 1)
+        _MainTexOffset ("Tilling Offset", Vector) = (0, 0, 1, 1)
+        _MainTexScale ("Tilling Offset", Vector) = (1, 1, 1, 1)
 
         // hex tiling
-        _Hex_RotationStrength ("Hex Tiling Rotation Strength", Range(0, 10)) = 0.5
-        _Hex_FallOff ("Hex Tiling Fall Off", Range(0, 1)) = 0.5
-        _Hex_Exponent ("Hex Tiling Exponent", Range(0, 10)) = 1.0
-        _Hex_EdgeSmoothness ("Hex Tiling Edge Smoothness", Range(0, 1)) = 0.5
+        _HexRotationStrength ("Hex Tiling Rotation Strength", Range(0, 10)) = 0.5
+        _HexFallOff ("Hex Tiling Fall Off", Range(0, 1)) = 0.5
+        _HexExponent ("Hex Tiling Exponent", Range(0, 10)) = 1.0
+        _HexEdgeSmoothness ("Hex Tiling Edge Smoothness", Range(0, 1)) = 0.5
 
         _Color ("Color", Color) = (1, 1, 1, 1) // name Unity expectes
         _MainTex ("Texture", 2D) = "white" { }// name Unity expectes
@@ -81,8 +81,8 @@ Shader "Takenoko/Standard"
         // -------------
         // Area Light
         // -------------
-        [Toggle] _VRC_AreaLight ("VRC Area Light", Int) = 0
-        [Toggle] _Area_Light_Mask ("Area Light Mask", Int) = 0
+        [Toggle] _VRCAreaLight ("VRC Area Light", Int) = 0
+        [Toggle] _AreaLightMask ("Area Light Mask", Int) = 0
         _AreaLightMask1 ("Area Light Mask 1", 2D) = "white" { }
         _AreaLightMask2 ("Area Light Mask 2", 2D) = "white" { }
         _AreaLightIntensity1 ("Area Light Intensity", Range(0, 10)) = 1.0
@@ -103,21 +103,21 @@ Shader "Takenoko/Standard"
         // -------------
         // Effect
         // -------------
-        [Toggle] _Specular_Occlusion ("Specular Occlusion [Experimental]", Int) = 0
-        [Toggle] _Specular_Occlusion_Lightmap ("Lightmap Occlusion[Experimental]", Int) = 1
+        [Toggle] _SpecularOcclusion ("Specular Occlusion [Experimental]", Int) = 0
+        [Toggle] _SpecularOcclusionLightmap ("Lightmap Occlusion[Experimental]", Int) = 1
         _SpecularOcclusionStrength ("Power", Range(0, 1)) = 1.0
         _SpecularOcclusionPower ("Power", Range(1, 20)) = 5.0
 
         _MaskLightProbe ("Light Probe Mask", Range(0, 2)) = 1.0
         _MaskLightmap ("Lightmap Mask", Range(0, 2)) = 1.0
 
-        _Filter_MainTex_HueShift ("Hue Shift", Range(-1, 1)) = 0.0
-        _Filter_MainTex_SaturateShift ("Saturate", Range(-1, 1)) = 0.0
-        _Filter_MainTex_ValueShift ("Value", Range(-1, 1)) = 0.0
+        _FilterMainTexHueShift ("Hue Shift", Range(-1, 1)) = 0.0
+        _FilterMainTexSaturateShift ("Saturate", Range(-1, 1)) = 0.0
+        _FilterMainTexValueShift ("Value", Range(-1, 1)) = 0.0
 
-        _Filter_Result_HueShift ("Hue Shift", Range(-1, 1)) = 0.0
-        _Filter_Result_SaturateShift ("Saturate", Range(-1, 1)) = 0.0
-        _Filter_Result_ValueShift ("Value", Range(-1, 1)) = 0.0
+        _FilterResultHueShift ("Hue Shift", Range(-1, 1)) = 0.0
+        _FilterResultSaturateShift ("Saturate", Range(-1, 1)) = 0.0
+        _FilterResultValueShift ("Value", Range(-1, 1)) = 0.0
 
         [Toggle] _SkyboxFog ("Skybox Fog", Int) = 0
         _SkyboxFogStrength ("Skybox Strength", Range(0, 1)) = 0.5
@@ -192,8 +192,8 @@ Shader "Takenoko/Standard"
 
             #define _TAKENOKO_FOWARD_BASE
 
-            #include "Standard/Takenoko_Standard_Vertex.hlsl"
-            #include "Standard/Takenoko_Standard_Fragment.hlsl"
+            #include "Standard/Takenoko_StandardVertex.hlsl"
+            #include "Standard/Takenoko_StandardFragment.hlsl"
 
             ENDCG
         }
@@ -234,8 +234,8 @@ Shader "Takenoko/Standard"
 
             #define _TAKENOKO_FOWARD_ADD
 
-            #include "Standard/Takenoko_Standard_Vertex.hlsl"
-            #include "Standard/Takenoko_Standard_Fragment.hlsl"
+            #include "Standard/Takenoko_StandardVertex.hlsl"
+            #include "Standard/Takenoko_StandardFragment.hlsl"
 
             ENDCG
         }

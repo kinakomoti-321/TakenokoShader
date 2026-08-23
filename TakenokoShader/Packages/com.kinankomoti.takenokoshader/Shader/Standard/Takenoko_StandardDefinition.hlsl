@@ -27,13 +27,13 @@ float _Occlusion;
 TAKENOKO_TEXTURE2D(_OcclusionTex);
 float _OcclusionPower;
 
-float4 _MaintexOffset;
-float4 _MaintexScale;
+float4 _MainTexOffset;
+float4 _MainTexScale;
 
-float _Hex_RotationStrength;
-float _Hex_FallOff;
-float _Hex_Exponent;
-float _Hex_EdgeSmoothness;
+float _HexRotationStrength;
+float _HexFallOff;
+float _HexExponent;
+float _HexEdgeSmoothness;
 
 TAKENOKO_TEXTURE2D(_HeightTex);
 float _HeightStrength;
@@ -55,13 +55,13 @@ float _SpecularOcclusionPower;
 float _MaskLightProbe;
 float _MaskLightmap;
 
-float _Filter_MainTex_HueShift;
-float _Filter_MainTex_SaturateShift;
-float _Filter_MainTex_ValueShift;
+float _FilterMainTexHueShift;
+float _FilterMainTexSaturateShift;
+float _FilterMainTexValueShift;
 
-float _Filter_Result_HueShift;
-float _Filter_Result_SaturateShift;
-float _Filter_Result_ValueShift;
+float _FilterResultHueShift;
+float _FilterResultSaturateShift;
+float _FilterResultValueShift;
 
 float _SkyboxFog;
 float _SkyboxFogStrength;

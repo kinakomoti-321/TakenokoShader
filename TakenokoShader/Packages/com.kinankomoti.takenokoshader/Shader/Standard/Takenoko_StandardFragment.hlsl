@@ -5,10 +5,10 @@
 #include "../Core/Takenoko_Hash.hlsl"
 #include "../Core/Takenoko_Lighting.hlsl"
 
-#include "Takenoko_Standard_Define.hlsl"
-#include "Takenoko_Standard_Attribute.hlsl"
-#include "Takenoko_Standard_Mapping.hlsl"
-#include "Takenoko_Standard_AreaLight.hlsl"
+#include "Takenoko_StandardDefinition.hlsl"
+#include "Takenoko_StandardAttribute.hlsl"
+#include "Takenoko_StandardMapping.hlsl"
+#include "Takenoko_StandardAreaLight.hlsl"
 
 struct MaterialData
 {
@@ -28,7 +28,7 @@ inline MaterialData HexTiling(float2 texcoord)
     int2 vert1, vert2, vert3;
     TriangleGrid(texcoord, w1, w2, w3, vert1, vert2, vert3);
 
-    float rotStrength = _Hex_RotationStrength;
+    float rotStrength = _HexRotationStrength;
     float2x2 rot1 = LoadRot2x2(vert1, rotStrength);
     float2x2 rot2 = LoadRot2x2(vert2, rotStrength);
     float2x2 rot3 = LoadRot2x2(vert3, rotStrength);
@@ -49,9 +49,9 @@ inline MaterialData HexTiling(float2 texcoord)
     float3 c2 = Standard_BaseColor(uv2, mul(dx, rot2), mul(dy, rot2));
     float3 c3 = Standard_BaseColor(uv3, mul(dx, rot3), mul(dy, rot3));
 
-    float fallOff = _Hex_FallOff;
-    float ex = _Hex_Exponent;
-    float edgeSmoothness = _Hex_EdgeSmoothness;
+    float fallOff = _HexFallOff;
+    float ex = _HexExponent;
+    float edgeSmoothness = _HexEdgeSmoothness;
     float3 hexWeight = float3(w1, w2, w3);
     
     float3 W = LuminanceWeight(hexWeight, c1, c2, c3, fallOff, ex, edgeSmoothness);
@@ -372,7 +372,7 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     lightingData.rawLightColor = lightData.color;
     lightingData.lightColor = lightData.color * lightingData.attenuation;
 
-    lightingData.basecolor = ShiftHSV(materialData.basecolor, float3(_Filter_MainTex_HueShift, _Filter_MainTex_SaturateShift, _Filter_MainTex_ValueShift));
+    lightingData.basecolor = ShiftHSV(materialData.basecolor, float3(_FilterMainTexHueShift, _FilterMainTexSaturateShift, _FilterMainTexValueShift));
     lightingData.roughness = materialData.roughness;
     lightingData.metallic = materialData.metallic;
     lightingData.emission = materialData.emission;

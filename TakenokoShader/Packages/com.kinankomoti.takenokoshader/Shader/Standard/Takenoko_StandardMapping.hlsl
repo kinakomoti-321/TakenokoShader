@@ -188,15 +188,15 @@ inline float3 Standard_Normal(float2 texcoord, float2 dx, float2 dy)
 inline float2 MainTexcoord(VertexOutput i)
 {
     #if defined(_MAINTEX_UV0)
-        return i.texcoord0 * float2(_MaintexScale.x, _MaintexScale.y) + float2(_MaintexOffset.x, _MaintexOffset.y);
+        return i.texcoord0 * float2(_MainTexScale.x, _MainTexScale.y) + float2(_MainTexOffset.x, _MainTexOffset.y);
     #elif defined(_MAINTEX_UV1)
-        return i.texcoord1 * float2(_MaintexScale.x, _MaintexScale.y) + float2(_MaintexOffset.x, _MaintexOffset.y);
+        return i.texcoord1 * float2(_MainTexScale.x, _MainTexScale.y) + float2(_MainTexOffset.x, _MainTexOffset.y);
     #elif defined(_MAINTEX_UV2)
-        return i.texcoord2 * float2(_MaintexScale.x, _MaintexScale.y) + float2(_MaintexOffset.x, _MaintexOffset.y);
+        return i.texcoord2 * float2(_MainTexScale.x, _MainTexScale.y) + float2(_MainTexOffset.x, _MainTexOffset.y);
     #elif defined(_MAINTEX_UV3)
-        return i.texcoord3 * float2(_MaintexScale.x, _MaintexScale.y) + float2(_MaintexOffset.x, _MaintexOffset.y);
+        return i.texcoord3 * float2(_MainTexScale.x, _MainTexScale.y) + float2(_MainTexOffset.x, _MainTexOffset.y);
     #else
-        return i.texcoord0 * float2(_MaintexScale.x, _MaintexScale.y) + float2(_MaintexOffset.x, _MaintexOffset.y);
+        return i.texcoord0 * float2(_MainTexScale.x, _MainTexScale.y) + float2(_MainTexOffset.x, _MainTexOffset.y);
     #endif
 }
 

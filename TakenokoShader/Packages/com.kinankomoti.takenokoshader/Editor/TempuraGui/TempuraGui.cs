@@ -139,13 +139,7 @@ namespace Tempura
             };
 
             style.normal.background = texture;
-            style.hover.background = texture;
-            style.active.background = texture;
-            style.focused.background = texture;
             style.onNormal.background = texture;
-            style.onHover.background = texture;
-            style.onActive.background = texture;
-            style.onFocused.background = texture;
 
             return style;
         }
@@ -181,15 +175,11 @@ namespace Tempura
                 var borderColor = new Color(0.5f, 0.5f, 0.5f, 0.5f);
 
                 EditorGUI.DrawRect(rect, backgroundColor);
-                EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, 1f), borderColor);
-                EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - 1f, rect.width, 1f), borderColor);
-                EditorGUI.DrawRect(new Rect(rect.x, rect.y, 1f, rect.height), borderColor);
-                EditorGUI.DrawRect(new Rect(rect.xMax - 1f, rect.y, 1f, rect.height), borderColor);
             }
 
             var labelRect = new Rect(
                 rect.x + foldoutStyle.padding.left,
-                rect.y + -2f,
+                rect.y + -1f,
                 rect.width - foldoutStyle.padding.horizontal,
                 rect.height);
             GUI.Label(labelRect, new GUIContent(title, help), foldoutStyle);
@@ -208,7 +198,7 @@ namespace Tempura
                 event_.Use();
             }
 
-            EditorGUILayout.Space(-2);
+            EditorGUILayout.Space(1f);
 
             return fold;
         }
