@@ -41,12 +41,18 @@ float _HeightOffset;
 float _HeightStep;
 float _HeightSubStep;
 
-#if defined(_THINFILM_ON)
+
+#if defined(_IRIDESCENCE_ON)
     float _ThinFilmThickness;
     TAKENOKO_TEXTURE2D(_ThinFilmThicknessTex);
     float _ThinFilmThicknessMin;
     float _ThinFilmThicknessMax;
     float _ThinFilmIor;
+#endif
+
+#if defined(_SSS_ON)
+    float _SssThickness;
+    TAKENOKO_TEXTURE2D(_SssThicknessTex);
 #endif
 
 float _SpecularOcclusionStrength;

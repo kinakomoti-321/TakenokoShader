@@ -94,8 +94,8 @@ public enum ShaderProps
     EmissionColor,
     [Description("_EmissionMap")]
     EmissionMap,
-    [Description("_ThinFilm")]
-    ThinFilm,
+    [Description("_Iridescence")]
+    Iridescence,
     [Description("_ThinFilmThickness")]
     ThinFilmThickness,
     [Description("_ThinFilmThicknessTex")]
@@ -108,6 +108,14 @@ public enum ShaderProps
     ThinFilmThicknessMax,
     [Description("_ThinFilmIor")]
     ThinFilmIor,
+    [Description("_Sss")]
+    Sss,
+    [Description("_SssMode")]
+    SssMode,
+    [Description("_SssThickness")]
+    SssThickness,
+    [Description("_SssThicknessTex")]
+    SssThicknessTex,
     [Description("_VRCAreaLight")]
     VRCAreaLight,
     [Description("_AreaLightMask")]
@@ -231,13 +239,17 @@ public static class ShaderPropsName
         { ShaderProps.Emission, "_Emission" },
         { ShaderProps.EmissionColor, "_EmissionColor" },
         { ShaderProps.EmissionMap, "_EmissionMap" },
-        { ShaderProps.ThinFilm, "_ThinFilm" },
+        { ShaderProps.Iridescence, "_Iridescence" },
         { ShaderProps.ThinFilmThickness, "_ThinFilmThickness" },
         { ShaderProps.ThinFilmThicknessTex, "_ThinFilmThicknessTex" },
         { ShaderProps.ThinFilmChannel, "_ThinFilmChannel" },
         { ShaderProps.ThinFilmThicknessMin, "_ThinFilmThicknessMin" },
         { ShaderProps.ThinFilmThicknessMax, "_ThinFilmThicknessMax" },
         { ShaderProps.ThinFilmIor, "_ThinFilmIor" },
+        { ShaderProps.Sss, "_Sss" },
+        { ShaderProps.SssMode, "_SssMode" },
+        { ShaderProps.SssThickness, "_SssThickness" },
+        { ShaderProps.SssThicknessTex, "_SssThicknessTex" },
         { ShaderProps.VRCAreaLight, "_VRCAreaLight" },
         { ShaderProps.AreaLightMask, "_AreaLightMask" },
         { ShaderProps.AreaLightMask1, "_AreaLightMask1" },

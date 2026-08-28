@@ -66,17 +66,22 @@ Shader "Takenoko/Standard"
         [Toggle] _HeightShadow ("Height Shaddow [Experimental]", Int) = 0
 
         [Toggle] _Emission ("Use Emission", Int) = 0
-        [HDR] _EmissionColor ("Emission Color", Color) = (0, 0, 0, 0) // name Unity expectes
-        _EmissionMap ("Emission Map", 2D) = "white" { }// name Unity expectes
+        [HDR] _EmissionColor ("Emission color", Color) = (0, 0, 0, 0) // name Unity expectes
+        _EmissionMap ("Emission texture", 2D) = "white" { }// name Unity expectes
 
         // Iridescence
-        [Toggle] _ThinFilm ("Thin Film", Int) = 0
-        _ThinFilmThickness ("Thickness", Range(0, 1)) = 0.5
-        _ThinFilmThicknessTex ("Thickness Texture", 2D) = "white" { }
+        [Toggle] _Iridescence ("Thin Film", Int) = 0
+        _ThinFilmThickness ("Film thickness", Range(0, 1)) = 0.5
+        _ThinFilmThicknessTex ("Film thickness texture", 2D) = "white" { }
         [Enum(R, 0, G, 1, B, 2, A, 3)] _ThinFilmChannel ("Thin Film Channel", Int) = 1
         _ThinFilmThicknessMin ("Thickness min", Range(0, 1000)) = 100
         _ThinFilmThicknessMax ("Thickness max", Range(0, 1000)) = 200
         _ThinFilmIor ("Ior", Range(1, 3)) = 1.5
+
+        [Toggle] _Sss ("Subsurface scattering", Int) = 0
+        [Enum(Volume, 0, ThinWall, 1)] _SssMode ("SSS Mode", Int) = 0
+        _SssThickness ("Thickness", Range(0, 1)) = 0.5
+        _SssThicknessTex ("Thickness", 2D) = "white" { }
 
         // -------------
         // Area Light
@@ -182,6 +187,10 @@ Shader "Takenoko/Standard"
             #pragma shader_feature_local _SKYBOXFOG_ON
             #pragma shader_feature_local _SKYBOXFOG_DISTANCE _SKYBOXFOG_BOX _SKYBOXFOG_SPHERE
 
+            #pragma shader_feature_local _IRIDESCENCE_ON
+            #pragma shader_feature_local _SSS_ON
+            #pragma shader_feature_local _SSS_MODE_VOLUME _SSS_MODE_THINWALL
+
             #pragma shader_feature_local _LIGHTMAP_DEFAULT _LIGHTMAP_SH _LIGHTMAP_MONOSH
             
             // VRC Light Volume
@@ -210,6 +219,7 @@ Shader "Takenoko/Standard"
             Name "FowardAdd"
             Tags { "LightMode" = "ForwardAdd" }
 
+            Cull [_UnityCullMode]
             Blend One One
             ZWrite Off
             ZTest LEqual
@@ -230,7 +240,10 @@ Shader "Takenoko/Standard"
             #pragma shader_feature_local _ROUGHNESS_CHANNEL_R _ROUGHNESS_CHANNEL_G _ROUGHNESS_CHANNEL_B _ROUGHNESS_CHANNEL_A
             #pragma shader_feature_local _METALLIC_CHANNEL_R _METALLIC_CHANNEL_G _METALLIC_CHANNEL_B _METALLIC_CHANNEL_A
             #pragma shader_feature_local _OCCLUSION_CHANNEL_R _OCCLUSION_CHANNEL_G _OCCLUSION_CHANNEL_B _OCCLUSION_CHANNEL_A
-            #pragma shader_feature_local _THINFILM_ON
+            
+            #pragma shader_feature_local _IRIDESCENCE_ON
+            #pragma shader_feature_local _SSS_ON
+            #pragma shader_feature_local _SSS_MODE_VOLUME _SSS_MODE_THINWALL
 
             #pragma shader_feature_local _HEIGHT_ON
             #pragma shader_feature_local _HEIGHT_CHANNEL_R _HEIGHT_CHANNEL_G _HEIGHT_CHANNEL_B _HEIGHT_CHANNEL_A
@@ -251,6 +264,7 @@ Shader "Takenoko/Standard"
             Name "ShadowCaster"
             Tags { "LightMode" = "ShadowCaster" }
 
+            Cull [_UnityCullMode]
             ZWrite On ZTest LEqual
 
             CGPROGRAM

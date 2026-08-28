@@ -185,15 +185,12 @@ namespace Takenoko.Standard
                         if (useHeight)
                         {
                             TempuraGui.Space2();
-                            using (new VerticalScope(TempuraGui.borderBox))
-                            {
-                                materialEditor.TexturePropertySingleLine(new GUIContent("Height"), props[ShaderProps.HeightTex], props[ShaderProps.HeightStrength]);
-                                DrawLinearTextureWarning(materials, ShaderProps.HeightTex.Name(), "Height");
-                                TempuraGui.Popup<TextureChannel>("Height Channel", props[ShaderProps.HeightChannel], materialEditor);
-                                materialEditor.ShaderProperty(props[ShaderProps.HeightOffset], new GUIContent("Height Offset"));
-                                materialEditor.ShaderProperty(props[ShaderProps.HeightStep], new GUIContent("Height Step"));
-                                materialEditor.ShaderProperty(props[ShaderProps.HeightSubStep], new GUIContent("Height Sub Step"));
-                            }
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Height"), props[ShaderProps.HeightTex], props[ShaderProps.HeightStrength]);
+                            DrawLinearTextureWarning(materials, ShaderProps.HeightTex.Name(), "Height");
+                            TempuraGui.Popup<TextureChannel>("Height Channel", props[ShaderProps.HeightChannel], materialEditor);
+                            materialEditor.ShaderProperty(props[ShaderProps.HeightOffset], new GUIContent("Height Offset"));
+                            materialEditor.ShaderProperty(props[ShaderProps.HeightStep], new GUIContent("Height Step"));
+                            materialEditor.ShaderProperty(props[ShaderProps.HeightSubStep], new GUIContent("Height Sub Step"));
                         }
                     }
 
@@ -204,29 +201,35 @@ namespace Takenoko.Standard
                         if (useEmission)
                         {
                             TempuraGui.Space2();
-                            using (new VerticalScope(TempuraGui.borderBox))
-                            {
-                                materialEditor.TexturePropertySingleLine(new GUIContent("Emission"), props[ShaderProps.EmissionMap], props[ShaderProps.EmissionColor]);
-                            }
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Emission"), props[ShaderProps.EmissionMap], props[ShaderProps.EmissionColor]);
                         }
                     }
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        materialEditor.ShaderProperty(props[ShaderProps.ThinFilm], new GUIContent("Thin Film"));
-                        bool useThinFilm = Cast(props[ShaderProps.ThinFilm].floatValue);
-                        if (useThinFilm)
+                        materialEditor.ShaderProperty(props[ShaderProps.Iridescence], new GUIContent("Iridescence"));
+                        bool useIridescence = Cast(props[ShaderProps.Iridescence].floatValue);
+                        if (useIridescence)
                         {
                             TempuraGui.Space2();
-                            using (new VerticalScope(TempuraGui.borderBox))
-                            {
-                                materialEditor.ShaderProperty(props[ShaderProps.ThinFilmThickness], new GUIContent("Thickness"));
-                                materialEditor.TexturePropertySingleLine(new GUIContent("Thickness Texture"), props[ShaderProps.ThinFilmThicknessTex]);
-                                DrawLinearTextureWarning(materials, ShaderProps.ThinFilmThicknessTex.Name(), "Thin Film Thickness");
-                                materialEditor.ShaderProperty(props[ShaderProps.ThinFilmThicknessMin], new GUIContent("Thickness Min"));
-                                materialEditor.ShaderProperty(props[ShaderProps.ThinFilmThicknessMax], new GUIContent("Thickness Max"));
-                                materialEditor.ShaderProperty(props[ShaderProps.ThinFilmIor], new GUIContent("Ior"));
-                            }
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Film thickness"), props[ShaderProps.ThinFilmThicknessTex], props[ShaderProps.ThinFilmThickness]);
+                            DrawLinearTextureWarning(materials, ShaderProps.ThinFilmThicknessTex.Name(), "Thin Film Thickness");
+                            materialEditor.ShaderProperty(props[ShaderProps.ThinFilmThicknessMin], new GUIContent("Thickness Min"));
+                            materialEditor.ShaderProperty(props[ShaderProps.ThinFilmThicknessMax], new GUIContent("Thickness Max"));
+                            materialEditor.ShaderProperty(props[ShaderProps.ThinFilmIor], new GUIContent("Ior"));
+                        }
+                    }
+
+                    using (new VerticalScope(TempuraGui.borderBox))
+                    {
+                        materialEditor.ShaderProperty(props[ShaderProps.Sss], new GUIContent("Subsurface Scattering"));
+                        bool useSss = Cast(props[ShaderProps.Sss].floatValue);
+                        if (useSss)
+                        {
+                            TempuraGui.Space2();
+                            TempuraGui.Popup<SssMode>("Mode", props[ShaderProps.SssMode], materialEditor);
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Thickness"), props[ShaderProps.SssThicknessTex], props[ShaderProps.SssThickness]);
+                            DrawLinearTextureWarning(materials, ShaderProps.SssThicknessTex.Name(), "SSS Thickness");
                         }
                     }
                 }

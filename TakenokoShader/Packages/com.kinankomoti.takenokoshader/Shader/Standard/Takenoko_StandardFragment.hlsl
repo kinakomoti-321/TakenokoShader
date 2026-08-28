@@ -23,107 +23,19 @@ struct MaterialData
     float3 normalTS;
 };
 
-inline MaterialData HexTiling(float2 texcoord)
-{
-    float w1 = 0.0, w2 = 0.0, w3 = 0.0;
-    int2 vert1, vert2, vert3;
-    TriangleGrid(texcoord, w1, w2, w3, vert1, vert2, vert3);
-
-    float rotStrength = _HexRotationStrength;
-    float2x2 rot1 = LoadRot2x2(vert1, rotStrength);
-    float2x2 rot2 = LoadRot2x2(vert2, rotStrength);
-    float2x2 rot3 = LoadRot2x2(vert3, rotStrength);
-
-    float2 cen1 = MakeCenST(vert1);
-    float2 cen2 = MakeCenST(vert2);
-    float2 cen3 = MakeCenST(vert3);
-
-    float hashScale = 1.0;
-    float2 uv1 = mul(texcoord - cen1, rot1) + cen1 + hash22(float2(vert1)) * hashScale;
-    float2 uv2 = mul(texcoord - cen2, rot2) + cen2 + hash22(float2(vert2)) * hashScale;
-    float2 uv3 = mul(texcoord - cen3, rot3) + cen3 + hash22(float2(vert3)) * hashScale;
-
-    float2 dx = ddx(texcoord);
-    float2 dy = ddy(texcoord);
-
-    float3 c1 = Standard_BaseColor(uv1, mul(dx, rot1), mul(dy, rot1));
-    float3 c2 = Standard_BaseColor(uv2, mul(dx, rot2), mul(dy, rot2));
-    float3 c3 = Standard_BaseColor(uv3, mul(dx, rot3), mul(dy, rot3));
-
-    float fallOff = _HexFallOff;
-    float ex = _HexExponent;
-    float edgeSmoothness = _HexEdgeSmoothness;
-    float3 hexWeight = float3(w1, w2, w3);
-    
-    float3 W = LuminanceWeight(hexWeight, c1, c2, c3, fallOff, ex, edgeSmoothness);
-    
-    float3 basecolor = W.x * c1 + W.y * c2 + W.z * c3;
-
-    float o1 = Standard_Occlusion(uv1, mul(rot1, dx), mul(rot1, dy));
-    float o2 = Standard_Occlusion(uv2, mul(rot2, dx), mul(rot2, dy));
-    float o3 = Standard_Occlusion(uv3, mul(rot3, dx), mul(rot3, dy));
-
-    float occlusion = W.x * o1 + W.y * o2 + W.z * o3;
-
-    float r1 = Standard_Roughness(uv1, mul(rot1, dx), mul(rot1, dy));
-    float r2 = Standard_Roughness(uv2, mul(rot2, dx), mul(rot2, dy));
-    float r3 = Standard_Roughness(uv3, mul(rot3, dx), mul(rot3, dy));
-
-    float roughness = W.x * r1 + W.y * r2 + W.z * r3;
-
-    float m1 = Standard_Metallic(uv1, mul(rot1, dx), mul(rot1, dy));
-    float m2 = Standard_Metallic(uv2, mul(rot2, dx), mul(rot2, dy));
-    float m3 = Standard_Metallic(uv3, mul(rot3, dx), mul(rot3, dy));
-
-    float metallic = W.x * m1 + W.y * m2 + W.z * m3;
-
-    float3 e1 = Standard_Emission(uv1, mul(dx, rot1), mul(dy, rot1));
-    float3 e2 = Standard_Emission(uv2, mul(dx, rot2), mul(dy, rot2));
-    float3 e3 = Standard_Emission(uv3, mul(dx, rot3), mul(dy, rot3));
-
-    float3 emission = W.x * e1 + W.y * e2 + W.z * e3;
-
-    // Hex Artifact Umm...
-    float2 n1 = TspaceNormalToDerivative(Standard_Normal(uv1, mul(dx, rot1), mul(dy, rot1)));
-    float2 n2 = TspaceNormalToDerivative(Standard_Normal(uv2, mul(dx, rot2), mul(dy, rot2)));
-    float2 n3 = TspaceNormalToDerivative(Standard_Normal(uv3, mul(dx, rot3), mul(dy, rot3)));
-
-    float2 d1 = mul(transpose(rot1), n1);
-    float2 d2 = mul(transpose(rot2), n2);
-    float2 d3 = mul(transpose(rot3), n3);
-
-    float3 nW = HeightSlopeWeight(hexWeight, d1, d2, d3, fallOff, ex, edgeSmoothness);
-    float2 hdiv = nW.x * d1 + nW.y * d2 + nW.z * d3;
-
-    float3 normal = normalize(float3(-hdiv, 1.0));
-
-    MaterialData materialData;
-    materialData.basecolor = basecolor;
-    materialData.roughness = roughness;
-    materialData.metallic = metallic;
-    materialData.occlusion = occlusion;
-    materialData.emission = emission;
-    materialData.normalTS = normal;
-
-    return materialData;
-}
-
 inline MaterialData GetMaterialData(float2 texcoord, float3 positionWS, float3 normalWS)
 {
-    #if defined(_MAINTEX_TILING_HEX)
-        return HexTiling(texcoord);
-    #else
-        MaterialData materialData;
-        float4 mainTex = Standard_BaseColor(texcoord);
-        materialData.basecolor = mainTex.rgb;
-        materialData.alpha = mainTex.a;
-        materialData.roughness = Standard_Roughness(texcoord);
-        materialData.metallic = Standard_Metallic(texcoord);
-        materialData.occlusion = Standard_Occlusion(texcoord);
-        materialData.emission = Standard_Emission(texcoord);
-        materialData.normalTS = Standard_Normal(texcoord);
-        return materialData;
-    #endif
+    MaterialData materialData;
+    float4 mainTex = Standard_BaseColor(texcoord);
+    materialData.basecolor = mainTex.rgb;
+    materialData.alpha = mainTex.a;
+    materialData.roughness = Standard_Roughness(texcoord);
+    materialData.metallic = Standard_Metallic(texcoord);
+    materialData.occlusion = Standard_Occlusion(texcoord);
+    materialData.emission = Standard_Emission(texcoord);
+    materialData.normalTS = Standard_Normal(texcoord);
+
+    return materialData;
 }
 
 #define Dielectric_F0 0.04
@@ -154,6 +66,16 @@ float3 EvaluateLightVolume(in LightingData lighting)
     #endif
     
     return lightVolumeDiffuse;
+}
+
+float3 EvaluateSss(in LightingData lighting)
+{
+    float3 sss = 0.0;
+    float backDotNL = saturate(dot(-lighting.sn, lighting.l));
+    float3 diffuse = (backDotNL * lighting.lightColor) * lighting.basecolor;
+    float thickness = lighting.sssThickness;
+    sss = diffuse * smoothstep(0.0, 1.0, 1.0 - thickness) * 0.5;
+    return saturate(sss);
 }
 
 float3 EvaluateLighting(in LightingData lighting)
@@ -196,6 +118,11 @@ float3 EvaluateLighting(in LightingData lighting)
         #endif
     #endif
 
+    float3 sss = 0.0;
+    #if defined(_SSS_ON)
+        sss = EvaluateSss(lighting);
+    #endif
+
     // Result
     float3 diffuse = (lightDiffuse + environmentDiffuse) * lighting.occlusion;
     float3 specular = lightSpecular + environmentSpecular;
@@ -208,7 +135,8 @@ float3 EvaluateLighting(in LightingData lighting)
         #endif
     #endif
 
-    float3 result = specular + (1.0 - metallic) * diffuse + emission;
+    float3 result = specular + (1.0 - metallic) * (diffuse + sss) + emission;
+    // result = sss;
 
     return result;
 }
@@ -340,11 +268,12 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
 
     float3 viewWS = normalize(_WorldSpaceCameraPos - positionWS);
     float3 viewTS = mul(tbn, viewWS);
-    float2 parallaxOffset = ParallaxOffset(texcoord, viewTS, 1.0);
+    float2 parallaxOffset = 0.0;
     texcoord += parallaxOffset;
 
     float wetness = 0.0;
     float3 wetnessNoise = 0.0;
+
     if (_Wetness > 0.5)
     {
         if (i.positionWS.y < _WetnessHeight)
@@ -362,6 +291,10 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     #endif
 
     float3 shadingNormal = normalize(mul(materialData.normalTS, tbn));
+    if (!isFrontFace)
+    {
+        shadingNormal = -shadingNormal;
+    }
     //---------------------------------------------------
     // Pre-Effect
     //---------------------------------------------------
@@ -391,11 +324,11 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     lightingData.l = lightData.direction;
     lightingData.v = normalize(_WorldSpaceCameraPos - i.positionWS);
     lightingData.h = normalize(lightingData.l + lightingData.v);
-    lightingData.dotNL = max(0.0, dot(lightingData.sn, lightingData.l));
-    lightingData.dotNV = max(0.0, dot(lightingData.sn, lightingData.v));
-    lightingData.dotHV = max(0.0, dot(lightingData.h, lightingData.v));
-    lightingData.dotNH = max(0.0, dot(lightingData.sn, lightingData.h));
-    lightingData.dotLH = max(0.0, dot(lightingData.l, lightingData.h));
+    lightingData.dotNL = saturate(dot(lightingData.sn, lightingData.l));
+    lightingData.dotNV = saturate(dot(lightingData.sn, lightingData.v));
+    lightingData.dotHV = saturate(dot(lightingData.h, lightingData.v));
+    lightingData.dotNH = saturate(dot(lightingData.sn, lightingData.h));
+    lightingData.dotLH = saturate(dot(lightingData.l, lightingData.h));
     lightingData.attenuation = lightData.attenuation;
     lightingData.rawLightColor = lightData.color;
     lightingData.lightColor = lightData.color * lightingData.attenuation;
@@ -405,6 +338,13 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     lightingData.metallic = materialData.metallic;
     lightingData.emission = materialData.emission;
     lightingData.occlusion = materialData.occlusion;
+    #if defined(_IRIDESCENCE_ON)
+        lightingData.thinFilmIor = _ThinFilmIor;
+        lightingData.thinFilmThickness = lerp(_ThinFilmThicknessMin, _ThinFilmThicknessMax, _ThinFilmThickness);
+    #endif
+    #if defined(_SSS_ON)
+        lightingData.sssThickness = saturate(_SssThickness / max(dot(lightingData.sn, lightingData.v), 0.01));
+    #endif
 
     lightingData.texcoord0 = i.texcoord0;
     lightingData.texcoord1 = i.texcoord1;

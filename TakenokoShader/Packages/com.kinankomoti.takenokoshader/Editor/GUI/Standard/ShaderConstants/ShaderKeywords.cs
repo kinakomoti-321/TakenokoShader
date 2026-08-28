@@ -97,6 +97,14 @@ public enum ShaderKeywords
     SkyboxfogBox,
     [Description("_SKYBOXFOG_SPHERE")]
     SkyboxfogSphere,
+    [Description("_IRIDESCENCE_ON")]
+    IridescenceOn,
+    [Description("_SSS_ON")]
+    SssOn,
+    [Description("_SSS_MODE_VOLUME")]
+    SssModeVolume,
+    [Description("_SSS_MODE_THINWALL")]
+    SssModeThinwall,
     [Description("_LIGHTMAP_DEFAULT")]
     LightmapDefault,
     [Description("_LIGHTMAP_SH")]
@@ -207,6 +215,10 @@ public static class ShaderKeywordsNames
         { ShaderKeywords.SkyboxfogDistance, "_SKYBOXFOG_DISTANCE" },
         { ShaderKeywords.SkyboxfogBox, "_SKYBOXFOG_BOX" },
         { ShaderKeywords.SkyboxfogSphere, "_SKYBOXFOG_SPHERE" },
+        { ShaderKeywords.IridescenceOn, "_IRIDESCENCE_ON" },
+        { ShaderKeywords.SssOn, "_SSS_ON" },
+        { ShaderKeywords.SssModeVolume, "_SSS_MODE_VOLUME" },
+        { ShaderKeywords.SssModeThinwall, "_SSS_MODE_THINWALL" },
         { ShaderKeywords.LightmapDefault, "_LIGHTMAP_DEFAULT" },
         { ShaderKeywords.LightmapSh, "_LIGHTMAP_SH" },
         { ShaderKeywords.LightmapMonosh, "_LIGHTMAP_MONOSH" },

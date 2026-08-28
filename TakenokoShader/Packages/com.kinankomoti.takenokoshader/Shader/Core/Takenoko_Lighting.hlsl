@@ -43,10 +43,9 @@ struct LightingData
     float3 roughness; // smoothness is 1.0 - roughness
     float3 metallic;
     float3 emission;
-    #if defined(_THINFILM_ON)
-        float thinFilmThickness;
-        float thinFilmIor;
-    #endif
+    float thinFilmThickness;
+    float thinFilmIor;
+    float sssThickness;
 
     float occlusion;
 
