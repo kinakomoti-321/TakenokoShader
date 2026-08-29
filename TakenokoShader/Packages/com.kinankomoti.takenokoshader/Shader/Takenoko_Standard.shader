@@ -83,6 +83,12 @@ Shader "Takenoko/Standard"
         _SssThickness ("Thickness", Range(0, 1)) = 0.5
         _SssThicknessTex ("Thickness", 2D) = "white" { }
 
+        [Toggle] _ClearCoat ("Clear Coat", Int) = 0
+        _ClearCoatMask ("Clear Coat Mask", 2D) = "white" { }
+
+        [Toggle] _Fuzz ("Fuzz", Int) = 0
+        _FuzzMask ("Fuzz Mask", 2D) = "white" { }
+
         // -------------
         // Area Light
         // -------------

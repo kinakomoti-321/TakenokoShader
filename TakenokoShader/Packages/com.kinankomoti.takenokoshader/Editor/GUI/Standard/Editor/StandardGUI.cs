@@ -137,7 +137,6 @@ namespace Takenoko.Standard
                 {
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        TempuraGui.Popup<RoughnessModel>("Roughness Smoothness", props[ShaderProps.RoughnessModel], materialEditor);
                         TempuraGui.Popup<TilingMode>("Tiling Mode", props[ShaderProps.MainTexTilingMode], materialEditor);
 
                         var tilingMode = Cast<TilingMode>(material, ShaderProps.MainTexTilingMode.Name());
@@ -157,10 +156,11 @@ namespace Takenoko.Standard
                         materialEditor.ShaderProperty(props[ShaderProps.MainTexScale], new GUIContent("MainTex Scale"));
                     }
 
-                    RoughnessModel roughnessModel = Cast<RoughnessModel>(material, ShaderProps.RoughnessModel.Name());
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
                         materialEditor.TexturePropertySingleLine(new GUIContent("Base Color"), props[ShaderProps.MainTex], props[ShaderProps.Color]);
+                        TempuraGui.Popup<RoughnessModel>("Roughness Smoothness", props[ShaderProps.RoughnessModel], materialEditor);
+                        RoughnessModel roughnessModel = Cast<RoughnessModel>(material, ShaderProps.RoughnessModel.Name());
                         if (roughnessModel == RoughnessModel.Roughness)
                         {
                             materialEditor.TexturePropertyTwoLines(new GUIContent("Roughness"), props[ShaderProps.RoughnessTex], props[ShaderProps.Roughness], new GUIContent("Channel"), props[ShaderProps.RoughnessChannel]);

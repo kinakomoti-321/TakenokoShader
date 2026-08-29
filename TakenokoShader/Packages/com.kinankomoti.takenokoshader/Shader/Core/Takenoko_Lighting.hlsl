@@ -3,6 +3,9 @@
 
 #include "Takenoko_Lightmap.hlsl"
 
+//--------------------------------------------
+// Unity Lighting
+//--------------------------------------------
 struct RefProbeData
 {
     #if defined(UNITY_SPECCUBE_BLENDING) || defined(UNITY_SPECCUBE_BOX_PROJECTION) || defined(UNITY_ENABLE_REFLECTION_BUFFERS)
@@ -15,58 +18,6 @@ struct RefProbeData
     float4 probeHDR[2];
 };
 
-struct LightingData
-{
-    float3 l; // Light Direction
-    float3 v; // View Direction
-    float3 h; // Half Vector
-    float3 sn; // Shading Normal
-    float3 st; // Shading Tangent
-    float3 gn; // Geometry Normal
-
-    float dotNL; // dot(n, l)
-    float dotNV; // dot(n, v)
-    float dotHV; // dot(h, v)
-    float dotNH; // dot(n, h)
-    float dotLH; // dot(l, h)
-
-    // Reflection Probe
-    float3 reflUVW;
-    RefProbeData probe;
-
-    // Lighting Parameters
-    float attenuation;
-    float3 rawLightColor;
-    float3 lightColor; // lightColor = rawLightColor * attenuation;
-
-    float3 basecolor;
-    float3 roughness; // smoothness is 1.0 - roughness
-    float3 metallic;
-    float3 emission;
-    float thinFilmThickness;
-    float thinFilmIor;
-    float sssThickness;
-
-    float occlusion;
-
-
-    // LightMap
-    float2 texcoord0;
-    float2 texcoord1;
-    float2 texcoord2;
-    float2 texcoord3;
-    float2 lightmapUV;
-
-
-    // Geometry
-    float3 positionWS;
-    float2 positionSS;
-    float3 positionOS;
-};
-
-//--------------------------------------------
-// Unity Lighting
-//--------------------------------------------
 struct UnityLightData
 {
     float3 direction;
@@ -114,119 +65,50 @@ UnityLightData GetUnityLightData(in VertexOutput v)
 //--------------------------------------------
 // Lighting Evaluation
 //--------------------------------------------
+inline float3 Mix(float3 a, float3 b, float f)
+{
+    return lerp(a, b, f);
+}
+
+inline float3 Layer(float3 a, float3 b)
+{
+    return a + b;
+}
+
 float3 EvaluateSH(float3 normalWS, float3 positionWS)
 {
-    // TODO : VRC Volume Light
     float3 sh;
     sh = ShadeSH9(half4(normalWS, 1.0));
 
     return sh;
 }
 
-inline float3 DiffuseBSDF(in LightingData lighting)
+
+inline float3 DiffuseBRDF(float3 basecolor, float roughness, float dotLH, float dotNL, float dotNV)
 {
     // Unity Standard uses DisneyDiffuse
-    float fd90 = 0.5 + 2.0 * lighting.dotLH * lighting.dotLH * lighting.roughness;
-    float lightScatter = 1.0 + (fd90 - 1.0) * pow(1.0 - lighting.dotNL, 5.0);
-    float viewScatter = 1.0 + (fd90 - 1.0) * pow(1.0 - lighting.dotNV, 5.0);
-    return lighting.basecolor * lightScatter * viewScatter;
+    float fd90 = 0.5 + 2.0 * dotLH * dotLH * roughness;
+    float lightScatter = 1.0 + (fd90 - 1.0) * pow(1.0 - dotNL, 5.0);
+    float viewScatter = 1.0 + (fd90 - 1.0) * pow(1.0 - dotNV, 5.0);
+    return basecolor * lightScatter * viewScatter;
 }
 
-
 // Shlick Fresnel Approximation
-float3 SlickFresnel(float3 F0, float cosine)
+float3 ShlickFresnel(float3 F0, float cosine)
 {
     float x = saturate(1.0 - cosine);
     return F0 + (1.0 - F0) * x * x * x * x * x;
 }
 
-float3 SlickFresnel(float3 F0, float3 F90, float cosine)
+float3 ShlickFresnel(float3 F0, float3 F90, float cosine)
 {
     float x = saturate(1.0 - cosine);
     return lerp(F0, F90, x * x * x * x * x);
 }
 
-inline float3 ThinFilmSensitivity(float opd, float phase)
-{
-    const float3 gaussianValue = float3(5.4856e-13, 4.4201e-13, 5.2481e-13);
-    const float3 gaussianPosition = float3(1.6810e06, 1.7953e06, 2.2084e06);
-    const float3 gaussianVariance = float3(4.3278e09, 9.3046e09, 6.6121e09);
-
-    const float spectralPhase = 2.0 * UNITY_PI * opd * 1.0e-9;
-    float3 xyz = gaussianValue * sqrt(2.0 * UNITY_PI * gaussianVariance) *
-    cos(gaussianPosition * spectralPhase + phase) *
-    exp(-gaussianVariance * spectralPhase * spectralPhase);
-
-    xyz.x += 9.7470e-14 * sqrt(2.0 * UNITY_PI * 4.5282e09) *
-    cos(2.2399e06 * spectralPhase + phase) *
-    exp(-4.5282e09 * spectralPhase * spectralPhase);
-
-    const float3 rgb = float3(
-        2.3706743 * xyz.x - 0.9000405 * xyz.y - 0.4706338 * xyz.z,
-        - 0.5138850 * xyz.x + 1.4253036 * xyz.y + 0.0885814 * xyz.z,
-        0.0052982 * xyz.x - 0.0146949 * xyz.y + 1.0093968 * xyz.z);
-
-    return rgb / 1.0685e-7;
-}
-
-inline float3 ThinFilmFresnel(
-    in LightingData lighting,
-    float3 baseF0)
-{
-    #if defined(_THINFILM_ON)
-        const float etaFilm = max(lighting.thinFilmIor, 1.0001);
-        const float cosTheta1 = saturate(lighting.dotHV);
-        const float sinTheta1Sqr = 1.0 - cosTheta1 * cosTheta1;
-        const float cosTheta2Sqr = 1.0 - sinTheta1Sqr / (etaFilm * etaFilm);
-
-        if (cosTheta2Sqr <= 0.0)
-        {
-            return 1.0;
-        }
-
-        const float cosTheta2 = sqrt(cosTheta2Sqr);
-        const float filmF0 = ((1.0 - etaFilm) / (1.0 + etaFilm)) *
-        ((1.0 - etaFilm) / (1.0 + etaFilm));
-
-        const float3 R12 = SlickFresnel(filmF0.xxx, cosTheta1);
-        const float3 T12 = 1.0 - R12;
-        const float3 R23 = SlickFresnel(saturate(baseF0), cosTheta2);
-        const float3 r123 = sqrt(max(R12 * R23, 0.0));
-        const float3 Rs = T12 * T12 * R23 / max(1.0 - R12 * R23, 1.0e-4);
-
-        // baseF0 does not contain the lower-interface phase information.
-        const float phase = UNITY_PI;
-        const float opd = 2.0 * etaFilm * lighting.thinFilmThickness * cosTheta2;
-
-        const float3 sensitivity0 = ThinFilmSensitivity(0.0, 0.0);
-        float3 result = R12 + Rs;
-        float3 interference = Rs - T12;
-
-        for (int m = 1; m <= 2; ++m)
-        {
-            interference *= r123;
-            const float3 sensitivity = ThinFilmSensitivity(opd * m, phase * m);
-            result += 2.0 * interference * sensitivity / max(sensitivity0, 1.0e-4);
-        }
-
-        return saturate(result);
-    #else
-        return saturate(baseF0);
-    #endif
-}
-
-float3 Fresnel(in LightingData lighting, float cosine, float3 F0)
-{
-    #if defined(_THINFILM_ON)
-        return ThinFilmFresnel(lighting, F0);
-    #else
-        return SlickFresnel(F0, cosine);
-    #endif
-}
-
 // Filament
 // https://google.github.io/filament/Filament.html#materialsystem/specularbrdf
-float D_Iso_GGX(float dotNH, float alpha)
+float DIsoGGX(float dotNH, float alpha)
 {
     float a = dotNH * alpha;
     float k = alpha / (1.0 - dotNH * dotNH + a * a);
@@ -235,7 +117,7 @@ float D_Iso_GGX(float dotNH, float alpha)
 
 // Visibility Function V
 // V = G / 4(<n,v> <n,l>)
-float V_Fast_Iso_GGX(float dotNV, float dotNL, float alpha)
+float VFastIsoGGX(float dotNV, float dotNL, float alpha)
 {
     float a2 = alpha * alpha;
     float GGXV = dotNL * sqrt(dotNV * dotNV * (1.0 - a2) + a2);
@@ -245,19 +127,14 @@ float V_Fast_Iso_GGX(float dotNV, float dotNL, float alpha)
 
 // Microfacet BRDF
 // f_{microfacet}(l, v) =  D G F / 4(<n,v> <n,l>) = D V F
-inline float3 SpecularBSDF(in LightingData lighting, float3 F0)
+inline float3 SpecularBRDF(float3 F, float roughness, float dotNH, float dotNV, float dotNL)
 {
-    float alpha = clamp(lighting.roughness * lighting.roughness, 0.0001, 1.0);
+    float alpha = clamp(roughness * roughness, 0.0001, 1.0);
 
-    float D = D_Iso_GGX(lighting.dotNH, alpha);
-    float V = V_Fast_Iso_GGX(clamp(lighting.dotNV, 0.01, 1.0), clamp(lighting.dotNL, 0.01, 1.0), alpha); // avoid nan
-    #if defined(_THINFILM_ON)
-        float3 F = ThinFilmFresnel(lighting, F0);
-    #else
-        float3 F = SlickFresnel(F0, lighting.dotHV);
-    #endif
+    float D = DIsoGGX(dotNH, alpha);
+    float V = VFastIsoGGX(clamp(dotNV, 0.01, 1.0), clamp(dotNL, 0.01, 1.0), alpha); // avoid nan
 
-    float3 specular = (D * V * UNITY_PI) * F;
+    float3 specular = (D * V * TAKE_PI) * F;
 
     return specular;
 
@@ -285,32 +162,31 @@ inline float3 ReflectionProbe(UNITY_ARGS_TEXCUBE(tex), half4 hdr, float3 directi
     return DecodeHDR(rgbm, hdr);
 }
 
-inline float3 IndirectSpecular(in LightingData lighting)
+inline float3 IndirectSpecular(float roughness, float3 reflUVW, RefProbeData probe, float3 positionWS)
 {
     float3 specular;
 
-    float3 reflUVW = lighting.reflUVW;
+    float3 originalReflUVW = reflUVW;
     
     #ifdef UNITY_SPECCUBE_BOX_PROJECTION
-        half3 originalReflUVW = lighting.reflUVW;
-        reflUVW = BoxProjectedCubemapDirection(originalReflUVW, lighting.positionWS, lighting.probe.probePosition[0], lighting.probe.boxMin[0], lighting.probe.boxMax[0]);
+        reflUVW = BoxProjectedCubemapDirection(originalReflUVW, positionWS, probe.probePosition[0], probe.boxMin[0], probe.boxMax[0]);
     #endif
     
     #ifdef _GLOSSYREFLECTIONS_OFF
         specular = unity_IndirectSpecColor.rgb;
     #else
-        half3 env0 = GlossyEnvironment(UNITY_PASS_TEXCUBE(unity_SpecCube0), lighting.probe.probeHDR[0], lighting.roughness, reflUVW);
+        half3 env0 = GlossyEnvironment(UNITY_PASS_TEXCUBE(unity_SpecCube0), probe.probeHDR[0], roughness, reflUVW);
         #ifdef UNITY_SPECCUBE_BLENDING
             const float kBlendFactor = 0.99999;
-            float blendLerp = lighting.probe.boxMin[0].w;
+            float blendLerp = probe.boxMin[0].w;
             UNITY_BRANCH
             if (blendLerp < kBlendFactor)
             {
                 #ifdef UNITY_SPECCUBE_BOX_PROJECTION
-                    reflUVW = BoxProjectedCubemapDirection(originalReflUVW, lighting.positionWS, lighting.probe.probePosition[1], lighting.probe.boxMin[1], lighting.probe.boxMax[1]);
+                    reflUVW = BoxProjectedCubemapDirection(originalReflUVW, positionWS, probe.probePosition[1], probe.boxMin[1], probe.boxMax[1]);
                 #endif
                 
-                half3 env1 = GlossyEnvironment(UNITY_PASS_TEXCUBE_SAMPLER(unity_SpecCube1, unity_SpecCube0), lighting.probe.probeHDR[1], lighting.roughness, reflUVW);
+                half3 env1 = GlossyEnvironment(UNITY_PASS_TEXCUBE_SAMPLER(unity_SpecCube1, unity_SpecCube0), probe.probeHDR[1], roughness, reflUVW);
                 specular = lerp(env1, env0, blendLerp);
             }
             else
@@ -322,28 +198,168 @@ inline float3 IndirectSpecular(in LightingData lighting)
         #endif
     #endif
     
-    return specular * lighting.occlusion;
+    return specular;
 }
 
-inline float3 SpecularEnvironment(in LightingData lighting, float3 F0)
+void ColorToComplexIor(float3 r, float3 g, inout float3 n, inout float3 k)
+{
+    r = clamp(r, 0.0, 0.99);
+    g = saturate(g);
+
+    float3 sqrtR = sqrt(r);
+    float3 nMin = (1.0 - r) / (1.0 + r);
+    float3 nMax = (1.0 + sqrtR) / (1.0 - sqrtR);
+
+    n = lerp(nMax, nMin, g);
+
+    float3 k2 = (r * (n + 1.0) * (n + 1.0) - (n - 1.0) * (n - 1.0)) / (1.0 - r);
+    k = sqrt(max(k2, 0.0));
+}
+
+inline float3 SpecularEnvironment(float3 F0, float roughness, float3 reflUVW, RefProbeData probe, float3 positionWS, float dotNV)
 {
     // Unity BSDF
-    float roughness = lighting.roughness * lighting.roughness;
-    float perceptualRoughness = lighting.roughness;
+    float roughnessSq = roughness * roughness;
+    float perceptualRoughness = roughness;
     float smoothness = 1.0 - perceptualRoughness;
 
     half surfaceReduction;
     #ifdef UNITY_COLORSPACE_GAMMA
-        surfaceReduction = 1.0 - 0.28 * roughness * perceptualRoughness;
+        surfaceReduction = 1.0 - 0.28 * roughnessSq * perceptualRoughness;
     #else
-        surfaceReduction = 1.0 / (roughness * roughness + 1.0);
+        surfaceReduction = 1.0 / (roughnessSq + 1.0);
     #endif
 
     float3 grazingTerm = saturate(smoothness + F0);
 
-    //float3 fresnel = SlickFresnel(F0, lighting.dotNV);
-    float3 fresnel = SlickFresnel(F0, grazingTerm, lighting.dotNV);
-    return IndirectSpecular(lighting) * surfaceReduction * fresnel;
+    float3 fresnel = ShlickFresnel(F0, grazingTerm, dotNV);
+    return IndirectSpecular(roughness, reflUVW, probe, positionWS) * surfaceReduction * fresnel;
 }
+
+// A Practical Extension to Microfacet Theory for the Modeling of Varying Iridescence
+float2 FresnelPhase(float cosTheta, float eta1, float eta2, float kappa2)
+{
+    float sinThetaSq = 1.0 - cosTheta * cosTheta;
+    float A = square(eta2) * (1.0 - square(kappa2)) - square(eta1) * sinThetaSq;
+    float B = sqrt(square(A) + square(2 * square(eta2) * kappa2));
+    float U = sqrt((A + B) / 2.0);
+    float V = sqrt((B - A) / 2.0);
+
+    float phiS = atan2(2 * eta1 * V * cosTheta, square(U) + square(V) - square(eta1 * cosTheta));
+    float phiP = atan2(2 * eta1 * square(eta2) * cosTheta * (2 * kappa2 * U - (1.0 - square(kappa2)) * V),
+    square(square(eta2) * (1.0 + square(kappa2)) * cosTheta) - square(eta1) * (square(U) + square(V)));
+
+    return float2(phiS, phiP);
+}
+
+float3 EvalSensitivity(float opd, float3 shift)
+{
+    float phase = 2 * TAKE_PI * opd * 1.0e-9;
+    float3 val = float3(5.4856e-13, 4.4201e-13, 5.2481e-13);
+    float3 pos = float3(1.6810e6, 1.7953e6, 2.2084e6);
+    float3 var = float3(4.3278e9, 9.3046e9, 6.6121e9);
+
+    float3 xyz = val * sqrt(2 * TAKE_PI * var) * cos(pos * phase + shift) * exp(-phase * phase * var);
+    xyz.x += 9.7470e-14 * sqrt(2 * TAKE_PI * 4.5282e9) * cos(2.2399e6 * phase + shift.x) * exp(-4.5282e9 * phase * phase);
+    return xyz / 1.0685e-7;
+}
+
+float2 FresnelConductorExact(float cosTheta, float eta, float kappa)
+{
+    cosTheta = saturate(cosTheta);
+
+    float cosThetaSq = square(cosTheta);
+    float sinThetaSq = 1.0 - cosThetaSq;
+    float temp = square(eta) - square(kappa) - sinThetaSq;
+    float a2PlusB2 = sqrt(square(temp) + 4.0 * square(eta) * square(kappa));
+    float a = sqrt(max(0.5 * (a2PlusB2 + temp), 0.0));
+
+    float term1 = a2PlusB2 + cosThetaSq;
+    float term2 = 2.0 * a * cosTheta;
+    float Rs = (term1 - term2) / max(term1 + term2, 1.0e-6);
+
+    float term3 = a2PlusB2 * cosThetaSq + square(sinThetaSq);
+    float term4 = term2 * sinThetaSq;
+    float Rp = Rs * (term3 - term4) / max(term3 + term4, 1.0e-6);
+
+    return saturate(float2(Rs, Rp));
+}
+
+inline float3 IridescenceFresnel(float ct1, float height, float eta1, float eta2, float3 eta3, float3 kappa3)
+{
+    ct1 = saturate(ct1);
+
+    float scale = eta1 / eta2;
+    float ct2Sq = 1.0 - (1.0 - square(ct1)) * square(scale);
+
+    if (ct2Sq <= 0.0)
+        return 1.0;
+
+    float ct2 = sqrt(ct2Sq);
+
+    float2 R12 = FresnelConductorExact(ct1, eta2 / eta1, 0.0);
+    float2 T121 = 1.0 - R12;
+
+    float2 R23R = FresnelConductorExact(ct2, eta3.r / eta2, kappa3.r / eta2);
+    float2 R23G = FresnelConductorExact(ct2, eta3.g / eta2, kappa3.g / eta2);
+    float2 R23B = FresnelConductorExact(ct2, eta3.b / eta2, kappa3.b / eta2);
+
+    float3 R23s = float3(R23R.x, R23G.x, R23B.x);
+    float3 R23p = float3(R23R.y, R23G.y, R23B.y);
+
+    float2 phi12 = FresnelPhase(ct1, eta1, eta2, 0.0);
+    float phi21s = TAKE_PI - phi12.x;
+    float phi21p = TAKE_PI - phi12.y;
+
+    float2 phi23R = FresnelPhase(ct2, eta2, eta3.r, kappa3.r);
+    float2 phi23G = FresnelPhase(ct2, eta2, eta3.g, kappa3.g);
+    float2 phi23B = FresnelPhase(ct2, eta2, eta3.b, kappa3.b);
+
+    float3 phi23s = float3(phi23R.x, phi23G.x, phi23B.x);
+    float3 phi23p = float3(phi23R.y, phi23G.y, phi23B.y);
+
+    float D = 2.0 * eta2 * height * ct2;
+
+    float3 r123s = sqrt(max(R12.x * R23s, 0.0));
+    float3 r123p = sqrt(max(R12.y * R23p, 0.0));
+
+    float3 I = 0.0;
+
+    float3 RstarP = square(T121.y) * R23p / max(1.0 - R12.y * R23p, 1.0e-6);
+    I += R12.y + RstarP;
+
+    float3 Cm = RstarP - T121.y;
+
+    [unroll]
+    for (int m = 1; m <= 3; ++m)
+    {
+        Cm *= r123p;
+        float3 Sm = 2.0 * EvalSensitivity((float)m * D, (float)m * (phi23p + phi21p));
+        I += Cm * Sm;
+    }
+
+    float3 RstarS = square(T121.x) * R23s / max(1.0 - R12.x * R23s, 1.0e-6);
+    I += R12.x + RstarS;
+
+    Cm = RstarS - T121.x;
+
+    [unroll]
+    for (int m = 1; m <= 3; ++m)
+    {
+        Cm *= r123s;
+        float3 Sm = 2.0 * EvalSensitivity((float)m * D, (float)m * (phi23s + phi21s));
+        I += Cm * Sm;
+    }
+
+    I *= 0.5;
+
+    float3 rgb;
+    rgb.r = 2.3646381 * I.x - 0.8965361 * I.y - 0.4680737 * I.z;
+    rgb.g = -0.5151664 * I.x + 1.4264000 * I.y + 0.0887608 * I.z;
+    rgb.b = 0.0052037 * I.x - 0.0144081 * I.y + 1.0092106 * I.z;
+
+    return max(rgb, 0.0);
+}
+
 
 #endif

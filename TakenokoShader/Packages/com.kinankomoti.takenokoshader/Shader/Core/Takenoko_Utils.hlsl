@@ -56,6 +56,11 @@ inline float3 Binormal(float3 t, float tw, float3 n)
     return cross(n, t) * crossSign;
 }
 
+inline float square(float x)
+{
+    return x * x;
+}
+
 #define MOD_GLSL(a) \
 inline a modGLSL(a x, a y)\
 {\

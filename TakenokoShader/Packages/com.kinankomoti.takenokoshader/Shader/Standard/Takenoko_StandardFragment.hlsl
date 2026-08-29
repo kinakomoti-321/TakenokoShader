@@ -23,6 +23,53 @@ struct MaterialData
     float3 normalTS;
 };
 
+struct LightingData
+{
+    float3 l; // Light Direction
+    float3 v; // View Direction
+    float3 h; // Half Vector
+    float3 sn; // Shading Normal
+    float3 st; // Shading Tangent
+    float3 gn; // Geometry Normal
+
+    float dotNL; // dot(n, l)
+    float dotNV; // dot(n, v)
+    float dotHV; // dot(h, v)
+    float dotNH; // dot(n, h)
+    float dotLH; // dot(l, h)
+
+    // Reflection Probe
+    float3 reflUVW;
+    RefProbeData probe;
+
+    // Lighting Parameters
+    float attenuation;
+    float3 rawLightColor;
+    float3 lightColor; // lightColor = rawLightColor * attenuation;
+
+    float3 basecolor;
+    float3 roughness; // smoothness is 1.0 - roughness
+    float3 metallic;
+    float3 emission;
+    float thinFilmThickness;
+    float thinFilmIor;
+    float sssThickness;
+
+    float occlusion;
+
+    // LightMap
+    float2 texcoord0;
+    float2 texcoord1;
+    float2 texcoord2;
+    float2 texcoord3;
+    float2 lightmapUV;
+
+    // Geometry
+    float3 positionWS;
+    float2 positionSS;
+    float3 positionOS;
+};
+
 inline MaterialData GetMaterialData(float2 texcoord, float3 positionWS, float3 normalWS)
 {
     MaterialData materialData;
@@ -37,8 +84,6 @@ inline MaterialData GetMaterialData(float2 texcoord, float3 positionWS, float3 n
 
     return materialData;
 }
-
-#define Dielectric_F0 0.04
 
 // VRC Light Volume evaluation
 float3 EvaluateLightVolume(in LightingData lighting)
@@ -68,40 +113,62 @@ float3 EvaluateLightVolume(in LightingData lighting)
     return lightVolumeDiffuse;
 }
 
-float3 EvaluateSss(in LightingData lighting)
-{
-    float3 sss = 0.0;
-    float backDotNL = saturate(dot(-lighting.sn, lighting.l));
-    float3 diffuse = (backDotNL * lighting.lightColor) * lighting.basecolor;
-    float thickness = lighting.sssThickness;
-    sss = diffuse * smoothstep(0.0, 1.0, 1.0 - thickness) * 0.5;
-    return saturate(sss);
-}
+#if defined(_SSS_ON)
+    float3 EvaluateSss(in LightingData lighting)
+    {
+        float3 sss = 0.0;
+        float backDotNL = saturate(dot(-lighting.sn, lighting.l));
+        float3 diffuse = (backDotNL * lighting.lightColor) * lighting.basecolor;
+        float thickness = lighting.sssThickness;
+        sss = diffuse * smoothstep(0.0, 1.0, 1.0 - thickness) * 0.5;
+        return saturate(sss);
+    }
+#endif
 
 float3 EvaluateLighting(in LightingData lighting)
 {
     float metallic = lighting.metallic;
-    float3 F0 = lerp(Dielectric_F0, lighting.basecolor, metallic);
+    float3 F0 = lerp(0.04, lighting.basecolor, metallic);
 
-    #if defined(_THINFILM_ON)
-        float thickness = lerp(
+    // float3 IridescenceF = EvaluateIridescence(lighting);
+    float3 F = ShlickFresnel(F0, lighting.dotNV);
+    #if defined(_IRIDESCENCE_ON)
+        float filmThickness = lerp(
             _ThinFilmThicknessMin,
             _ThinFilmThicknessMax,
             _ThinFilmThickness);
-        lighting.thinFilmIor = _ThinFilmIor;
-        lighting.thinFilmThickness = thickness;
+
+        float3 kappa;
+        float3 ior;
+        ColorToComplexIor(F0, ShlickFresnel(F0, 0.01), ior, kappa);
+
+        float3 IridescenceF = IridescenceFresnel(lighting.dotLH, filmThickness, 1.0, lighting.thinFilmIor, ior, kappa);
+        F = IridescenceF;
+        // F = Mix(F, IridescenceF, _IridescenceStrength);
     #endif
 
     // Light
-    float3 lightDiffuse = DiffuseBSDF(lighting) * lighting.dotNL * lighting.lightColor;
-    float3 lightSpecular = SpecularBSDF(lighting, F0) * lighting.dotNL * lighting.lightColor;
+    float3 lightDiffuse = DiffuseBRDF(lighting.basecolor, lighting.roughness, lighting.dotNH, lighting.dotNV, lighting.dotNL) * lighting.dotNL * lighting.lightColor;
+    float3 lightSpecular = SpecularBRDF(F, lighting.roughness, lighting.dotNH, lighting.dotNV, lighting.dotNL) * lighting.dotNL * lighting.lightColor;
+    float3 lightSss = 0.0;
+    #if defined(_SSS_ON)
+        lightSss = EvaluateSss(lighting);
+    #endif
+    float3 lightCoat = 0.0;
+    float3 lightFuzz = 0.0;
 
     // GI
     float3 environmentSpecular = 0.0;
     float3 environmentDiffuse = 0.0;
+    float3 environmentCoat = 0.0;
+    float3 environmentFuzz = 0.0;
 
     #if defined(_TAKENOKO_FOWARD_BASE)
-        environmentSpecular += SpecularEnvironment(lighting, F0);
+        environmentSpecular += SpecularEnvironment(F, lighting.roughness, lighting.reflUVW, lighting.probe, lighting.positionWS, lighting.dotNV);
+
+        #if defined(_COAT_ON)
+            environmentCoat += SpecularEnvironment(ShlickFresnel(0.04, lighting.dotNV), lighting.roughness, lighting.reflUVW, lighting.probe, lighting.positionWS, lighting.dotNV);
+        #endif
         
         #if defined(LIGHTVOLUME_SUPPORT) && defined(_LIGHTVOLUME_ON) && defined(_LIGHTVOLUME_MODE_REPLACE)
             // Use VRC Light Volume instead of lightmap/SH
@@ -118,14 +185,12 @@ float3 EvaluateLighting(in LightingData lighting)
         #endif
     #endif
 
-    float3 sss = 0.0;
-    #if defined(_SSS_ON)
-        sss = EvaluateSss(lighting);
-    #endif
-
     // Result
     float3 diffuse = (lightDiffuse + environmentDiffuse) * lighting.occlusion;
     float3 specular = lightSpecular + environmentSpecular;
+    float3 coat = lightCoat;
+    float3 sss = lightSss;
+    float3 fuzz = lightFuzz;
     float3 emission = lighting.emission;
 
     #if defined(_SPECULAR_OCCLUSION_ON)
@@ -135,8 +200,7 @@ float3 EvaluateLighting(in LightingData lighting)
         #endif
     #endif
 
-    float3 result = specular + (1.0 - metallic) * (diffuse + sss) + emission;
-    // result = sss;
+    float3 result = Layer(Layer(Layer(Mix(Layer(diffuse, sss), specular, metallic), coat), fuzz), emission);
 
     return result;
 }
