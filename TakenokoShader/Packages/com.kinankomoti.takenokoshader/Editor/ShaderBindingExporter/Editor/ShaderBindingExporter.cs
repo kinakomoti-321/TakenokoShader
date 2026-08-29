@@ -35,7 +35,7 @@ namespace ShaderBindingExporter
 
         bool updated = false;
 
-        [MenuItem("Takenoko/Shader Binding Exporte")]
+        [MenuItem("Takenoko/Development/Shader Binding Exporte")]
         public static void ShowWindow()
         {
             GetWindow<ShaderBindingExporter>("Shader Binding Exporter");

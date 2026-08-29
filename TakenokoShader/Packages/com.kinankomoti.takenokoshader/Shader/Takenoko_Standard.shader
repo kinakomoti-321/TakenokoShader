@@ -90,28 +90,6 @@ Shader "Takenoko/Standard"
         _FuzzMask ("Fuzz Mask", 2D) = "white" { }
 
         // -------------
-        // Area Light
-        // -------------
-        [Toggle] _VRCAreaLight ("VRC Area Light", Int) = 0
-        [Toggle] _AreaLightMask ("Area Light Mask", Int) = 0
-        _AreaLightMask1 ("Area Light Mask 1", 2D) = "white" { }
-        _AreaLightMask2 ("Area Light Mask 2", 2D) = "white" { }
-        _AreaLightIntensity1 ("Area Light Intensity", Range(0, 10)) = 1.0
-        _AreaLightIntensity2 ("Area Light Intensity", Range(0, 10)) = 1.0
-        _AreaLightIntensity3 ("Area Light Intensity", Range(0, 10)) = 1.0
-        _AreaLightIntensity4 ("Area Light Intensity", Range(0, 10)) = 1.0
-        _AreaLightIntensity5 ("Area Light Intensity", Range(0, 10)) = 1.0
-
-        // -------------
-        // VRC Light Volume
-        // -------------
-        [Toggle] _LightVolume ("VRC Light Volume", Int) = 0
-        [Enum(Replace, 0, Additive, 1)] _LightVolumeMode ("Light Volume Mode", Int) = 0
-        _LightVolumeStrength ("Light Volume Strength", Range(0, 2)) = 1.0
-        _LightVolumeColorModulation ("Light Volume Color Modulation", Color) = (1, 1, 1, 1)
-        _LightVolumeIntensityMultiplier ("Light Volume Intensity Multiplier", Range(0, 5)) = 1.0
-
-        // -------------
         // Effect
         // -------------
         [Toggle] _SpecularOcclusion ("Specular Occlusion [Experimental]", Int) = 0
@@ -141,6 +119,19 @@ Shader "Takenoko/Standard"
         _SkyboxFogBoxSizeMax ("Skybox Fog Box Size Max", Vector) = (1, 1, 1, 0)
         _SkyboxFogSphereCenter ("Skybox Fog Sphere Center", Vector) = (0, 0, 0, 0)
         _SkyboxFogSphereRadius ("Skybox Fog Sphere Radius", Range(0, 1000)) = 100.0
+
+        // -------------
+        // Area Light
+        // -------------
+        [Toggle] _VRCAreaLight ("VRC Area Light", Int) = 0
+        [Toggle] _AreaLightMask ("Area Light Mask", Int) = 0
+        _AreaLightMask1 ("Area Light Mask 1", 2D) = "white" { }
+        _AreaLightMask2 ("Area Light Mask 2", 2D) = "white" { }
+        _AreaLightIntensity1 ("Area Light Intensity", Range(0, 10)) = 1.0
+        _AreaLightIntensity2 ("Area Light Intensity", Range(0, 10)) = 1.0
+        _AreaLightIntensity3 ("Area Light Intensity", Range(0, 10)) = 1.0
+        _AreaLightIntensity4 ("Area Light Intensity", Range(0, 10)) = 1.0
+        _AreaLightIntensity5 ("Area Light Intensity", Range(0, 10)) = 1.0
     }
 
     SubShader

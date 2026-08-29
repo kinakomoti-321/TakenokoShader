@@ -19,8 +19,9 @@ namespace Takenoko.Standard
         {
             public bool foldRenderMenu = false;
             public bool foldMainMenu = false;
-            public bool foldAreaLightMenu = false;
+            public bool foldLightingMenu = false;
             public bool foldEffectMenu = false;
+            public bool foldAreaLightMenu = false;
             public bool foldDebugMenu = false;
         }
 
@@ -159,7 +160,7 @@ namespace Takenoko.Standard
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
                         materialEditor.TexturePropertySingleLine(new GUIContent("Base Color"), props[ShaderProps.MainTex], props[ShaderProps.Color]);
-                        TempuraGui.Popup<RoughnessModel>("Roughness Smoothness", props[ShaderProps.RoughnessModel], materialEditor);
+                        TempuraGui.Popup<RoughnessModel>("Workflow", props[ShaderProps.RoughnessModel], materialEditor);
                         RoughnessModel roughnessModel = Cast<RoughnessModel>(material, ShaderProps.RoughnessModel.Name());
                         if (roughnessModel == RoughnessModel.Roughness)
                         {
@@ -178,21 +179,22 @@ namespace Takenoko.Standard
                         materialEditor.TexturePropertySingleLine(new GUIContent("Normal"), props[ShaderProps.BumpMap], props[ShaderProps.BumpScale]);
                     }
 
-                    using (new VerticalScope(TempuraGui.borderBox))
-                    {
-                        materialEditor.ShaderProperty(props[ShaderProps.Height], new GUIContent("Height"));
-                        bool useHeight = Cast(props[ShaderProps.Height].floatValue);
-                        if (useHeight)
-                        {
-                            TempuraGui.Space2();
-                            materialEditor.TexturePropertySingleLine(new GUIContent("Height"), props[ShaderProps.HeightTex], props[ShaderProps.HeightStrength]);
-                            DrawLinearTextureWarning(materials, ShaderProps.HeightTex.Name(), "Height");
-                            TempuraGui.Popup<TextureChannel>("Height Channel", props[ShaderProps.HeightChannel], materialEditor);
-                            materialEditor.ShaderProperty(props[ShaderProps.HeightOffset], new GUIContent("Height Offset"));
-                            materialEditor.ShaderProperty(props[ShaderProps.HeightStep], new GUIContent("Height Step"));
-                            materialEditor.ShaderProperty(props[ShaderProps.HeightSubStep], new GUIContent("Height Sub Step"));
-                        }
-                    }
+                    // TODO : Height
+                    // using (new VerticalScope(TempuraGui.borderBox))
+                    // {
+                    //     materialEditor.ShaderProperty(props[ShaderProps.Height], new GUIContent("Height"));
+                    //     bool useHeight = Cast(props[ShaderProps.Height].floatValue);
+                    //     if (useHeight)
+                    //     {
+                    //         TempuraGui.Space2();
+                    //         materialEditor.TexturePropertySingleLine(new GUIContent("Height"), props[ShaderProps.HeightTex], props[ShaderProps.HeightStrength]);
+                    //         DrawLinearTextureWarning(materials, ShaderProps.HeightTex.Name(), "Height");
+                    //         TempuraGui.Popup<TextureChannel>("Height Channel", props[ShaderProps.HeightChannel], materialEditor);
+                    //         materialEditor.ShaderProperty(props[ShaderProps.HeightOffset], new GUIContent("Height Offset"));
+                    //         materialEditor.ShaderProperty(props[ShaderProps.HeightStep], new GUIContent("Height Step"));
+                    //         materialEditor.ShaderProperty(props[ShaderProps.HeightSubStep], new GUIContent("Height Sub Step"));
+                    //     }
+                    // }
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
@@ -235,48 +237,17 @@ namespace Takenoko.Standard
                 }
                 TempuraGui.Space2();
             }
-            #endregion  
-
-            //-----------------------------------------------
-            // Area Light
-            //-----------------------------------------------
-            #region Area Light
-            settings.foldAreaLightMenu = TempuraGui.FoldOut("Area Light", "", settings.foldAreaLightMenu);
-            if (settings.foldAreaLightMenu)
-            {
-                using (new VerticalScope(TempuraGui.largeBox))
-                {
-
-                    using (new VerticalScope(TempuraGui.borderBox))
-                    {
-                        materialEditor.ShaderProperty(props[ShaderProps.VRCAreaLight], new GUIContent("VRC Area Light"));
-                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightMask], new GUIContent("Area Light Mask"));
-                        if (Cast(props[ShaderProps.AreaLightMask].floatValue))
-                        {
-                            materialEditor.TexturePropertySingleLine(new GUIContent("Area Light Mask 1"), props[ShaderProps.AreaLightMask1]);
-                            materialEditor.TexturePropertySingleLine(new GUIContent("Area Light Mask 2"), props[ShaderProps.AreaLightMask2]);
-                        }
-                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity1], new GUIContent("Area Light Intensity 1"));
-                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity2], new GUIContent("Area Light Intensity 2"));
-                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity3], new GUIContent("Area Light Intensity 3"));
-                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity4], new GUIContent("Area Light Intensity 4"));
-                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity5], new GUIContent("Area Light Intensity 5"));
-                    }
-                }
-                TempuraGui.Space2();
-            }
             #endregion
 
             //-----------------------------------------------
-            // Effect
+            // Lighting
             //-----------------------------------------------
-            #region Effect
-            settings.foldEffectMenu = TempuraGui.FoldOut("Effect", "", settings.foldEffectMenu);
-            if (settings.foldEffectMenu)
+            #region Lighting
+            settings.foldLightingMenu = TempuraGui.FoldOut("Lighting", "", settings.foldLightingMenu);
+            if (settings.foldLightingMenu)
             {
                 using (new VerticalScope(TempuraGui.largeBox))
                 {
-
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
                         materialEditor.ShaderProperty(props[ShaderProps.SpecularOcclusion], new GUIContent("Specular Occlusion"));
@@ -292,6 +263,25 @@ namespace Takenoko.Standard
                         }
                     }
 
+                    using (new VerticalScope(TempuraGui.borderBox))
+                    {
+                        materialEditor.ShaderProperty(props[ShaderProps.MaskLightProbe], new GUIContent("Mask Light Probe"));
+                        materialEditor.ShaderProperty(props[ShaderProps.MaskLightmap], new GUIContent("Mask Lightmap"));
+                    }
+                }
+            }
+            #endregion
+
+
+            //-----------------------------------------------
+            // Effect
+            //-----------------------------------------------
+            #region Effect
+            settings.foldEffectMenu = TempuraGui.FoldOut("Effect", "", settings.foldEffectMenu);
+            if (settings.foldEffectMenu)
+            {
+                using (new VerticalScope(TempuraGui.largeBox))
+                {
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
                         EditorGUILayout.LabelField("Filter", EditorStyles.boldLabel);
@@ -322,12 +312,6 @@ namespace Takenoko.Standard
                                 materialEditor.ShaderProperty(props[ShaderProps.WetnessColor], new GUIContent("Wetness Color"));
                             }
                         }
-                    }
-
-                    using (new VerticalScope(TempuraGui.borderBox))
-                    {
-                        materialEditor.ShaderProperty(props[ShaderProps.MaskLightProbe], new GUIContent("Mask Light Probe"));
-                        materialEditor.ShaderProperty(props[ShaderProps.MaskLightmap], new GUIContent("Mask Lightmap"));
                     }
 
                     using (new VerticalScope(TempuraGui.borderBox))
@@ -365,6 +349,35 @@ namespace Takenoko.Standard
                     }
                 }
 
+                TempuraGui.Space2();
+            }
+            #endregion
+            //-----------------------------------------------
+            // Area Light
+            //-----------------------------------------------
+            #region Area Light
+            settings.foldAreaLightMenu = TempuraGui.FoldOut("Area Light", "", settings.foldAreaLightMenu);
+            if (settings.foldAreaLightMenu)
+            {
+                using (new VerticalScope(TempuraGui.largeBox))
+                {
+
+                    using (new VerticalScope(TempuraGui.borderBox))
+                    {
+                        materialEditor.ShaderProperty(props[ShaderProps.VRCAreaLight], new GUIContent("VRC Area Light"));
+                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightMask], new GUIContent("Area Light Mask"));
+                        if (Cast(props[ShaderProps.AreaLightMask].floatValue))
+                        {
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Area Light Mask 1"), props[ShaderProps.AreaLightMask1]);
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Area Light Mask 2"), props[ShaderProps.AreaLightMask2]);
+                        }
+                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity1], new GUIContent("Area Light Intensity 1"));
+                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity2], new GUIContent("Area Light Intensity 2"));
+                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity3], new GUIContent("Area Light Intensity 3"));
+                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity4], new GUIContent("Area Light Intensity 4"));
+                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity5], new GUIContent("Area Light Intensity 5"));
+                    }
+                }
                 TempuraGui.Space2();
             }
             #endregion
