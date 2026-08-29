@@ -133,18 +133,12 @@ float3 EvaluateLighting(in LightingData lighting)
     // float3 IridescenceF = EvaluateIridescence(lighting);
     float3 F = ShlickFresnel(F0, lighting.dotNV);
     #if defined(_IRIDESCENCE_ON)
-        float filmThickness = lerp(
-            _ThinFilmThicknessMin,
-            _ThinFilmThicknessMax,
-            _ThinFilmThickness);
+        float3 bottomKappa;
+        float3 bottomIor;
+        ColorToComplexIor(clamp(F0, 0.0, 0.95), clamp(ShlickFresnel(F0, 0.01), 0.0, 0.95), bottomIor, bottomKappa);
 
-        float3 kappa;
-        float3 ior;
-        ColorToComplexIor(F0, ShlickFresnel(F0, 0.01), ior, kappa);
-
-        float3 IridescenceF = IridescenceFresnel(lighting.dotLH, filmThickness, 1.0, lighting.thinFilmIor, ior, kappa);
-        F = IridescenceF;
-        // F = Mix(F, IridescenceF, _IridescenceStrength);
+        float3 IridescenceF = IridescenceFresnel(lighting.dotLH, lighting.thinFilmThickness, 1.0, lighting.thinFilmIor, bottomIor, bottomKappa);
+        F = lerp(F, IridescenceF, saturate(lighting.thinFilmThickness * 10.0));
     #endif
 
     // Light
@@ -161,12 +155,12 @@ float3 EvaluateLighting(in LightingData lighting)
     float3 environmentSpecular = 0.0;
     float3 environmentDiffuse = 0.0;
     float3 environmentCoat = 0.0;
-    float3 environmentFuzz = 0.0;
+    float3 environmentFuzz = 0.0; // TODO
 
     #if defined(_TAKENOKO_FOWARD_BASE)
         environmentSpecular += SpecularEnvironment(F, lighting.roughness, lighting.reflUVW, lighting.probe, lighting.positionWS, lighting.dotNV);
 
-        #if defined(_COAT_ON)
+        #if defined(_CLEARCOAT_ON)
             environmentCoat += SpecularEnvironment(ShlickFresnel(0.04, lighting.dotNV), lighting.roughness, lighting.reflUVW, lighting.probe, lighting.positionWS, lighting.dotNV);
         #endif
         
@@ -200,7 +194,7 @@ float3 EvaluateLighting(in LightingData lighting)
         #endif
     #endif
 
-    float3 result = Layer(Layer(Layer(Mix(Layer(diffuse, sss), specular, metallic), coat), fuzz), emission);
+    float3 result = diffuse * (1.0 - metallic) + specular;
 
     return result;
 }
@@ -404,7 +398,7 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     lightingData.occlusion = materialData.occlusion;
     #if defined(_IRIDESCENCE_ON)
         lightingData.thinFilmIor = _ThinFilmIor;
-        lightingData.thinFilmThickness = lerp(_ThinFilmThicknessMin, _ThinFilmThicknessMax, _ThinFilmThickness);
+        lightingData.thinFilmThickness = lerp(_ThinFilmThicknessMin, _ThinFilmThicknessMax, _ThinFilmThickness * TAKENOKO_SAMPLE(_ThinFilmThicknessTex, i.texcoord0).r);
     #endif
     #if defined(_SSS_ON)
         lightingData.sssThickness = saturate(_SssThickness / max(dot(lightingData.sn, lightingData.v), 0.01));

@@ -65,16 +65,6 @@ UnityLightData GetUnityLightData(in VertexOutput v)
 //--------------------------------------------
 // Lighting Evaluation
 //--------------------------------------------
-inline float3 Mix(float3 a, float3 b, float f)
-{
-    return lerp(a, b, f);
-}
-
-inline float3 Layer(float3 a, float3 b)
-{
-    return a + b;
-}
-
 float3 EvaluateSH(float3 normalWS, float3 positionWS)
 {
     float3 sh;
@@ -216,23 +206,21 @@ void ColorToComplexIor(float3 r, float3 g, inout float3 n, inout float3 k)
     k = sqrt(max(k2, 0.0));
 }
 
-inline float3 SpecularEnvironment(float3 F0, float roughness, float3 reflUVW, RefProbeData probe, float3 positionWS, float dotNV)
+inline float3 SpecularEnvironment(float3 F, float roughness, float3 reflUVW, RefProbeData probe, float3 positionWS, float dotNV)
 {
     // Unity BSDF
-    float roughnessSq = roughness * roughness;
+    float realRoughness = roughness * roughness;
     float perceptualRoughness = roughness;
     float smoothness = 1.0 - perceptualRoughness;
 
     half surfaceReduction;
     #ifdef UNITY_COLORSPACE_GAMMA
-        surfaceReduction = 1.0 - 0.28 * roughnessSq * perceptualRoughness;
+        surfaceReduction = 1.0 - 0.28 * realRoughness * perceptualRoughness;
     #else
-        surfaceReduction = 1.0 / (roughnessSq + 1.0);
+        surfaceReduction = 1.0 / (realRoughness * realRoughness + 1.0);
     #endif
 
-    float3 grazingTerm = saturate(smoothness + F0);
-
-    float3 fresnel = ShlickFresnel(F0, grazingTerm, dotNV);
+    float3 fresnel = F;
     return IndirectSpecular(roughness, reflUVW, probe, positionWS) * surfaceReduction * fresnel;
 }
 
