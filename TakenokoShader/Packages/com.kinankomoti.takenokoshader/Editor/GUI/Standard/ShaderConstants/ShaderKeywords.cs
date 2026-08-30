@@ -75,6 +75,14 @@ public enum ShaderKeywords
     OcclusionChannelA,
     [Description("_THINFILM_ON")]
     ThinfilmOn,
+    [Description("_THINFILM_CHANNEL_R")]
+    ThinfilmChannelR,
+    [Description("_THINFILM_CHANNEL_G")]
+    ThinfilmChannelG,
+    [Description("_THINFILM_CHANNEL_B")]
+    ThinfilmChannelB,
+    [Description("_THINFILM_CHANNEL_A")]
+    ThinfilmChannelA,
     [Description("_HEIGHT_ON")]
     HeightOn,
     [Description("_HEIGHT_CHANNEL_R")]
@@ -105,6 +113,14 @@ public enum ShaderKeywords
     SssModeVolume,
     [Description("_SSS_MODE_THINWALL")]
     SssModeThinwall,
+    [Description("_SSS_THICKNESS_CHANNEL_R")]
+    SssThicknessChannelR,
+    [Description("_SSS_THICKNESS_CHANNEL_G")]
+    SssThicknessChannelG,
+    [Description("_SSS_THICKNESS_CHANNEL_B")]
+    SssThicknessChannelB,
+    [Description("_SSS_THICKNESS_CHANNEL_A")]
+    SssThicknessChannelA,
     [Description("_LIGHTMAP_DEFAULT")]
     LightmapDefault,
     [Description("_LIGHTMAP_SH")]
@@ -204,6 +220,10 @@ public static class ShaderKeywordsNames
         { ShaderKeywords.OcclusionChannelB, "_OCCLUSION_CHANNEL_B" },
         { ShaderKeywords.OcclusionChannelA, "_OCCLUSION_CHANNEL_A" },
         { ShaderKeywords.ThinfilmOn, "_THINFILM_ON" },
+        { ShaderKeywords.ThinfilmChannelR, "_THINFILM_CHANNEL_R" },
+        { ShaderKeywords.ThinfilmChannelG, "_THINFILM_CHANNEL_G" },
+        { ShaderKeywords.ThinfilmChannelB, "_THINFILM_CHANNEL_B" },
+        { ShaderKeywords.ThinfilmChannelA, "_THINFILM_CHANNEL_A" },
         { ShaderKeywords.HeightOn, "_HEIGHT_ON" },
         { ShaderKeywords.HeightChannelR, "_HEIGHT_CHANNEL_R" },
         { ShaderKeywords.HeightChannelG, "_HEIGHT_CHANNEL_G" },
@@ -219,6 +239,10 @@ public static class ShaderKeywordsNames
         { ShaderKeywords.SssOn, "_SSS_ON" },
         { ShaderKeywords.SssModeVolume, "_SSS_MODE_VOLUME" },
         { ShaderKeywords.SssModeThinwall, "_SSS_MODE_THINWALL" },
+        { ShaderKeywords.SssThicknessChannelR, "_SSS_THICKNESS_CHANNEL_R" },
+        { ShaderKeywords.SssThicknessChannelG, "_SSS_THICKNESS_CHANNEL_G" },
+        { ShaderKeywords.SssThicknessChannelB, "_SSS_THICKNESS_CHANNEL_B" },
+        { ShaderKeywords.SssThicknessChannelA, "_SSS_THICKNESS_CHANNEL_A" },
         { ShaderKeywords.LightmapDefault, "_LIGHTMAP_DEFAULT" },
         { ShaderKeywords.LightmapSh, "_LIGHTMAP_SH" },
         { ShaderKeywords.LightmapMonosh, "_LIGHTMAP_MONOSH" },

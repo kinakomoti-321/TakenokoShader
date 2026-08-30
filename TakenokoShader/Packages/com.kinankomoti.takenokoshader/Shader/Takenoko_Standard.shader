@@ -82,6 +82,7 @@ Shader "Takenoko/Standard"
         [Enum(Volume, 0, ThinWall, 1)] _SssMode ("SSS Mode", Int) = 0
         _SssThickness ("Thickness", Range(0, 1)) = 0.5
         _SssThicknessTex ("Thickness", 2D) = "white" { }
+        [Enum(R, 0, G, 1, B, 2, A, 3)] _SssThicknessChannel ("Thickness Channel", Int) = 0
 
         [Toggle] _ClearCoat ("Clear Coat", Int) = 0
         _ClearCoatMask ("Clear Coat Mask", 2D) = "white" { }
@@ -185,8 +186,10 @@ Shader "Takenoko/Standard"
             #pragma shader_feature_local _SKYBOXFOG_DISTANCE _SKYBOXFOG_BOX _SKYBOXFOG_SPHERE
 
             #pragma shader_feature_local _IRIDESCENCE_ON
+            #pragma shader_feature_local _THINFILM_CHANNEL_R _THINFILM_CHANNEL_G _THINFILM_CHANNEL_B _THINFILM_CHANNEL_A
             #pragma shader_feature_local _SSS_ON
             #pragma shader_feature_local _SSS_MODE_VOLUME _SSS_MODE_THINWALL
+            #pragma shader_feature_local _SSS_THICKNESS_CHANNEL_R _SSS_THICKNESS_CHANNEL_G _SSS_THICKNESS_CHANNEL_B _SSS_THICKNESS_CHANNEL_A
 
             #pragma shader_feature_local _LIGHTMAP_DEFAULT _LIGHTMAP_SH _LIGHTMAP_MONOSH
             
@@ -239,8 +242,10 @@ Shader "Takenoko/Standard"
             #pragma shader_feature_local _OCCLUSION_CHANNEL_R _OCCLUSION_CHANNEL_G _OCCLUSION_CHANNEL_B _OCCLUSION_CHANNEL_A
             
             #pragma shader_feature_local _IRIDESCENCE_ON
+            #pragma shader_feature_local _THINFILM_CHANNEL_R _THINFILM_CHANNEL_G _THINFILM_CHANNEL_B _THINFILM_CHANNEL_A
             #pragma shader_feature_local _SSS_ON
             #pragma shader_feature_local _SSS_MODE_VOLUME _SSS_MODE_THINWALL
+            #pragma shader_feature_local _SSS_THICKNESS_CHANNEL_R _SSS_THICKNESS_CHANNEL_G _SSS_THICKNESS_CHANNEL_B _SSS_THICKNESS_CHANNEL_A
 
             #pragma shader_feature_local _HEIGHT_ON
             #pragma shader_feature_local _HEIGHT_CHANNEL_R _HEIGHT_CHANNEL_G _HEIGHT_CHANNEL_B _HEIGHT_CHANNEL_A

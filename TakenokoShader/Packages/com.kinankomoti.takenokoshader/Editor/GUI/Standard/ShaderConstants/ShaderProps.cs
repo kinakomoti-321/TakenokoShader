@@ -116,6 +116,8 @@ public enum ShaderProps
     SssThickness,
     [Description("_SssThicknessTex")]
     SssThicknessTex,
+    [Description("_SssThicknessChannel")]
+    SssThicknessChannel,
     [Description("_ClearCoat")]
     ClearCoat,
     [Description("_ClearCoatMask")]
@@ -248,6 +250,7 @@ public static class ShaderPropsName
         { ShaderProps.SssMode, "_SssMode" },
         { ShaderProps.SssThickness, "_SssThickness" },
         { ShaderProps.SssThicknessTex, "_SssThicknessTex" },
+        { ShaderProps.SssThicknessChannel, "_SssThicknessChannel" },
         { ShaderProps.ClearCoat, "_ClearCoat" },
         { ShaderProps.ClearCoatMask, "_ClearCoatMask" },
         { ShaderProps.Fuzz, "_Fuzz" },

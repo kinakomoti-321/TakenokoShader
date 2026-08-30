@@ -221,12 +221,12 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float3 F = ShlickFresnel(F0, dotNV);
     #if defined(_IRIDESCENCE_ON)
         float thinFilmIor = _ThinFilmIor;
-        float thinFilmThickness = lerp(_ThinFilmThicknessMin, _ThinFilmThicknessMax, _ThinFilmThickness * TAKENOKO_SAMPLE(_ThinFilmThicknessTex, i.texcoord0).r);
+        float thinFilmThickness = lerp(_ThinFilmThicknessMin, _ThinFilmThicknessMax, _ThinFilmThickness * Standard_ThinFilmThickness(i.texcoord0));
         float3 bottomIor;
         float3 bottomKappa;
         ColorToComplexIor(clamp(F0, 0.0, 0.95), clamp(ShlickFresnel(F0, 0.01), 0.0, 0.95), bottomIor, bottomKappa);
-        bottomIor = lerp(1.3, bottomIor, metallic);
-        bottomKappa = lerp(0.0, bottomKappa, metallic);
+        bottomIor = lerp(1.0, bottomIor, metallic);
+        bottomKappa = lerp(0.01, max(bottomKappa, 0.01), metallic);
 
         float3 IridescenceF = IridescenceFresnel(dotLH, thinFilmThickness, 1.0, thinFilmIor, bottomIor, bottomKappa);
         F = lerp(F, saturate(IridescenceF), saturate(thinFilmThickness / 10.0));
@@ -236,7 +236,7 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float3 lightSpecular = SpecularBRDF(F, roughness, dotNH, dotNV, dotNL) * dotNL * lightColor;
     float3 lightSss = 0.0;
     #if defined(_SSS_ON)
-        float sssThickness = saturate(_SssThickness / max(dot(shadingNormal, viewDirection), 0.01));
+        float sssThickness = saturate((_SssThickness * Standard_SssThickness(texcoord)) / max(dot(shadingNormal, viewDirection), 0.01));
         float backDotNL = saturate(dot(-shadingNormal, lightDirection));
         float3 sssDiffuse = (backDotNL * lightColor) * basecolor;
         lightSss = saturate(sssDiffuse * smoothstep(0.0, 1.0, 1.0 - sssThickness) * 0.5);

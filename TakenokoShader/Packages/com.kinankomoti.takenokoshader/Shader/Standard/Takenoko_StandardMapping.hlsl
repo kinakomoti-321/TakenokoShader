@@ -137,6 +137,42 @@ float Standard_Height(float2 texcoord, float2 dx, float2 dy)
     return height;
 }
 
+#if defined(_IRIDESCENCE_ON)
+    float Standard_ThinFilmThickness(float2 texcoord)
+    {
+        float4 thickness = TAKENOKO_SAMPLE(_ThinFilmThicknessTex, texcoord);
+        #if defined(_THINFILM_CHANNEL_R)
+            return thickness.r;
+        #elif defined(_THINFILM_CHANNEL_G)
+            return thickness.g;
+        #elif defined(_THINFILM_CHANNEL_B)
+            return thickness.b;
+        #elif defined(_THINFILM_CHANNEL_A)
+            return thickness.a;
+        #else
+            return thickness.r;
+        #endif
+    }
+#endif
+
+#if defined(_SSS_ON)
+    float Standard_SssThickness(float2 texcoord)
+    {
+        float4 thickness = TAKENOKO_SAMPLE(_SssThicknessTex, texcoord);
+        #if defined(_SSS_THICKNESS_CHANNEL_R)
+            return thickness.r;
+        #elif defined(_SSS_THICKNESS_CHANNEL_G)
+            return thickness.g;
+        #elif defined(_SSS_THICKNESS_CHANNEL_B)
+            return thickness.b;
+        #elif defined(_SSS_THICKNESS_CHANNEL_A)
+            return thickness.a;
+        #else
+            return thickness.r;
+        #endif
+    }
+#endif
+
 float Standard_Occlusion(float2 texcoord, float2 dx, float2 dy)
 {
     float occlusion = 0;

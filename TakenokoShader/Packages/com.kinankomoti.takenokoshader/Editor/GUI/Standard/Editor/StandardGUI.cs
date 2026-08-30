@@ -214,7 +214,7 @@ namespace Takenoko.Standard
                         if (useIridescence)
                         {
                             TempuraGui.Space2();
-                            materialEditor.TexturePropertySingleLine(new GUIContent("Film thickness"), props[ShaderProps.ThinFilmThicknessTex], props[ShaderProps.ThinFilmThickness]);
+                            materialEditor.TexturePropertyTwoLines(new GUIContent("Film thickness"), props[ShaderProps.ThinFilmThicknessTex], props[ShaderProps.ThinFilmThickness], new GUIContent("Channel"), props[ShaderProps.ThinFilmChannel]);
                             DrawLinearTextureWarning(materials, ShaderProps.ThinFilmThicknessTex.Name(), "Thin Film Thickness");
                             materialEditor.ShaderProperty(props[ShaderProps.ThinFilmThicknessMin], new GUIContent("Thickness Min"));
                             materialEditor.ShaderProperty(props[ShaderProps.ThinFilmThicknessMax], new GUIContent("Thickness Max"));
@@ -230,7 +230,7 @@ namespace Takenoko.Standard
                         {
                             TempuraGui.Space2();
                             TempuraGui.Popup<SssMode>("Mode", props[ShaderProps.SssMode], materialEditor);
-                            materialEditor.TexturePropertySingleLine(new GUIContent("Thickness"), props[ShaderProps.SssThicknessTex], props[ShaderProps.SssThickness]);
+                            materialEditor.TexturePropertyTwoLines(new GUIContent("Thickness"), props[ShaderProps.SssThicknessTex], props[ShaderProps.SssThickness], new GUIContent("Channel"), props[ShaderProps.SssThicknessChannel]);
                             DrawLinearTextureWarning(materials, ShaderProps.SssThicknessTex.Name(), "SSS Thickness");
                         }
                     }
@@ -543,6 +543,20 @@ namespace Takenoko.Standard
                 ShaderKeywords.OcclusionChannelG.Name(),
                 ShaderKeywords.OcclusionChannelB.Name(),
                 ShaderKeywords.OcclusionChannelA.Name(),
+            });
+
+            TempuraGui.ExcusiveKeyward<TextureChannel>(material, ShaderProps.ThinFilmChannel.Name(), new string[]{
+                ShaderKeywords.ThinfilmChannelR.Name(),
+                ShaderKeywords.ThinfilmChannelG.Name(),
+                ShaderKeywords.ThinfilmChannelB.Name(),
+                ShaderKeywords.ThinfilmChannelA.Name(),
+            });
+
+            TempuraGui.ExcusiveKeyward<TextureChannel>(material, ShaderProps.SssThicknessChannel.Name(), new string[]{
+                ShaderKeywords.SssThicknessChannelR.Name(),
+                ShaderKeywords.SssThicknessChannelG.Name(),
+                ShaderKeywords.SssThicknessChannelB.Name(),
+                ShaderKeywords.SssThicknessChannelA.Name(),
             });
 
             if (Cast(material.GetFloat(ShaderProps.Height.Name())))
