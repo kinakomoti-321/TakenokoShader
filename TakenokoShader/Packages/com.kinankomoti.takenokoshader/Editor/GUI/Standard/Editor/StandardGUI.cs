@@ -364,18 +364,22 @@ namespace Takenoko.Standard
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        materialEditor.ShaderProperty(props[ShaderProps.VRCAreaLight], new GUIContent("VRC Area Light"));
-                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightMask], new GUIContent("Area Light Mask"));
-                        if (Cast(props[ShaderProps.AreaLightMask].floatValue))
+                        materialEditor.ShaderProperty(props[ShaderProps.VRCAreaLight], new GUIContent("AreaLight"));
+                        bool useAreaLight = Cast(props[ShaderProps.VRCAreaLight].floatValue);
+                        if (useAreaLight)
                         {
-                            materialEditor.TexturePropertySingleLine(new GUIContent("Area Light Mask 1"), props[ShaderProps.AreaLightMask1]);
-                            materialEditor.TexturePropertySingleLine(new GUIContent("Area Light Mask 2"), props[ShaderProps.AreaLightMask2]);
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightMask], new GUIContent("Area Light Mask"));
+                            if (Cast(props[ShaderProps.AreaLightMask].floatValue))
+                            {
+                                materialEditor.TexturePropertySingleLine(new GUIContent("Area Light Mask 1"), props[ShaderProps.AreaLightMask1]);
+                                materialEditor.TexturePropertySingleLine(new GUIContent("Area Light Mask 2"), props[ShaderProps.AreaLightMask2]);
+                            }
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity1], new GUIContent("Area Light Intensity 1"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity2], new GUIContent("Area Light Intensity 2"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity3], new GUIContent("Area Light Intensity 3"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity4], new GUIContent("Area Light Intensity 4"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity5], new GUIContent("Area Light Intensity 5"));
                         }
-                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity1], new GUIContent("Area Light Intensity 1"));
-                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity2], new GUIContent("Area Light Intensity 2"));
-                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity3], new GUIContent("Area Light Intensity 3"));
-                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity4], new GUIContent("Area Light Intensity 4"));
-                        materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity5], new GUIContent("Area Light Intensity 5"));
                     }
                 }
                 TempuraGui.Space2();

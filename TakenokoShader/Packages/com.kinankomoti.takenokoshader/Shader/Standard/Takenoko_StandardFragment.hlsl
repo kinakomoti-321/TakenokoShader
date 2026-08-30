@@ -222,12 +222,14 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     #if defined(_IRIDESCENCE_ON)
         float thinFilmIor = _ThinFilmIor;
         float thinFilmThickness = lerp(_ThinFilmThicknessMin, _ThinFilmThicknessMax, _ThinFilmThickness * TAKENOKO_SAMPLE(_ThinFilmThicknessTex, i.texcoord0).r);
-        float3 bottomKappa;
         float3 bottomIor;
+        float3 bottomKappa;
         ColorToComplexIor(clamp(F0, 0.0, 0.95), clamp(ShlickFresnel(F0, 0.01), 0.0, 0.95), bottomIor, bottomKappa);
+        bottomIor = lerp(1.3, bottomIor, metallic);
+        bottomKappa = lerp(0.0, bottomKappa, metallic);
 
         float3 IridescenceF = IridescenceFresnel(dotLH, thinFilmThickness, 1.0, thinFilmIor, bottomIor, bottomKappa);
-        F = lerp(F, IridescenceF, saturate(thinFilmThickness * 10.0));
+        F = lerp(F, saturate(IridescenceF), saturate(thinFilmThickness / 10.0));
     #endif
 
     float3 lightDiffuse = DiffuseBRDF(basecolor, roughness, dotNH, dotNV, dotNL) * dotNL * lightColor;
@@ -288,6 +290,7 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float3 specular = lightSpecular + environmentSpecular;
     float3 coat = lightCoat;
     float3 sss = lightSss;
+    float3 emission = materialData.emission;
 
     #if defined(_SPECULAR_OCCLUSION_ON)
         specular *= lerp(1.0, pow(occlusion, _SpecularOcclusionPower), _SpecularOcclusionStrength);
@@ -296,7 +299,7 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
         #endif
     #endif
 
-    float3 result = ((diffuse + sss) * (1.0 - metallic) + specular) + coat;
+    float3 result = ((diffuse + sss) * (1.0 - metallic) + specular) + coat + emission;
 
     //---------------------------------------------------
     // Area Light

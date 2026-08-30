@@ -127,11 +127,11 @@ Shader "Takenoko/Standard"
         [Toggle] _AreaLightMask ("Area Light Mask", Int) = 0
         _AreaLightMask1 ("Area Light Mask 1", 2D) = "white" { }
         _AreaLightMask2 ("Area Light Mask 2", 2D) = "white" { }
-        _AreaLightIntensity1 ("Area Light Intensity", Range(0, 10)) = 1.0
-        _AreaLightIntensity2 ("Area Light Intensity", Range(0, 10)) = 1.0
-        _AreaLightIntensity3 ("Area Light Intensity", Range(0, 10)) = 1.0
-        _AreaLightIntensity4 ("Area Light Intensity", Range(0, 10)) = 1.0
-        _AreaLightIntensity5 ("Area Light Intensity", Range(0, 10)) = 1.0
+        _AreaLightIntensity1 ("Area Light Intensity", Range(0, 2)) = 1.0
+        _AreaLightIntensity2 ("Area Light Intensity", Range(0, 2)) = 1.0
+        _AreaLightIntensity3 ("Area Light Intensity", Range(0, 2)) = 1.0
+        _AreaLightIntensity4 ("Area Light Intensity", Range(0, 2)) = 1.0
+        _AreaLightIntensity5 ("Area Light Intensity", Range(0, 2)) = 1.0
     }
 
     SubShader
