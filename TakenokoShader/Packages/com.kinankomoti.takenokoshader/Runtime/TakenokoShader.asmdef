@@ -1,7 +1,10 @@
 {
   "name": "TakenokoShader",
   "rootNamespace": "Kinankomoti.TakenokoShader",
-  "references": [],
+  "references": [
+    "VRC.Udon",
+    "UdonSharp.Runtime"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

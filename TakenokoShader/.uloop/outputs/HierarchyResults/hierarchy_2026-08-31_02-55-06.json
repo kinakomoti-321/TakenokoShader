@@ -1,0 +1,168 @@
+{
+  "ExportTimestamp": "2026-08-31 02:55:06",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "VRCDefaultWorldScene",
+    "nodeCount": 10,
+    "maxDepth": 0
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "VRCDefaultWorldScene",
+      "stats": {
+        "rootCount": 10,
+        "nodeCount": 10,
+        "maxDepth": 0
+      },
+      "roots": [
+        {
+          "name": "VRCWorld",
+          "isActive": true,
+          "components": [
+            "Transform",
+            "VRCSceneDescriptor",
+            "PipelineManager",
+            "UdonBehaviour",
+            "UdonBehaviour"
+          ],
+          "siblingIndex": 0,
+          "tag": "Untagged",
+          "layer": 0,
+          "path": "VRCWorld",
+          "children": []
+        },
+        {
+          "name": "Main Camera",
+          "isActive": true,
+          "components": [
+            "Transform",
+            "Camera",
+            "AudioListener"
+          ],
+          "siblingIndex": 1,
+          "tag": "MainCamera",
+          "layer": 0,
+          "path": "Main Camera",
+          "children": []
+        },
+        {
+          "name": "Directional Light",
+          "isActive": true,
+          "components": [
+            "Transform",
+            "Light"
+          ],
+          "siblingIndex": 2,
+          "tag": "Untagged",
+          "layer": 0,
+          "path": "Directional Light",
+          "children": []
+        },
+        {
+          "name": "EventSystem",
+          "isActive": true,
+          "components": [
+            "Transform",
+            "EventSystem",
+            "StandaloneInputModule"
+          ],
+          "siblingIndex": 3,
+          "tag": "Untagged",
+          "layer": 0,
+          "path": "EventSystem",
+          "children": []
+        },
+        {
+          "name": "Plane (1)",
+          "isActive": true,
+          "components": [
+            "Transform",
+            "MeshFilter",
+            "MeshRenderer",
+            "MeshCollider"
+          ],
+          "siblingIndex": 4,
+          "tag": "Untagged",
+          "layer": 0,
+          "path": "Plane (1)",
+          "children": []
+        },
+        {
+          "name": "Cube",
+          "isActive": true,
+          "components": [
+            "Transform",
+            "MeshFilter",
+            "MeshRenderer",
+            "BoxCollider"
+          ],
+          "siblingIndex": 5,
+          "tag": "Untagged",
+          "layer": 0,
+          "path": "Cube",
+          "children": []
+        },
+        {
+          "name": "Sphere",
+          "isActive": true,
+          "components": [
+            "Transform",
+            "MeshFilter",
+            "MeshRenderer",
+            "SphereCollider"
+          ],
+          "siblingIndex": 6,
+          "tag": "Untagged",
+          "layer": 0,
+          "path": "Sphere",
+          "children": []
+        },
+        {
+          "name": "Sphere (1)",
+          "isActive": true,
+          "components": [
+            "Transform",
+            "MeshFilter",
+            "MeshRenderer",
+            "SphereCollider"
+          ],
+          "siblingIndex": 7,
+          "tag": "Untagged",
+          "layer": 0,
+          "path": "Sphere (1)",
+          "children": []
+        },
+        {
+          "name": "TakenokoLightSystem",
+          "isActive": true,
+          "components": [
+            "Transform",
+            "TakenokoLightSystem",
+            "UdonBehaviour"
+          ],
+          "siblingIndex": 8,
+          "tag": "Untagged",
+          "layer": 0,
+          "path": "TakenokoLightSystem",
+          "children": []
+        },
+        {
+          "name": "TakenokoAreaLight",
+          "isActive": true,
+          "components": [
+            "Transform",
+            "MeshFilter",
+            "MeshRenderer",
+            "TakenokoAreaLight",
+            "UdonBehaviour"
+          ],
+          "siblingIndex": 9,
+          "tag": "Untagged",
+          "layer": 0,
+          "path": "TakenokoAreaLight",
+          "children": []
+        }
+      ]
+    }
+  ]
+}

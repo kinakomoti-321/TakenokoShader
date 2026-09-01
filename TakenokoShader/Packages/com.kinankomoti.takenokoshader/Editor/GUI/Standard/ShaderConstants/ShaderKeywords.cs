@@ -75,14 +75,6 @@ public enum ShaderKeywords
     OcclusionChannelA,
     [Description("_THINFILM_ON")]
     ThinfilmOn,
-    [Description("_THINFILM_CHANNEL_R")]
-    ThinfilmChannelR,
-    [Description("_THINFILM_CHANNEL_G")]
-    ThinfilmChannelG,
-    [Description("_THINFILM_CHANNEL_B")]
-    ThinfilmChannelB,
-    [Description("_THINFILM_CHANNEL_A")]
-    ThinfilmChannelA,
     [Description("_HEIGHT_ON")]
     HeightOn,
     [Description("_HEIGHT_CHANNEL_R")]
@@ -107,6 +99,14 @@ public enum ShaderKeywords
     SkyboxfogSphere,
     [Description("_IRIDESCENCE_ON")]
     IridescenceOn,
+    [Description("_THINFILM_CHANNEL_R")]
+    ThinfilmChannelR,
+    [Description("_THINFILM_CHANNEL_G")]
+    ThinfilmChannelG,
+    [Description("_THINFILM_CHANNEL_B")]
+    ThinfilmChannelB,
+    [Description("_THINFILM_CHANNEL_A")]
+    ThinfilmChannelA,
     [Description("_SSS_ON")]
     SssOn,
     [Description("_SSS_MODE_VOLUME")]
@@ -121,6 +121,16 @@ public enum ShaderKeywords
     SssThicknessChannelB,
     [Description("_SSS_THICKNESS_CHANNEL_A")]
     SssThicknessChannelA,
+    [Description("_CLEARCOAT_ON")]
+    ClearcoatOn,
+    [Description("_CLEARCOAT_MASK_CHANNEL_R")]
+    ClearcoatMaskChannelR,
+    [Description("_CLEARCOAT_MASK_CHANNEL_G")]
+    ClearcoatMaskChannelG,
+    [Description("_CLEARCOAT_MASK_CHANNEL_B")]
+    ClearcoatMaskChannelB,
+    [Description("_CLEARCOAT_MASK_CHANNEL_A")]
+    ClearcoatMaskChannelA,
     [Description("_LIGHTMAP_DEFAULT")]
     LightmapDefault,
     [Description("_LIGHTMAP_SH")]
@@ -220,10 +230,6 @@ public static class ShaderKeywordsNames
         { ShaderKeywords.OcclusionChannelB, "_OCCLUSION_CHANNEL_B" },
         { ShaderKeywords.OcclusionChannelA, "_OCCLUSION_CHANNEL_A" },
         { ShaderKeywords.ThinfilmOn, "_THINFILM_ON" },
-        { ShaderKeywords.ThinfilmChannelR, "_THINFILM_CHANNEL_R" },
-        { ShaderKeywords.ThinfilmChannelG, "_THINFILM_CHANNEL_G" },
-        { ShaderKeywords.ThinfilmChannelB, "_THINFILM_CHANNEL_B" },
-        { ShaderKeywords.ThinfilmChannelA, "_THINFILM_CHANNEL_A" },
         { ShaderKeywords.HeightOn, "_HEIGHT_ON" },
         { ShaderKeywords.HeightChannelR, "_HEIGHT_CHANNEL_R" },
         { ShaderKeywords.HeightChannelG, "_HEIGHT_CHANNEL_G" },
@@ -236,6 +242,10 @@ public static class ShaderKeywordsNames
         { ShaderKeywords.SkyboxfogBox, "_SKYBOXFOG_BOX" },
         { ShaderKeywords.SkyboxfogSphere, "_SKYBOXFOG_SPHERE" },
         { ShaderKeywords.IridescenceOn, "_IRIDESCENCE_ON" },
+        { ShaderKeywords.ThinfilmChannelR, "_THINFILM_CHANNEL_R" },
+        { ShaderKeywords.ThinfilmChannelG, "_THINFILM_CHANNEL_G" },
+        { ShaderKeywords.ThinfilmChannelB, "_THINFILM_CHANNEL_B" },
+        { ShaderKeywords.ThinfilmChannelA, "_THINFILM_CHANNEL_A" },
         { ShaderKeywords.SssOn, "_SSS_ON" },
         { ShaderKeywords.SssModeVolume, "_SSS_MODE_VOLUME" },
         { ShaderKeywords.SssModeThinwall, "_SSS_MODE_THINWALL" },
@@ -243,6 +253,11 @@ public static class ShaderKeywordsNames
         { ShaderKeywords.SssThicknessChannelG, "_SSS_THICKNESS_CHANNEL_G" },
         { ShaderKeywords.SssThicknessChannelB, "_SSS_THICKNESS_CHANNEL_B" },
         { ShaderKeywords.SssThicknessChannelA, "_SSS_THICKNESS_CHANNEL_A" },
+        { ShaderKeywords.ClearcoatOn, "_CLEARCOAT_ON" },
+        { ShaderKeywords.ClearcoatMaskChannelR, "_CLEARCOAT_MASK_CHANNEL_R" },
+        { ShaderKeywords.ClearcoatMaskChannelG, "_CLEARCOAT_MASK_CHANNEL_G" },
+        { ShaderKeywords.ClearcoatMaskChannelB, "_CLEARCOAT_MASK_CHANNEL_B" },
+        { ShaderKeywords.ClearcoatMaskChannelA, "_CLEARCOAT_MASK_CHANNEL_A" },
         { ShaderKeywords.LightmapDefault, "_LIGHTMAP_DEFAULT" },
         { ShaderKeywords.LightmapSh, "_LIGHTMAP_SH" },
         { ShaderKeywords.LightmapMonosh, "_LIGHTMAP_MONOSH" },

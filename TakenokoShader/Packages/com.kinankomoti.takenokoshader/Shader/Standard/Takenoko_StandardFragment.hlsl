@@ -42,35 +42,34 @@ inline MaterialData GetMaterialData(float2 texcoord, float3 positionWS, float3 n
 // Area Light
 //---------------------------------------------------
 // #region Area Light
-float3 Takenoko_AreaLight(float3 N, float3 V, float3 basecolor, float metallic, float roughness, float dotNV, float3 positionWS, float2 lightmapUV)
-{
-    #if !defined(_VRC_AREALIGHT_ON)
-        return 0.0;
-    #else
-        const float3 F0 = lerp(0.04, basecolor, metallic);
+#if defined(_AREALIGHT_ON)
+    void Takenoko_AreaLight(float3 N, float3 V, float3 basecolor, float3 F, float roughness, float dotNV, float3 positionWS, float2 lightmapUV, out float3 areaDiffuse, out float3 areaSpecular)
+    {
+        areaDiffuse = 0.0;
+        areaSpecular = 0.0;
+
+        roughness = clamp(roughness, 0.001, 0.95);
         const float2 lutUV = GetLtcTexcoord(dotNV, roughness);
         const float3x3 Minv = SampleLtcInverseMatrix(lutUV, _UdonLtcLut, sampler__UdonLtcLut);
         
         if (_UdonEnableLtcSystem != 1.0)
         {
-            return 0.0;
+            return;
         }
 
-        float3 color = 0.0;
         float2 fresnelUV = lutUV;
-        float4 fresnelLut = _UdonFresnelLut.SampleLevel(sampler__UdonLtcLut, fresnelUV, 0);
-        float3 fresnel = F0 * fresnelLut.r + (1.0 - F0) * fresnelLut.g;
+        float3 fresnel = F;
         float3 specular = 1.0;
         float3 diffuse = 1.0;
         float3 L[4];
         Texture2D lightTexture = _UdonLightTexture1;
 
         #if defined(_AREA_LIGHT_MASK_ON)
-            float3 mask1 = saturate(TAKENOKO_SAMPLE(_AreaLightMask1, lightmapUV).xyz * 10.0);
-            float2 mask2 = saturate(TAKENOKO_SAMPLE(_AreaLightMask2, lightmapUV).xy * 10.0);
+            float4 mask1 = saturate(TAKENOKO_SAMPLE(_AreaLightMask1, lightmapUV) * 10.0);
+            float4 mask2 = saturate(TAKENOKO_SAMPLE(_AreaLightMask2, lightmapUV) * 10.0);
         #else
-            float3 mask1 = 1.0;
-            float2 mask2 = 1.0;
+            float4 mask1 = 1.0;
+            float4 mask2 = 1.0;
         #endif
 
         if (mask1.x >= 0.01)
@@ -82,7 +81,8 @@ float3 Takenoko_AreaLight(float3 N, float3 V, float3 basecolor, float metallic, 
             EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler__UdonLtcLut, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
-            color += (specular + diffuse * (1.0 - metallic)) * _UdonLightEmission1.xyz * mask1.x * _AreaLightIntensity1;
+            areaSpecular += specular * _UdonLightEmission1.xyz * mask1.x * _AreaLightIntensity1;
+            areaDiffuse += diffuse * _UdonLightEmission1.xyz * mask1.x * _AreaLightIntensity1;
         }
 
         lightTexture = _UdonLightTexture2;
@@ -95,7 +95,8 @@ float3 Takenoko_AreaLight(float3 N, float3 V, float3 basecolor, float metallic, 
             EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler__UdonLtcLut, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
-            color += (specular + diffuse * (1.0 - metallic)) * _UdonLightEmission2.xyz * mask1.y * _AreaLightIntensity2;
+            areaSpecular += specular * _UdonLightEmission2.xyz * mask1.y * _AreaLightIntensity2;
+            areaDiffuse += diffuse * _UdonLightEmission2.xyz * mask1.y * _AreaLightIntensity2;
         }
 
         lightTexture = _UdonLightTexture3;
@@ -108,11 +109,12 @@ float3 Takenoko_AreaLight(float3 N, float3 V, float3 basecolor, float metallic, 
             EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler__UdonLtcLut, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
-            color += (specular + diffuse * (1.0 - metallic)) * _UdonLightEmission3.xyz * mask1.z * _AreaLightIntensity3;
+            areaSpecular += specular * _UdonLightEmission3.xyz * mask1.z * _AreaLightIntensity3;
+            areaDiffuse += diffuse * _UdonLightEmission3.xyz * mask1.z * _AreaLightIntensity3;
         }
 
         lightTexture = _UdonLightTexture4;
-        if (mask2.x >= 0.01)
+        if (mask1.w >= 0.01)
         {
             L[0] = float3(_UdonLightVertex4[0], _UdonLightVertex4[1], _UdonLightVertex4[2]);
             L[1] = float3(_UdonLightVertex4[3], _UdonLightVertex4[4], _UdonLightVertex4[5]);
@@ -121,11 +123,12 @@ float3 Takenoko_AreaLight(float3 N, float3 V, float3 basecolor, float metallic, 
             EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler__UdonLtcLut, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
-            color += (specular + diffuse * (1.0 - metallic)) * _UdonLightEmission4.xyz * mask2.x * _AreaLightIntensity4;
+            areaSpecular += specular * _UdonLightEmission4.xyz * mask1.w * _AreaLightIntensity4;
+            areaDiffuse += diffuse * _UdonLightEmission4.xyz * mask1.w * _AreaLightIntensity4;
         }
 
         lightTexture = _UdonLightTexture5;
-        if (mask2.y >= 0.01)
+        if (mask2.x >= 0.01)
         {
             L[0] = float3(_UdonLightVertex5[0], _UdonLightVertex5[1], _UdonLightVertex5[2]);
             L[1] = float3(_UdonLightVertex5[3], _UdonLightVertex5[4], _UdonLightVertex5[5]);
@@ -134,13 +137,53 @@ float3 Takenoko_AreaLight(float3 N, float3 V, float3 basecolor, float metallic, 
             EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler__UdonLtcLut, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
-            color += (specular + diffuse * (1.0 - metallic)) * _UdonLightEmission5.xyz * mask2.y * _AreaLightIntensity5;
+            areaSpecular += specular * _UdonLightEmission5.xyz * mask2.x * _AreaLightIntensity5;
+            areaDiffuse += diffuse * _UdonLightEmission5.xyz * mask2.x * _AreaLightIntensity5;
         }
 
-        return color;
+        lightTexture = _UdonLightTexture6;
+        if (mask2.y >= 0.01)
+        {
+            L[0] = float3(_UdonLightVertex6[0], _UdonLightVertex6[1], _UdonLightVertex6[2]);
+            L[1] = float3(_UdonLightVertex6[3], _UdonLightVertex6[4], _UdonLightVertex6[5]);
+            L[2] = float3(_UdonLightVertex6[6], _UdonLightVertex6[7], _UdonLightVertex6[8]);
+            L[3] = float3(_UdonLightVertex6[9], _UdonLightVertex6[10], _UdonLightVertex6[11]);
+            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler__UdonLtcLut, diffuse, specular);
+            specular *= fresnel;
+            diffuse *= basecolor;
+            areaSpecular += specular * _UdonLightEmission6.xyz * mask2.y * _AreaLightIntensity6;
+            areaDiffuse += diffuse * _UdonLightEmission6.xyz * mask2.y * _AreaLightIntensity6;
+        }
 
-    #endif
-}
+        lightTexture = _UdonLightTexture7;
+        if (mask2.z >= 0.01)
+        {
+            L[0] = float3(_UdonLightVertex7[0], _UdonLightVertex7[1], _UdonLightVertex7[2]);
+            L[1] = float3(_UdonLightVertex7[3], _UdonLightVertex7[4], _UdonLightVertex7[5]);
+            L[2] = float3(_UdonLightVertex7[6], _UdonLightVertex7[7], _UdonLightVertex7[8]);
+            L[3] = float3(_UdonLightVertex7[9], _UdonLightVertex7[10], _UdonLightVertex7[11]);
+            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler__UdonLtcLut, diffuse, specular);
+            specular *= fresnel;
+            diffuse *= basecolor;
+            areaSpecular += specular * _UdonLightEmission7.xyz * mask2.z * _AreaLightIntensity7;
+            areaDiffuse += diffuse * _UdonLightEmission7.xyz * mask2.z * _AreaLightIntensity7;
+        }
+
+        lightTexture = _UdonLightTexture8;
+        if (mask2.w >= 0.01)
+        {
+            L[0] = float3(_UdonLightVertex8[0], _UdonLightVertex8[1], _UdonLightVertex8[2]);
+            L[1] = float3(_UdonLightVertex8[3], _UdonLightVertex8[4], _UdonLightVertex8[5]);
+            L[2] = float3(_UdonLightVertex8[6], _UdonLightVertex8[7], _UdonLightVertex8[8]);
+            L[3] = float3(_UdonLightVertex8[9], _UdonLightVertex8[10], _UdonLightVertex8[11]);
+            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler__UdonLtcLut, diffuse, specular);
+            specular *= fresnel;
+            diffuse *= basecolor;
+            areaSpecular += specular * _UdonLightEmission8.xyz * mask2.w * _AreaLightIntensity8;
+            areaDiffuse += diffuse * _UdonLightEmission8.xyz * mask2.w * _AreaLightIntensity8;
+        }
+    }
+#endif
 // #endregion
 
 //---------------------------------------------------
@@ -222,14 +265,22 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     #if defined(_IRIDESCENCE_ON)
         float thinFilmIor = _ThinFilmIor;
         float thinFilmThickness = lerp(_ThinFilmThicknessMin, _ThinFilmThicknessMax, _ThinFilmThickness * Standard_ThinFilmThickness(i.texcoord0));
-        float3 bottomIor;
-        float3 bottomKappa;
-        ColorToComplexIor(clamp(F0, 0.0, 0.95), clamp(ShlickFresnel(F0, 0.01), 0.0, 0.95), bottomIor, bottomKappa);
-        bottomIor = lerp(1.0, bottomIor, metallic);
-        bottomKappa = lerp(0.01, max(bottomKappa, 0.01), metallic);
+        if (thinFilmThickness > 1.0)
+        {
+            float3 bottomIor;
+            float3 bottomKappa;
+            ColorToComplexIor(clamp(F0, 0.0, 0.95), clamp(ShlickFresnel(F0, 0.01), 0.0, 0.95), bottomIor, bottomKappa);
+            bottomIor = lerp(1.0, bottomIor, metallic);
+            bottomKappa = lerp(0.01, max(bottomKappa, 0.01), metallic);
 
-        float3 IridescenceF = IridescenceFresnel(dotLH, thinFilmThickness, 1.0, thinFilmIor, bottomIor, bottomKappa);
-        F = lerp(F, saturate(IridescenceF), saturate(thinFilmThickness / 10.0));
+            float3 IridescenceF = IridescenceFresnel(dotLH, thinFilmThickness, 1.0, thinFilmIor, bottomIor, bottomKappa);
+            F = lerp(F, saturate(IridescenceF), smoothstep(0.0, 1.0, saturate(thinFilmThickness / 50.0)));
+        }
+        else
+        {
+            F = ShlickFresnel(F0, dotNV);
+        }
+        // F = IridescenceF;
     #endif
 
     float3 lightDiffuse = DiffuseBRDF(basecolor, roughness, dotNH, dotNV, dotNL) * dotNL * lightColor;
@@ -242,6 +293,10 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
         lightSss = saturate(sssDiffuse * smoothstep(0.0, 1.0, 1.0 - sssThickness) * 0.5);
     #endif
     float3 lightCoat = 0.0;
+    #if defined(_CLEARCOAT_ON)
+        float clearcoat = saturate(_ClearCoatStrength * Standard_Clearcoat(texcoord));
+        lightCoat += SpecularBRDF(ShlickFresnel(0.04, dotNV), 0.25, dotNH, dotNV, dotNL) * dotNL * lightColor * clearcoat;
+    #endif
 
     float3 environmentSpecular = 0.0;
     float3 environmentDiffuse = 0.0;
@@ -252,7 +307,7 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
         environmentSpecular += SpecularEnvironment(F, roughness, reflUVW, lightData.probe, positionWS, dotNV);
 
         #if defined(_CLEARCOAT_ON)
-            environmentCoat += SpecularEnvironment(ShlickFresnel(0.04, dotNV), roughness, reflUVW, lightData.probe, positionWS, dotNV);
+            environmentCoat += SpecularEnvironment(ShlickFresnel(0.04, dotNV), 0.25, reflUVW, lightData.probe, positionWS, dotNV) * clearcoat;
         #endif
 
         #if defined(LIGHTVOLUME_SUPPORT) && defined(_LIGHTVOLUME_ON)
@@ -284,11 +339,20 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     #endif
 
     //---------------------------------------------------
+    // Area Light
+    //---------------------------------------------------
+    float3 areaDiffuse = 0.0;
+    float3 areaSpecular = 0.0;
+    #if defined(_AREALIGHT_ON)
+        Takenoko_AreaLight(shadingNormal, viewDirection, basecolor, F, roughness, dotNV, positionWS, i.lightmapUV, areaDiffuse, areaSpecular);
+    #endif
+
+    //---------------------------------------------------
     // Main Lighting
     //---------------------------------------------------
-    float3 diffuse = (lightDiffuse + environmentDiffuse) * occlusion;
-    float3 specular = lightSpecular + environmentSpecular;
-    float3 coat = lightCoat;
+    float3 diffuse = (lightDiffuse + environmentDiffuse + areaDiffuse) * occlusion;
+    float3 specular = lightSpecular + environmentSpecular + areaSpecular;
+    float3 coat = lightCoat + environmentCoat;
     float3 sss = lightSss;
     float3 emission = materialData.emission;
 
@@ -301,12 +365,6 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
 
     float3 result = ((diffuse + sss) * (1.0 - metallic) + specular) + coat + emission;
 
-    //---------------------------------------------------
-    // Area Light
-    //---------------------------------------------------
-    #if defined(_VRC_AREALIGHT_ON) && defined(_TAKENOKO_FOWARD_BASE)
-        result += Takenoko_AreaLight(shadingNormal, viewDirection, basecolor, metallic, roughness, dotNV, positionWS, i.lightmapUV);
-    #endif
 
     //---------------------------------------------------
     // Post-Effect

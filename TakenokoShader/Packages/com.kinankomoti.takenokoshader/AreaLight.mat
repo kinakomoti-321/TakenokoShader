@@ -1,0 +1,215 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: AreaLight
+  m_Shader: {fileID: 4800000, guid: 03a48053ac41c9f4792e4bc7d7f018f1, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _CLEARCOAT_MASK_CHANNEL_R
+  - _EMISSION_ON
+  - _HEIGHT_CHANNEL_G
+  - _MAINTEX_TILING_SIMPLE
+  - _MAINTEX_UV0
+  - _METALLIC_CHANNEL_G
+  - _OCCLUSION_CHANNEL_B
+  - _ROUGHNESS_CHANNEL_R
+  - _ROUGHNESS_MODEL_ROUGHNESS
+  - _SKYBOXFOG_DISTANCE
+  - _SSS_THICKNESS_CHANNEL_R
+  - _THINFILM_CHANNEL_G
+  m_InvalidKeywords:
+  - _SPECULAROCCLUSIONLIGHTMAP_ON
+  - _VRCAREALIGHT_ON
+  m_LightmapFlags: 3
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 2000
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _AreaLightMask1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _AreaLightMask2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ClearCoatMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FuzzMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HeightTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RoughnessTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SssThicknessTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ThinFilmThicknessTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AlphaMode: 0
+    - _AreaLight: 0
+    - _AreaLightIntensity1: 1
+    - _AreaLightIntensity2: 1
+    - _AreaLightIntensity3: 1
+    - _AreaLightIntensity4: 1
+    - _AreaLightIntensity5: 1
+    - _AreaLightMask: 0
+    - _BumpScale: 1
+    - _ClearCoat: 0
+    - _ClearCoatMaskChannel: 0
+    - _ClearCoatStrength: 1
+    - _Cutoff: 0.5
+    - _DetailNormalMapScale: 1
+    - _DstBlend: 0
+    - _Emission: 1
+    - _ErrorMessageENG: 0
+    - _ErrorMessageJPN: 0
+    - _FilterMainTexHueShift: 0
+    - _FilterMainTexSaturateShift: 0
+    - _FilterMainTexValueShift: 0
+    - _FilterResultHueShift: 0
+    - _FilterResultSaturateShift: 0
+    - _FilterResultValueShift: 0
+    - _Fuzz: 0
+    - _GlossMapScale: 1
+    - _Glossiness: 0.5
+    - _GlossyReflections: 1
+    - _Height: 0
+    - _HeightChannel: 1
+    - _HeightOffset: 0
+    - _HeightShadow: 0
+    - _HeightStep: 10
+    - _HeightStrength: 0.01
+    - _HeightSubStep: 3
+    - _HexEdgeSmoothness: 0.5
+    - _HexExponent: 1
+    - _HexFallOff: 0.5
+    - _HexRotationStrength: 0.5
+    - _Iridescence: 0
+    - _MainTexTilingMode: 0
+    - _MainTexcoord: 0
+    - _MaskLightProbe: 1
+    - _MaskLightmap: 1
+    - _Metallic: 0
+    - _MetallicChannel: 1
+    - _Mode: 0
+    - _Occlusion: 1
+    - _OcclusionChannel: 2
+    - _OcclusionPower: 1
+    - _OcclusionStrength: 1
+    - _Parallax: 0.02
+    - _RenderQueueOffset: 0
+    - _Roughness: 1
+    - _RoughnessChannel: 0
+    - _RoughnessModel: 0
+    - _SkyboxFog: 0
+    - _SkyboxFogDistance: 100
+    - _SkyboxFogMode: 0
+    - _SkyboxFogSphereRadius: 100
+    - _SkyboxFogStrength: 0.5
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _SpecularOcclusion: 0
+    - _SpecularOcclusionLightmap: 1
+    - _SpecularOcclusionPower: 6.2
+    - _SpecularOcclusionStrength: 1
+    - _SrcBlend: 1
+    - _Sss: 0
+    - _SssMode: 0
+    - _SssThickness: 0.5
+    - _SssThicknessChannel: 0
+    - _ThinFilmChannel: 1
+    - _ThinFilmIor: 1.5
+    - _ThinFilmThickness: 0.5
+    - _ThinFilmThicknessMax: 200
+    - _ThinFilmThicknessMin: 100
+    - _TransparentZWrite: 0
+    - _UVSec: 0
+    - _UnityAlphaToMask: 0
+    - _UnityCullMode: 2
+    - _UnityDstBlend: 0
+    - _UnitySrcBlend: 1
+    - _UnityZWrite: 1
+    - _VRCAreaLight: 1
+    - _Wetness: 0
+    - _ZWrite: 1
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _MainTexOffset: {r: 0, g: 0, b: 1, a: 1}
+    - _MainTexScale: {r: 1, g: 1, b: 1, a: 1}
+    - _SkyboxFogBoxSizeMax: {r: 1, g: 1, b: 1, a: 0}
+    - _SkyboxFogBoxSizeMin: {r: -1, g: -1, b: -1, a: 0}
+    - _SkyboxFogSphereCenter: {r: 0, g: 0, b: 0, a: 0}
+    - _WetnessColor: {r: 1, g: 1, b: 1, a: 0}
+  m_BuildTextureStacks: []

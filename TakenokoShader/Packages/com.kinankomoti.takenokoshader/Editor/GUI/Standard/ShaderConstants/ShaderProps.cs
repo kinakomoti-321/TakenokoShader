@@ -120,8 +120,12 @@ public enum ShaderProps
     SssThicknessChannel,
     [Description("_ClearCoat")]
     ClearCoat,
+    [Description("_ClearCoatStrength")]
+    ClearCoatStrength,
     [Description("_ClearCoatMask")]
     ClearCoatMask,
+    [Description("_ClearCoatMaskChannel")]
+    ClearCoatMaskChannel,
     [Description("_Fuzz")]
     Fuzz,
     [Description("_FuzzMask")]
@@ -170,8 +174,8 @@ public enum ShaderProps
     SkyboxFogSphereCenter,
     [Description("_SkyboxFogSphereRadius")]
     SkyboxFogSphereRadius,
-    [Description("_VRCAreaLight")]
-    VRCAreaLight,
+    [Description("_AreaLight")]
+    AreaLight,
     [Description("_AreaLightMask")]
     AreaLightMask,
     [Description("_AreaLightMask1")]
@@ -188,6 +192,12 @@ public enum ShaderProps
     AreaLightIntensity4,
     [Description("_AreaLightIntensity5")]
     AreaLightIntensity5,
+    [Description("_AreaLightIntensity6")]
+    AreaLightIntensity6,
+    [Description("_AreaLightIntensity7")]
+    AreaLightIntensity7,
+    [Description("_AreaLightIntensity8")]
+    AreaLightIntensity8,
 }
 
 public static class ShaderPropsName
@@ -252,7 +262,9 @@ public static class ShaderPropsName
         { ShaderProps.SssThicknessTex, "_SssThicknessTex" },
         { ShaderProps.SssThicknessChannel, "_SssThicknessChannel" },
         { ShaderProps.ClearCoat, "_ClearCoat" },
+        { ShaderProps.ClearCoatStrength, "_ClearCoatStrength" },
         { ShaderProps.ClearCoatMask, "_ClearCoatMask" },
+        { ShaderProps.ClearCoatMaskChannel, "_ClearCoatMaskChannel" },
         { ShaderProps.Fuzz, "_Fuzz" },
         { ShaderProps.FuzzMask, "_FuzzMask" },
         { ShaderProps.SpecularOcclusion, "_SpecularOcclusion" },
@@ -277,7 +289,7 @@ public static class ShaderPropsName
         { ShaderProps.SkyboxFogBoxSizeMax, "_SkyboxFogBoxSizeMax" },
         { ShaderProps.SkyboxFogSphereCenter, "_SkyboxFogSphereCenter" },
         { ShaderProps.SkyboxFogSphereRadius, "_SkyboxFogSphereRadius" },
-        { ShaderProps.VRCAreaLight, "_VRCAreaLight" },
+        { ShaderProps.AreaLight, "_AreaLight" },
         { ShaderProps.AreaLightMask, "_AreaLightMask" },
         { ShaderProps.AreaLightMask1, "_AreaLightMask1" },
         { ShaderProps.AreaLightMask2, "_AreaLightMask2" },
@@ -286,6 +298,9 @@ public static class ShaderPropsName
         { ShaderProps.AreaLightIntensity3, "_AreaLightIntensity3" },
         { ShaderProps.AreaLightIntensity4, "_AreaLightIntensity4" },
         { ShaderProps.AreaLightIntensity5, "_AreaLightIntensity5" },
+        { ShaderProps.AreaLightIntensity6, "_AreaLightIntensity6" },
+        { ShaderProps.AreaLightIntensity7, "_AreaLightIntensity7" },
+        { ShaderProps.AreaLightIntensity8, "_AreaLightIntensity8" },
     };
 public static IReadOnlyDictionary<ShaderProps, string> NameTableReadonly => NameTable;
 }

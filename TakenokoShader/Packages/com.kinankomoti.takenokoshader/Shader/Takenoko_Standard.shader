@@ -85,7 +85,9 @@ Shader "Takenoko/Standard"
         [Enum(R, 0, G, 1, B, 2, A, 3)] _SssThicknessChannel ("Thickness Channel", Int) = 0
 
         [Toggle] _ClearCoat ("Clear Coat", Int) = 0
+        _ClearCoatStrength ("Strength", Range(0, 1)) = 1.0
         _ClearCoatMask ("Clear Coat Mask", 2D) = "white" { }
+        [Enum(R, 0, G, 1, B, 2, A, 3)] _ClearCoatMaskChannel ("Mask Channel", Int) = 0
 
         [Toggle] _Fuzz ("Fuzz", Int) = 0
         _FuzzMask ("Fuzz Mask", 2D) = "white" { }
@@ -124,7 +126,7 @@ Shader "Takenoko/Standard"
         // -------------
         // Area Light
         // -------------
-        [Toggle] _VRCAreaLight ("VRC Area Light", Int) = 0
+        [Toggle] _AreaLight ("Area Light", Int) = 0
         [Toggle] _AreaLightMask ("Area Light Mask", Int) = 0
         _AreaLightMask1 ("Area Light Mask 1", 2D) = "white" { }
         _AreaLightMask2 ("Area Light Mask 2", 2D) = "white" { }
@@ -133,6 +135,9 @@ Shader "Takenoko/Standard"
         _AreaLightIntensity3 ("Area Light Intensity", Range(0, 2)) = 1.0
         _AreaLightIntensity4 ("Area Light Intensity", Range(0, 2)) = 1.0
         _AreaLightIntensity5 ("Area Light Intensity", Range(0, 2)) = 1.0
+        _AreaLightIntensity6 ("Area Light Intensity", Range(0, 2)) = 1.0
+        _AreaLightIntensity7 ("Area Light Intensity", Range(0, 2)) = 1.0
+        _AreaLightIntensity8 ("Area Light Intensity", Range(0, 2)) = 1.0
     }
 
     SubShader
@@ -190,6 +195,8 @@ Shader "Takenoko/Standard"
             #pragma shader_feature_local _SSS_ON
             #pragma shader_feature_local _SSS_MODE_VOLUME _SSS_MODE_THINWALL
             #pragma shader_feature_local _SSS_THICKNESS_CHANNEL_R _SSS_THICKNESS_CHANNEL_G _SSS_THICKNESS_CHANNEL_B _SSS_THICKNESS_CHANNEL_A
+            #pragma shader_feature_local _CLEARCOAT_ON
+            #pragma shader_feature_local _CLEARCOAT_MASK_CHANNEL_R _CLEARCOAT_MASK_CHANNEL_G _CLEARCOAT_MASK_CHANNEL_B _CLEARCOAT_MASK_CHANNEL_A
 
             #pragma shader_feature_local _LIGHTMAP_DEFAULT _LIGHTMAP_SH _LIGHTMAP_MONOSH
             
@@ -199,7 +206,7 @@ Shader "Takenoko/Standard"
             #pragma multi_compile _ LIGHTVOLUME_SUPPORT
             
             // VRC Area Light
-            #pragma shader_feature_local _VRC_AREALIGHT_ON
+            #pragma shader_feature_local _AREALIGHT_ON
             #pragma shader_feature_local _AREA_LIGHT_MASK_ON
 
             #define _TAKENOKO_FOWARD_BASE
@@ -246,6 +253,8 @@ Shader "Takenoko/Standard"
             #pragma shader_feature_local _SSS_ON
             #pragma shader_feature_local _SSS_MODE_VOLUME _SSS_MODE_THINWALL
             #pragma shader_feature_local _SSS_THICKNESS_CHANNEL_R _SSS_THICKNESS_CHANNEL_G _SSS_THICKNESS_CHANNEL_B _SSS_THICKNESS_CHANNEL_A
+            #pragma shader_feature_local _CLEARCOAT_ON
+            #pragma shader_feature_local _CLEARCOAT_MASK_CHANNEL_R _CLEARCOAT_MASK_CHANNEL_G _CLEARCOAT_MASK_CHANNEL_B _CLEARCOAT_MASK_CHANNEL_A
 
             #pragma shader_feature_local _HEIGHT_ON
             #pragma shader_feature_local _HEIGHT_CHANNEL_R _HEIGHT_CHANNEL_G _HEIGHT_CHANNEL_B _HEIGHT_CHANNEL_A

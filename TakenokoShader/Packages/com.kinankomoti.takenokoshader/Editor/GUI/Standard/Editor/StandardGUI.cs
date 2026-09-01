@@ -234,6 +234,18 @@ namespace Takenoko.Standard
                             DrawLinearTextureWarning(materials, ShaderProps.SssThicknessTex.Name(), "SSS Thickness");
                         }
                     }
+
+                    using (new VerticalScope(TempuraGui.borderBox))
+                    {
+                        materialEditor.ShaderProperty(props[ShaderProps.ClearCoat], new GUIContent("ClearCoat"));
+                        bool useClearCoat = Cast(props[ShaderProps.ClearCoat].floatValue);
+                        if (useClearCoat)
+                        {
+                            TempuraGui.Space2();
+                            materialEditor.ShaderProperty(props[ShaderProps.ClearCoatStrength], new GUIContent("Strength"));
+                            // materialEditor.TexturePropertyTwoLines(new GUIContent("Mask"), props[ShaderProps.ClearCoatMask], null, new GUIContent("Channel"), props[ShaderProps.ClearCoatMaskChannel]);
+                        }
+                    }
                 }
                 TempuraGui.Space2();
             }
@@ -364,8 +376,8 @@ namespace Takenoko.Standard
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        materialEditor.ShaderProperty(props[ShaderProps.VRCAreaLight], new GUIContent("AreaLight"));
-                        bool useAreaLight = Cast(props[ShaderProps.VRCAreaLight].floatValue);
+                        materialEditor.ShaderProperty(props[ShaderProps.AreaLight], new GUIContent("AreaLight"));
+                        bool useAreaLight = Cast(props[ShaderProps.AreaLight].floatValue);
                         if (useAreaLight)
                         {
                             materialEditor.ShaderProperty(props[ShaderProps.AreaLightMask], new GUIContent("Area Light Mask"));
@@ -379,6 +391,9 @@ namespace Takenoko.Standard
                             materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity3], new GUIContent("Area Light Intensity 3"));
                             materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity4], new GUIContent("Area Light Intensity 4"));
                             materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity5], new GUIContent("Area Light Intensity 5"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity6], new GUIContent("Area Light Intensity 6"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity7], new GUIContent("Area Light Intensity 7"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity8], new GUIContent("Area Light Intensity 8"));
                         }
                     }
                 }
@@ -557,6 +572,22 @@ namespace Takenoko.Standard
                 ShaderKeywords.SssThicknessChannelG.Name(),
                 ShaderKeywords.SssThicknessChannelB.Name(),
                 ShaderKeywords.SssThicknessChannelA.Name(),
+            });
+
+            if (Cast(material.GetFloat(ShaderProps.ClearCoat.Name())))
+            {
+                material.EnableKeyword(ShaderKeywords.ClearcoatOn.Name());
+            }
+            else
+            {
+                material.DisableKeyword(ShaderKeywords.ClearcoatOn.Name());
+            }
+
+            TempuraGui.ExcusiveKeyward<TextureChannel>(material, ShaderProps.ClearCoatMaskChannel.Name(), new string[]{
+                ShaderKeywords.ClearcoatMaskChannelR.Name(),
+                ShaderKeywords.ClearcoatMaskChannelG.Name(),
+                ShaderKeywords.ClearcoatMaskChannelB.Name(),
+                ShaderKeywords.ClearcoatMaskChannelA.Name(),
             });
 
             if (Cast(material.GetFloat(ShaderProps.Height.Name())))

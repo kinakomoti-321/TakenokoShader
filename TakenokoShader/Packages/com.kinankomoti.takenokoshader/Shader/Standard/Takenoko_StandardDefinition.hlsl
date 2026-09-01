@@ -55,6 +55,11 @@ float _HeightSubStep;
     TAKENOKO_TEXTURE2D(_SssThicknessTex);
 #endif
 
+#if defined(_CLEARCOAT_ON)
+    float _ClearCoatStrength;
+    TAKENOKO_TEXTURE2D(_ClearCoatMask);
+#endif
+
 float _SpecularOcclusionStrength;
 float _SpecularOcclusionPower;
 
@@ -81,18 +86,19 @@ float4 _SkyboxFogBoxSizeMax;
 float4 _SkyboxFogSphereCenter;
 float _SkyboxFogSphereRadius;
 
-#if defined(_VRC_AREALIGHT_ON)
-    #if defined(_AREA_LIGHT_MASK_ON)
-        TAKENOKO_TEXTURE2D(_AreaLightMask1);
-        TAKENOKO_TEXTURE2D(_AreaLightMask2);
-    #endif
-
-    float _AreaLightIntensity1;
-    float _AreaLightIntensity2;
-    float _AreaLightIntensity3;
-    float _AreaLightIntensity4;
-    float _AreaLightIntensity5;
+#if defined(_AREA_LIGHT_MASK_ON)
+    TAKENOKO_TEXTURE2D(_AreaLightMask1);
+    TAKENOKO_TEXTURE2D(_AreaLightMask2);
 #endif
+
+float _AreaLightIntensity1;
+float _AreaLightIntensity2;
+float _AreaLightIntensity3;
+float _AreaLightIntensity4;
+float _AreaLightIntensity5;
+float _AreaLightIntensity6;
+float _AreaLightIntensity7;
+float _AreaLightIntensity8;
 
 //--------------------------------------------
 // VRC Light Volume Properties

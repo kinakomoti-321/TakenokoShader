@@ -173,6 +173,24 @@ float Standard_Height(float2 texcoord, float2 dx, float2 dy)
     }
 #endif
 
+#if defined(_CLEARCOAT_ON)
+    float Standard_Clearcoat(float2 texcoord)
+    {
+        float4 clearcoat = TAKENOKO_SAMPLE(_ClearCoatMask, texcoord);
+        #if defined(_CLEARCOAT_MASK_CHANNEL_R)
+            return clearcoat.r;
+        #elif defined(_CLEARCOAT_MASK_CHANNEL_G)
+            return clearcoat.g;
+        #elif defined(_CLEARCOAT_MASK_CHANNEL_B)
+            return clearcoat.b;
+        #elif defined(_CLEARCOAT_MASK_CHANNEL_A)
+            return clearcoat.a;
+        #else
+            return clearcoat.r;
+        #endif
+    }
+#endif
+
 float Standard_Occlusion(float2 texcoord, float2 dx, float2 dy)
 {
     float occlusion = 0;

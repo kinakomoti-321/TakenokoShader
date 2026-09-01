@@ -1,11 +1,10 @@
 #ifndef TAKENOKO_STANDARD_AREA_LIGHT_HLSL
 #define TAKENOKO_STANDARD_AREA_LIGHT_HLSL
 
-#if defined(_VRC_AREALIGHT_ON)
+#if defined(_AREALIGHT_ON)
     float _UdonEnableLtcSystem;
 
     TAKENOKO_TEXTURE2D(_UdonLtcLut);
-    Texture2D _UdonFresnelLut;
 
     float _UdonLightVertex1[12]; // 4 vertices * 3 components
     Texture2D _UdonLightTexture1;
@@ -26,6 +25,18 @@
     float _UdonLightVertex5[12]; // 4 vertices * 3 components
     Texture2D _UdonLightTexture5;
     float4 _UdonLightEmission5;
+
+    float _UdonLightVertex6[12]; // 4 vertices * 3 components
+    Texture2D _UdonLightTexture6;
+    float4 _UdonLightEmission6;
+
+    float _UdonLightVertex7[12]; // 4 vertices * 3 components
+    Texture2D _UdonLightTexture7;
+    float4 _UdonLightEmission7;
+
+    float _UdonLightVertex8[12]; // 4 vertices * 3 components
+    Texture2D _UdonLightTexture8;
+    float4 _UdonLightEmission8;
 
     static const float LUT_SIZE = 64;
     static const float LUT_SCALE = (LUT_SIZE - 1.0) / LUT_SIZE;
@@ -237,7 +248,7 @@
         float2 uv;
         uv.y = (dotV2V2 * dotP1V1 - dotV1V2 * dotP1V2) / delta;
         uv.x = (-dotV1V2 * dotP1V1 + dotV1V1 * dotP1V2) / delta;
-        uv.y = 1.0 - uv.y;
+        uv.x = 1.0 - uv.x;
 
         // Blur sigma
         float sigma = abs(r) / sqrt(Area);
@@ -297,7 +308,7 @@
             integration += IntegrateEdge(p[4], p[0]);
 
         // integration = abs(integration);
-        integration = max(0.0, -integration);
+        integration = max(0.0, integration);
 
         float3 Lo_i = integration;
 
@@ -327,7 +338,6 @@
 
         specular = EvaluateAreaLightContribution(v, lightTexture, lightSampler);
     }
-
 #endif
 
 #endif
