@@ -65,6 +65,14 @@ float _SpecularOcclusionPower;
 
 float _MaskLightProbe;
 float _MaskLightmap;
+Texture2D _AdditionalLightmap1;
+float _AdditionalLightmapStrength1;
+Texture2D _AdditionalLightmap2;
+float _AdditionalLightmapStrength2;
+Texture2D _AdditionalLightmap3;
+float _AdditionalLightmapStrength3;
+Texture2D _AdditionalLightmap4;
+float _AdditionalLightmapStrength4;
 
 float _FilterMainTexHueShift;
 float _FilterMainTexSaturateShift;

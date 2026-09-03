@@ -277,8 +277,18 @@ namespace Takenoko.Standard
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
+                        TempuraGui.Popup<LightmapMode>("Lightmap", props[ShaderProps.LightmapMode], materialEditor);
                         materialEditor.ShaderProperty(props[ShaderProps.MaskLightProbe], new GUIContent("Mask Light Probe"));
                         materialEditor.ShaderProperty(props[ShaderProps.MaskLightmap], new GUIContent("Mask Lightmap"));
+                    }
+
+                    using (new VerticalScope(TempuraGui.borderBox))
+                    {
+                        EditorGUILayout.LabelField("Additional Lightmap", EditorStyles.boldLabel);
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Lightmap 1"), props[ShaderProps.AdditionalLightmap1], props[ShaderProps.AdditionalLightmapStrength1]);
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Lightmap 2"), props[ShaderProps.AdditionalLightmap2], props[ShaderProps.AdditionalLightmapStrength2]);
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Lightmap 3"), props[ShaderProps.AdditionalLightmap3], props[ShaderProps.AdditionalLightmapStrength3]);
+                        materialEditor.TexturePropertySingleLine(new GUIContent("Lightmap 4"), props[ShaderProps.AdditionalLightmap4], props[ShaderProps.AdditionalLightmapStrength4]);
                     }
                 }
             }
@@ -524,6 +534,14 @@ namespace Takenoko.Standard
             {
                 ShaderKeywords.RoughnessModelRoughness.Name(),
                 ShaderKeywords.RoughnessModelSmoothness.Name()
+            });
+
+            TempuraGui.ExcusiveKeyward<LightmapMode>(material, ShaderProps.LightmapMode.Name(), new string[]
+            {
+                ShaderKeywords.LightmapDefault.Name(),
+                ShaderKeywords.LightmapRnm.Name(),
+                ShaderKeywords.LightmapSh.Name(),
+                ShaderKeywords.LightmapMonosh.Name()
             });
 
             TempuraGui.ExcusiveKeyward<TilingMode>(material, ShaderProps.MainTexTilingMode.Name(), new string[]

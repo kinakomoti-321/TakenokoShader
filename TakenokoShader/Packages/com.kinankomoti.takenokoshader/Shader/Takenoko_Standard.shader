@@ -102,6 +102,19 @@ Shader "Takenoko/Standard"
 
         _MaskLightProbe ("Light Probe Mask", Range(0, 2)) = 1.0
         _MaskLightmap ("Lightmap Mask", Range(0, 2)) = 1.0
+        [Enum(Default,0,RNM,1,SH,2,MonoSH,3)] _LightmapMode ("Lightmap", Float) = 0
+        [HideInInspector][Toggle(BAKERY_RNM)] _BAKERY_RNM ("Allow RNM Lightmaps", Float) = 0
+        [HideInInspector][Toggle(BAKERY_SH)] _BAKERY_SH ("Enable SH", Float) = 0
+        [HideInInspector][Toggle(BAKERY_MONOSH)] _BAKERY_MONOSH ("Enable MonoSH", Float) = 0
+        [HideInInspector][Toggle(BAKERY_SHNONLINEAR)] _BAKERY_SHNONLINEAR ("SH non-linear mode", Float) = 1
+        _AdditionalLightmap1 ("Additional Lightmap 1", 2D) = "black" { }
+        _AdditionalLightmapStrength1 ("Additional Lightmap Strength 1", Range(0, 1)) = 1.0
+        _AdditionalLightmap2 ("Additional Lightmap 2", 2D) = "black" { }
+        _AdditionalLightmapStrength2 ("Additional Lightmap Strength 2", Range(0, 1)) = 1.0
+        _AdditionalLightmap3 ("Additional Lightmap 3", 2D) = "black" { }
+        _AdditionalLightmapStrength3 ("Additional Lightmap Strength 3", Range(0, 1)) = 1.0
+        _AdditionalLightmap4 ("Additional Lightmap 4", 2D) = "black" { }
+        _AdditionalLightmapStrength4 ("Additional Lightmap Strength 4", Range(0, 1)) = 1.0
 
         _FilterMainTexHueShift ("Hue Shift", Range(-1, 1)) = 0.0
         _FilterMainTexSaturateShift ("Saturate", Range(-1, 1)) = 0.0
@@ -198,7 +211,7 @@ Shader "Takenoko/Standard"
             #pragma shader_feature_local _CLEARCOAT_ON
             #pragma shader_feature_local _CLEARCOAT_MASK_CHANNEL_R _CLEARCOAT_MASK_CHANNEL_G _CLEARCOAT_MASK_CHANNEL_B _CLEARCOAT_MASK_CHANNEL_A
 
-            #pragma shader_feature_local _LIGHTMAP_DEFAULT _LIGHTMAP_SH _LIGHTMAP_MONOSH
+            #pragma shader_feature_local _LIGHTMAP_DEFAULT _LIGHTMAP_RNM _LIGHTMAP_SH _LIGHTMAP_MONOSH
             
             // VRC Light Volume
             #pragma shader_feature_local _LIGHTVOLUME_OFF _LIGHTVOLUME_ON

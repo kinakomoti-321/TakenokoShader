@@ -116,3 +116,6 @@ InitTestScene*.unity*
 
 /Packages/com.vrchat.base
 /Packages/com.vrchat.worlds
+/Assets/Bakery
+/Assets/Editor
+/Assets/BakeryLightmaps

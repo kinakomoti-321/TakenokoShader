@@ -133,6 +133,8 @@ public enum ShaderKeywords
     ClearcoatMaskChannelA,
     [Description("_LIGHTMAP_DEFAULT")]
     LightmapDefault,
+    [Description("_LIGHTMAP_RNM")]
+    LightmapRnm,
     [Description("_LIGHTMAP_SH")]
     LightmapSh,
     [Description("_LIGHTMAP_MONOSH")]
@@ -259,6 +261,7 @@ public static class ShaderKeywordsNames
         { ShaderKeywords.ClearcoatMaskChannelB, "_CLEARCOAT_MASK_CHANNEL_B" },
         { ShaderKeywords.ClearcoatMaskChannelA, "_CLEARCOAT_MASK_CHANNEL_A" },
         { ShaderKeywords.LightmapDefault, "_LIGHTMAP_DEFAULT" },
+        { ShaderKeywords.LightmapRnm, "_LIGHTMAP_RNM" },
         { ShaderKeywords.LightmapSh, "_LIGHTMAP_SH" },
         { ShaderKeywords.LightmapMonosh, "_LIGHTMAP_MONOSH" },
         { ShaderKeywords.LightvolumeOff, "_LIGHTVOLUME_OFF" },

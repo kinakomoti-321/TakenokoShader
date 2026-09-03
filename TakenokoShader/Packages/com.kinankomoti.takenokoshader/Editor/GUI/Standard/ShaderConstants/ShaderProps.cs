@@ -142,6 +142,24 @@ public enum ShaderProps
     MaskLightProbe,
     [Description("_MaskLightmap")]
     MaskLightmap,
+    [Description("_LightmapMode")]
+    LightmapMode,
+    [Description("_AdditionalLightmap1")]
+    AdditionalLightmap1,
+    [Description("_AdditionalLightmapStrength1")]
+    AdditionalLightmapStrength1,
+    [Description("_AdditionalLightmap2")]
+    AdditionalLightmap2,
+    [Description("_AdditionalLightmapStrength2")]
+    AdditionalLightmapStrength2,
+    [Description("_AdditionalLightmap3")]
+    AdditionalLightmap3,
+    [Description("_AdditionalLightmapStrength3")]
+    AdditionalLightmapStrength3,
+    [Description("_AdditionalLightmap4")]
+    AdditionalLightmap4,
+    [Description("_AdditionalLightmapStrength4")]
+    AdditionalLightmapStrength4,
     [Description("_FilterMainTexHueShift")]
     FilterMainTexHueShift,
     [Description("_FilterMainTexSaturateShift")]
@@ -273,6 +291,15 @@ public static class ShaderPropsName
         { ShaderProps.SpecularOcclusionPower, "_SpecularOcclusionPower" },
         { ShaderProps.MaskLightProbe, "_MaskLightProbe" },
         { ShaderProps.MaskLightmap, "_MaskLightmap" },
+        { ShaderProps.LightmapMode, "_LightmapMode" },
+        { ShaderProps.AdditionalLightmap1, "_AdditionalLightmap1" },
+        { ShaderProps.AdditionalLightmapStrength1, "_AdditionalLightmapStrength1" },
+        { ShaderProps.AdditionalLightmap2, "_AdditionalLightmap2" },
+        { ShaderProps.AdditionalLightmapStrength2, "_AdditionalLightmapStrength2" },
+        { ShaderProps.AdditionalLightmap3, "_AdditionalLightmap3" },
+        { ShaderProps.AdditionalLightmapStrength3, "_AdditionalLightmapStrength3" },
+        { ShaderProps.AdditionalLightmap4, "_AdditionalLightmap4" },
+        { ShaderProps.AdditionalLightmapStrength4, "_AdditionalLightmapStrength4" },
         { ShaderProps.FilterMainTexHueShift, "_FilterMainTexHueShift" },
         { ShaderProps.FilterMainTexSaturateShift, "_FilterMainTexSaturateShift" },
         { ShaderProps.FilterMainTexValueShift, "_FilterMainTexValueShift" },

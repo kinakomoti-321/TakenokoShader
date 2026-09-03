@@ -10,6 +10,7 @@
 #include "Takenoko_StandardAttribute.hlsl"
 #include "Takenoko_StandardMapping.hlsl"
 #include "Takenoko_StandardAreaLight.hlsl"
+#include "../ThirdParty/Bakery.hlsl"
 
 struct MaterialData
 {
@@ -327,7 +328,16 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
             // Use VRC Light Volume instead of lightmap/SH
             environmentDiffuse += lightVolumeDiffuse * basecolor;
         #elif defined(LIGHTMAP_ON)
-            environmentDiffuse += EvaluateLightmap(i.lightmapUV, shadingNormal, viewDirection) * basecolor * _MaskLightmap;
+            float3 lightmapDiffuse = 0.0;
+            float3 lightmapDirection = 0.0;
+
+            EvaluateLightmap(i.lightmapUV, shadingNormal, materialData.normalTS, tbn, lightmapDiffuse, lightmapDirection);
+            environmentDiffuse += EvaluateLightmapDiffuse(_AdditionalLightmap1, i.lightmapUV) * _AdditionalLightmapStrength1;
+            environmentDiffuse += EvaluateLightmapDiffuse(_AdditionalLightmap2, i.lightmapUV) * _AdditionalLightmapStrength2;
+            environmentDiffuse += EvaluateLightmapDiffuse(_AdditionalLightmap3, i.lightmapUV) * _AdditionalLightmapStrength3;
+            environmentDiffuse += EvaluateLightmapDiffuse(_AdditionalLightmap4, i.lightmapUV) * _AdditionalLightmapStrength4;
+            environmentDiffuse += lightmapDiffuse * basecolor * _MaskLightmap;
+
         #else
             environmentDiffuse += EvaluateSH(shadingNormal, positionWS) * basecolor * _MaskLightProbe;
         #endif
