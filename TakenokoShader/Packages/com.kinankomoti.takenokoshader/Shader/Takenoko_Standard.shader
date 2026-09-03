@@ -103,6 +103,7 @@ Shader "Takenoko/Standard"
         _MaskLightProbe ("Light Probe Mask", Range(0, 2)) = 1.0
         _MaskLightmap ("Lightmap Mask", Range(0, 2)) = 1.0
         [Enum(Default,0,RNM,1,SH,2,MonoSH,3)] _LightmapMode ("Lightmap", Float) = 0
+        [Toggle(_LIGHTMAP_NONLINEAR_SH_ON)] _LightmapNonLinearSh ("Non-Linear SH", Int) = 1
         [HideInInspector][Toggle(BAKERY_RNM)] _BAKERY_RNM ("Allow RNM Lightmaps", Float) = 0
         [HideInInspector][Toggle(BAKERY_SH)] _BAKERY_SH ("Enable SH", Float) = 0
         [HideInInspector][Toggle(BAKERY_MONOSH)] _BAKERY_MONOSH ("Enable MonoSH", Float) = 0
@@ -212,6 +213,7 @@ Shader "Takenoko/Standard"
             #pragma shader_feature_local _CLEARCOAT_MASK_CHANNEL_R _CLEARCOAT_MASK_CHANNEL_G _CLEARCOAT_MASK_CHANNEL_B _CLEARCOAT_MASK_CHANNEL_A
 
             #pragma shader_feature_local _LIGHTMAP_DEFAULT _LIGHTMAP_RNM _LIGHTMAP_SH _LIGHTMAP_MONOSH
+            #pragma shader_feature_local _LIGHTMAP_NONLINEAR_SH_ON
             
             // VRC Light Volume
             #pragma shader_feature_local _LIGHTVOLUME_OFF _LIGHTVOLUME_ON

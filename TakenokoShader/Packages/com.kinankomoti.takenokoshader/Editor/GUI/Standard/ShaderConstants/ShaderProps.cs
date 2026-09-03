@@ -144,6 +144,8 @@ public enum ShaderProps
     MaskLightmap,
     [Description("_LightmapMode")]
     LightmapMode,
+    [Description("_LightmapNonLinearSh")]
+    LightmapNonLinearSh,
     [Description("_AdditionalLightmap1")]
     AdditionalLightmap1,
     [Description("_AdditionalLightmapStrength1")]
@@ -292,6 +294,7 @@ public static class ShaderPropsName
         { ShaderProps.MaskLightProbe, "_MaskLightProbe" },
         { ShaderProps.MaskLightmap, "_MaskLightmap" },
         { ShaderProps.LightmapMode, "_LightmapMode" },
+        { ShaderProps.LightmapNonLinearSh, "_LightmapNonLinearSh" },
         { ShaderProps.AdditionalLightmap1, "_AdditionalLightmap1" },
         { ShaderProps.AdditionalLightmapStrength1, "_AdditionalLightmapStrength1" },
         { ShaderProps.AdditionalLightmap2, "_AdditionalLightmap2" },

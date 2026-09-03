@@ -275,16 +275,27 @@ namespace Takenoko.Standard
                         }
                     }
 
+
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        TempuraGui.Popup<LightmapMode>("Lightmap", props[ShaderProps.LightmapMode], materialEditor);
                         materialEditor.ShaderProperty(props[ShaderProps.MaskLightProbe], new GUIContent("Mask Light Probe"));
                         materialEditor.ShaderProperty(props[ShaderProps.MaskLightmap], new GUIContent("Mask Lightmap"));
                     }
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        EditorGUILayout.LabelField("Additional Lightmap", EditorStyles.boldLabel);
+                        EditorGUILayout.LabelField("Lightmap", EditorStyles.boldLabel);
+                        TempuraGui.Popup<LightmapMode>("Format", props[ShaderProps.LightmapMode], materialEditor);
+
+                        var lightmapMode = Cast<LightmapMode>(material, ShaderProps.LightmapMode.Name());
+                        if (lightmapMode == LightmapMode.SH || lightmapMode == LightmapMode.MonoSH)
+                        {
+                            materialEditor.ShaderProperty(props[ShaderProps.LightmapNonLinearSh], new GUIContent("Non-Linear SH"));
+                        }
+
+                        TempuraGui.Space2();
+
+                        EditorGUILayout.LabelField("Additional lightmap", EditorStyles.boldLabel);
                         materialEditor.TexturePropertySingleLine(new GUIContent("Lightmap 1"), props[ShaderProps.AdditionalLightmap1], props[ShaderProps.AdditionalLightmapStrength1]);
                         materialEditor.TexturePropertySingleLine(new GUIContent("Lightmap 2"), props[ShaderProps.AdditionalLightmap2], props[ShaderProps.AdditionalLightmapStrength2]);
                         materialEditor.TexturePropertySingleLine(new GUIContent("Lightmap 3"), props[ShaderProps.AdditionalLightmap3], props[ShaderProps.AdditionalLightmapStrength3]);
@@ -543,6 +554,9 @@ namespace Takenoko.Standard
                 ShaderKeywords.LightmapSh.Name(),
                 ShaderKeywords.LightmapMonosh.Name()
             });
+
+            TempuraGui.ToggleKeyward(material, ShaderKeywords.LightmapNonlinearShOn.Name(),
+                Cast(material.GetFloat(ShaderProps.LightmapNonLinearSh.Name())));
 
             TempuraGui.ExcusiveKeyward<TilingMode>(material, ShaderProps.MainTexTilingMode.Name(), new string[]
             {

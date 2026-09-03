@@ -139,6 +139,8 @@ public enum ShaderKeywords
     LightmapSh,
     [Description("_LIGHTMAP_MONOSH")]
     LightmapMonosh,
+    [Description("_LIGHTMAP_NONLINEAR_SH_ON")]
+    LightmapNonlinearShOn,
     [Description("_LIGHTVOLUME_OFF")]
     LightvolumeOff,
     [Description("_LIGHTVOLUME_ON")]
@@ -264,6 +266,7 @@ public static class ShaderKeywordsNames
         { ShaderKeywords.LightmapRnm, "_LIGHTMAP_RNM" },
         { ShaderKeywords.LightmapSh, "_LIGHTMAP_SH" },
         { ShaderKeywords.LightmapMonosh, "_LIGHTMAP_MONOSH" },
+        { ShaderKeywords.LightmapNonlinearShOn, "_LIGHTMAP_NONLINEAR_SH_ON" },
         { ShaderKeywords.LightvolumeOff, "_LIGHTVOLUME_OFF" },
         { ShaderKeywords.LightvolumeOn, "_LIGHTVOLUME_ON" },
         { ShaderKeywords.LightvolumeModeReplace, "_LIGHTVOLUME_MODE_REPLACE" },
