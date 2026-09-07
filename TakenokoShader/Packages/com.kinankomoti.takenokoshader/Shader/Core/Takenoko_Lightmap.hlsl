@@ -7,14 +7,9 @@
 
 SamplerState sampler_LinearClamp;
 
-void EvaluateLightmap(float2 lightmapUV, float3 normalWS, float3 normalTS, float3x3 tbn, out float3 diffuse, out float3 direction)
+void EvaluateLightmap(float2 lightmapUV, float3 normalWS, float3 normalTS, float3x3 tbn, out float3 diffuse, out ShDirectionalLight directionalLight)
 {
-    float3 directionWS;
-    Bakery_EvaluateLightmap(lightmapUV, normalWS, normalTS, tbn, diffuse, directionWS);
-
-    // Unlit texels give a zero direction, so guard the divide instead of normalizing.
-    float directionLength = length(directionWS);
-    direction = directionLength > 1.0e-6 ? directionWS / directionLength : 0.0;
+    Bakery_EvaluateLightmap(lightmapUV, normalWS, normalTS, tbn, diffuse, directionalLight);
 }
 
 float3 EvaluateLightmapDiffuse(Texture2D lightmap, float2 lightmapUV)

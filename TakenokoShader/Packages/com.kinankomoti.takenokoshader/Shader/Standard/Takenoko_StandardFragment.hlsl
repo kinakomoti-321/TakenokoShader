@@ -320,6 +320,9 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float3 environmentSpecular = 0.0;
     float3 environmentDiffuse = 0.0;
     float3 environmentCoat = 0.0;
+    float3 environmentSss = 0.0;
+    
+    ShDirectionalLight environmentLight = NoShDirectionalLight();
     float3 reflUVW = reflect(-viewDirection, shadingNormal);
 
     #if defined(_TAKENOKO_FOWARD_BASE)
@@ -347,9 +350,8 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
             environmentDiffuse += lightVolumeDiffuse * basecolor;
         #elif defined(LIGHTMAP_ON)
             float3 lightmapDiffuse = 0.0;
-            float3 lightmapDirection = 0.0;
 
-            EvaluateLightmap(i.lightmapUV, shadingNormal, materialData.normalTS, tbn, lightmapDiffuse, lightmapDirection);
+            EvaluateLightmap(i.lightmapUV, shadingNormal, materialData.normalTS, tbn, lightmapDiffuse, environmentLight);
             environmentDiffuse += EvaluateLightmapDiffuse(_AdditionalLightmap1, i.lightmapUV) * _AdditionalLightmapStrength1;
             environmentDiffuse += EvaluateLightmapDiffuse(_AdditionalLightmap2, i.lightmapUV) * _AdditionalLightmapStrength2;
             environmentDiffuse += EvaluateLightmapDiffuse(_AdditionalLightmap3, i.lightmapUV) * _AdditionalLightmapStrength3;
@@ -357,12 +359,27 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
             environmentDiffuse += lightmapDiffuse * basecolor * _MaskLightmap;
 
         #else
-            environmentDiffuse += EvaluateSH(shadingNormal, positionWS) * basecolor * _MaskLightProbe;
+            environmentDiffuse += EvaluateSH(shadingNormal, positionWS, environmentLight) * basecolor * _MaskLightProbe;
         #endif
 
         #if defined(LIGHTVOLUME_SUPPORT) && defined(_LIGHTVOLUME_ON) && defined(_LIGHTVOLUME_MODE_ADDITIVE)
             // Additive Light Volume support (blend with existing lighting)
             environmentDiffuse += lightVolumeDiffuse * basecolor * _LightVolumeStrength * _MaskLightProbe;
+        #endif
+
+        float3 envLightDirection = environmentLight.direction;
+        float3 envHalfVector = Unity_SafeNormalize(envLightDirection + viewDirection);
+        float envDotNL = saturate(dot(shadingNormal, envLightDirection));
+        float envDotNH = saturate(dot(shadingNormal, envHalfVector));
+
+        environmentSpecular += SpecularBRDF(F, roughness, envDotNH, dotNV, envDotNL) * envDotNL * environmentLight.color;
+
+        #if defined(_CLEARCOAT_ON)
+            environmentCoat += SpecularBRDF(ShlickFresnel(0.04, dotNV), 0.25, envDotNH, dotNV, envDotNL) * envDotNL * environmentLight.color * clearcoat;
+        #endif
+
+        #if defined(_SSS_ON)
+            environmentSss += max(EvaluateSss(shadingNormal, envLightDirection, viewDirection, sssColor, thickness, _SssAnisotropy, basecolor, _SssFrontPower, _SssBackPower) - basecolor * envDotNL, 0.0) * environmentLight.color;
         #endif
     #endif
 
@@ -381,7 +398,7 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float3 diffuse = (lightDiffuse + environmentDiffuse + areaDiffuse) * occlusion;
     float3 specular = lightSpecular + environmentSpecular + areaSpecular;
     float3 coat = lightCoat + environmentCoat;
-    float3 sss = lightSss;
+    float3 sss = lightSss + environmentSss;
     float3 emission = materialData.emission;
 
     #if defined(_SPECULAR_OCCLUSION_ON)

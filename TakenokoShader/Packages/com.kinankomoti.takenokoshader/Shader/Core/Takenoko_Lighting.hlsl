@@ -89,8 +89,15 @@ UnityLightData GetUnityLightData(in VertexOutput v)
 //--------------------------------------------
 // Lighting Evaluation
 //--------------------------------------------
-float3 EvaluateSH(float3 normalWS, float3 positionWS)
+float3 EvaluateSH(float3 normalWS, float3 positionWS, out ShDirectionalLight directionalLight)
 {
+    float3 L0 = float3(unity_SHAr.w, unity_SHAg.w, unity_SHAb.w);
+    float3 L1x = float3(unity_SHAr.x, unity_SHAg.x, unity_SHAb.x);
+    float3 L1y = float3(unity_SHAr.y, unity_SHAg.y, unity_SHAb.y);
+    float3 L1z = float3(unity_SHAr.z, unity_SHAg.z, unity_SHAb.z);
+
+    directionalLight = EvaluateShDirectionalLight(L0, L1x, L1y, L1z);
+
     float3 sh;
     sh = ShadeSH9(half4(normalWS, 1.0));
 

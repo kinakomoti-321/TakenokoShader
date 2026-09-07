@@ -130,4 +130,46 @@ float3 ShiftHSV(float3 rgb, float3 shift)
     return HSV2RGB(hsv);
 }
 
+//--------------------------------------------
+// SH Directional Light
+//--------------------------------------------
+
+// A single pseudo directional light standing in for an L0/L1 spherical harmonic.
+// For L1 data the optimal linear direction is the dominant direction: the L1 band
+// is the first moment of the sphere, so it already points at the mean incoming
+// light. Only L2 would make the two differ.
+struct ShDirectionalLight
+{
+    float3 direction;
+    float3 color;
+};
+
+ShDirectionalLight NoShDirectionalLight()
+{
+    ShDirectionalLight light;
+    light.direction = float3(0.0, 1.0, 0.0);
+    light.color = 0.0;
+    return light;
+}
+
+// Optimal linear direction
+ShDirectionalLight EvaluateShDirectionalLight(float3 L0, float3 L1x, float3 L1y, float3 L1z)
+{
+    const float3 luma = float3(0.2125, 0.7154, 0.0721);
+
+    float3 R1 = float3(dot(L1x, luma), dot(L1y, luma), dot(L1z, luma));
+    float R0 = max(dot(L0, luma), 1.0e-5);
+    float lengthR1 = length(R1);
+
+    ShDirectionalLight light;
+    light.direction = lengthR1 > 1.0e-5 ? R1 / lengthR1 : float3(0.0, 1.0, 0.0);
+
+    float directionality = saturate(lengthR1 / R0);
+    float3 alongDirection = max(
+        L0 + light.direction.x * L1x + light.direction.y * L1y + light.direction.z * L1z, 0.0);
+    light.color = alongDirection * directionality;
+
+    return light;
+}
+
 #endif

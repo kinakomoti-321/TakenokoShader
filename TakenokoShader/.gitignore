@@ -116,6 +116,7 @@ InitTestScene*.unity*
 
 /Packages/com.vrchat.base
 /Packages/com.vrchat.worlds
+/Packages/red.sim.lightvolumes
 /Assets/Bakery
 /Assets/Editor
 /Assets/BakeryLightmaps
