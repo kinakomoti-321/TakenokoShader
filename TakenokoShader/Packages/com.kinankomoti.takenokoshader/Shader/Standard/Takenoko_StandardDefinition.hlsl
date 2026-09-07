@@ -52,19 +52,12 @@ float _HeightSubStep;
 
 #if defined(_SSS_ON)
     float _SssThickness;
-    float _SssFrontStrength;
-    TAKENOKO_TEXTURE2D(_SssCurvatureTex);
-    float _SssCurvature;
     TAKENOKO_TEXTURE2D(_SssThicknessTex);
     float4 _SssColor;
     TAKENOKO_TEXTURE2D(_SssColorTex);
-    float _SssScatterDistance;
-    float _SssDistortion;
-    float _SssPower;
-    float _SssScale;
-    float _SssAmbient;
+    float _SssFrontPower;
+    float _SssBackPower;
     float _SssAnisotropy;
-    float _SssDirectionalWeight;
     float _SssShadowStrength;
 #endif
 

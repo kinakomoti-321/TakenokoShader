@@ -109,10 +109,6 @@ public enum ShaderKeywords
     ThinfilmChannelA,
     [Description("_SSS_ON")]
     SssOn,
-    [Description("_SSS_MODE_VOLUME")]
-    SssModeVolume,
-    [Description("_SSS_MODE_THINWALL")]
-    SssModeThinwall,
     [Description("_SSS_THICKNESS_CHANNEL_R")]
     SssThicknessChannelR,
     [Description("_SSS_THICKNESS_CHANNEL_G")]
@@ -251,8 +247,6 @@ public static class ShaderKeywordsNames
         { ShaderKeywords.ThinfilmChannelB, "_THINFILM_CHANNEL_B" },
         { ShaderKeywords.ThinfilmChannelA, "_THINFILM_CHANNEL_A" },
         { ShaderKeywords.SssOn, "_SSS_ON" },
-        { ShaderKeywords.SssModeVolume, "_SSS_MODE_VOLUME" },
-        { ShaderKeywords.SssModeThinwall, "_SSS_MODE_THINWALL" },
         { ShaderKeywords.SssThicknessChannelR, "_SSS_THICKNESS_CHANNEL_R" },
         { ShaderKeywords.SssThicknessChannelG, "_SSS_THICKNESS_CHANNEL_G" },
         { ShaderKeywords.SssThicknessChannelB, "_SSS_THICKNESS_CHANNEL_B" },

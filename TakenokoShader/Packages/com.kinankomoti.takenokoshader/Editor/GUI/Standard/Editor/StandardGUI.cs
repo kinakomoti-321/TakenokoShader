@@ -229,34 +229,21 @@ namespace Takenoko.Standard
                         if (useSss)
                         {
                             TempuraGui.Space2();
-                            TempuraGui.Popup<SssMode>("Mode", props[ShaderProps.SssMode], materialEditor);
+
                             materialEditor.TexturePropertySingleLine(new GUIContent("SSS Color"), props[ShaderProps.SssColorTex], props[ShaderProps.SssColor]);
-                            materialEditor.ShaderProperty(props[ShaderProps.SssScatterDistance], new GUIContent("Scatter Distance"));
+                            materialEditor.ShaderProperty(props[ShaderProps.SssFrontPower], new GUIContent("Front Power", "Multiplies the front scattering lobe."));
+
                             TempuraGui.Space2();
-                            EditorGUILayout.LabelField("Front Scattering", EditorStyles.boldLabel);
-                            materialEditor.ShaderProperty(props[ShaderProps.SssFrontStrength], new GUIContent("Strength"));
-                            materialEditor.TexturePropertySingleLine(new GUIContent("Curvature (R)"), props[ShaderProps.SssCurvatureTex], props[ShaderProps.SssCurvature]);
-                            DrawLinearTextureWarning(materials, ShaderProps.SssCurvatureTex.Name(), "Curvature");
+
                             EditorGUILayout.LabelField("Transmission", EditorStyles.boldLabel);
-                            TempuraGui.Popup<SssModel>("Scattering Model", props[ShaderProps.SssModel], materialEditor);
                             materialEditor.TexturePropertyTwoLines(new GUIContent("Thickness"), props[ShaderProps.SssThicknessTex], props[ShaderProps.SssThickness], new GUIContent("Channel"), props[ShaderProps.SssThicknessChannel]);
                             DrawLinearTextureWarning(materials, ShaderProps.SssThicknessTex.Name(), "SSS Thickness");
 
                             TempuraGui.Space2();
 
-                            materialEditor.ShaderProperty(props[ShaderProps.SssDistortion], new GUIContent("Distortion"));
-                            if (props[ShaderProps.SssModel].hasMixedValue || props[ShaderProps.SssModel].floatValue == (float)SssModel.Fast)
-                            {
-                                materialEditor.ShaderProperty(props[ShaderProps.SssPower], new GUIContent("Power"));
-                            }
-                            if (props[ShaderProps.SssModel].hasMixedValue || props[ShaderProps.SssModel].floatValue == (float)SssModel.HG)
-                            {
-                                materialEditor.ShaderProperty(props[ShaderProps.SssAnisotropy], new GUIContent("Anisotropy"));
-                                materialEditor.ShaderProperty(props[ShaderProps.SssDirectionalWeight], new GUIContent("Directional Weight"));
-                            }
+                            materialEditor.ShaderProperty(props[ShaderProps.SssBackPower], new GUIContent("Back Power", "Multiplies the transmitted lobe."));
+                            materialEditor.ShaderProperty(props[ShaderProps.SssAnisotropy], new GUIContent("Anisotropy"));
                             materialEditor.ShaderProperty(props[ShaderProps.SssShadowStrength], new GUIContent("Shadow Strength"));
-                            materialEditor.ShaderProperty(props[ShaderProps.SssScale], new GUIContent("Scale"));
-                            materialEditor.ShaderProperty(props[ShaderProps.SssAmbient], new GUIContent("Ambient", "Constant floor so the material still scatters away from the light."));
                         }
                     }
 
@@ -622,15 +609,6 @@ namespace Takenoko.Standard
                 ShaderKeywords.ThinfilmChannelG.Name(),
                 ShaderKeywords.ThinfilmChannelB.Name(),
                 ShaderKeywords.ThinfilmChannelA.Name(),
-            });
-
-            TempuraGui.ExcusiveKeyward<SssModel>(material, ShaderProps.SssModel.Name(), new string[]{
-                "_SSS_MODEL_FAST", "_SSS_MODEL_HG"
-            });
-
-            TempuraGui.ExcusiveKeyward<SssMode>(material, ShaderProps.SssMode.Name(), new string[]{
-                ShaderKeywords.SssModeVolume.Name(),
-                ShaderKeywords.SssModeThinwall.Name(),
             });
 
             TempuraGui.ExcusiveKeyward<TextureChannel>(material, ShaderProps.SssThicknessChannel.Name(), new string[]{

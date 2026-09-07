@@ -25,16 +25,17 @@ struct MaterialData
 };
 
 #if defined(_SSS_ON)
-    float3 EvaluateSss(float3 normalWS, float3 lightWS, float3 viewWS, float3 sssColor, float thickness)
+    float3 EvaluateSss(float3 normalWS, float3 lightWS, float3 viewWS, float3 sssColor, float thickness, float anisotropy, float3 basecolor, float frontPower, float backPower)
     {
+        // Front scattering is light re-emerging near where it entered, so it carries
+        // the surface albedo. The back lobe below is tinted by sssColor instead.
         float3 w = saturate(sssColor);
-        float3 sssFront = max(dot(normalWS, lightWS) + w, 0.0) / ((1.0 + w) * (1.0 + w));
+        float3 sssFront = frontPower * basecolor * max(dot(normalWS, lightWS) + w, 0.0) / ((1.0 + w) * (1.0 + w));
 
-        float3 distortedL = Unity_SafeNormalize(lightWS);
-        float cosTheta = clamp(dot(viewWS, -distortedL), -1.0, 1.0);
-        float phase = HgPhase(cosTheta, clamp(_SssAnisotropy, -0.95, 0.95));
+        float cosTheta = clamp(dot(viewWS, -lightWS), -1.0, 1.0);
+        float phase = HgPhase(cosTheta, clamp(anisotropy, -0.95, 0.95));
         float transmission = 1.0 - saturate(thickness);
-        float3 sssBack = sssColor * transmission * phase;
+        float3 sssBack = backPower * sssColor * transmission * phase;
 
         return sssFront + sssBack;
     }
@@ -304,9 +305,11 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float3 lightSpecular = SpecularBRDF(F, roughness, dotNH, dotNV, dotNL) * dotNL * lightColor;
     float3 lightSss = 0.0;
     #if defined(_SSS_ON)
-        float3 sssColor = _SssColor;
+        float3 sssColor = Standard_SssColor(texcoord);
         float thickness = _SssThickness * Standard_SssThickness(texcoord);
-        lightSss += max(EvaluateSss(shadingNormal, lightDirection, viewDirection, sssColor, thickness) - lightDiffuse, 0.0) * lightData.color;
+        float sssShadow = lerp(1.0, lightData.shadow, _SssShadowStrength);
+        float3 sssLight = lightData.color * lightData.distanceAttenuation * sssShadow;
+        lightSss += max(EvaluateSss(shadingNormal, lightDirection, viewDirection, sssColor, thickness, _SssAnisotropy, basecolor, _SssFrontPower, _SssBackPower) - basecolor * dotNL, 0.0) * sssLight;
     #endif
     float3 lightCoat = 0.0;
     #if defined(_CLEARCOAT_ON)

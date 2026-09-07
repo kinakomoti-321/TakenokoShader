@@ -23,14 +23,14 @@ Material:
   - _ROUGHNESS_CHANNEL_R
   - _ROUGHNESS_MODEL_ROUGHNESS
   - _SKYBOXFOG_DISTANCE
-  - _SSS_MODEL_HG
-  - _SSS_MODE_VOLUME
   - _SSS_ON
   - _SSS_THICKNESS_CHANNEL_R
   - _THINFILM_CHANNEL_G
   m_InvalidKeywords:
   - BAKERY_SHNONLINEAR
   - _SPECULAROCCLUSIONLIGHTMAP_ON
+  - _SSS_MODEL_HG
+  - _SSS_MODE_VOLUME
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -257,18 +257,18 @@ Material:
     - _SrcBlend: 1
     - _Sss: 1
     - _SssAmbient: 0
-    - _SssAnisotropy: 0.844
+    - _SssAnisotropy: 0.61
     - _SssCurvature: 1
     - _SssDirectionalWeight: 1
-    - _SssDistortion: 0
+    - _SssDistortion: 0.773
     - _SssFrontStrength: 0.565
     - _SssMode: 0
     - _SssModel: 1
     - _SssPower: 4.67
     - _SssScale: 2.06
     - _SssScatterDistance: 0.802
-    - _SssShadowStrength: 0
-    - _SssThickness: 0.5
+    - _SssShadowStrength: 0.076
+    - _SssThickness: 0.951
     - _SssThicknessChannel: 0
     - _ThinFilmChannel: 1
     - _ThinFilmIor: 1.5
@@ -294,7 +294,7 @@ Material:
     - _SkyboxFogBoxSizeMin: {r: -1, g: -1, b: -1, a: 0}
     - _SkyboxFogSphereCenter: {r: 0, g: 0, b: 0, a: 0}
     - _SpecOcclusionParams: {r: 10, g: -0.5, b: 0.8, a: 0}
-    - _SssColor: {r: 0.9, g: 0.39999998, b: 0.29999998, a: 1}
+    - _SssColor: {r: 0.62507415, g: 0.9245283, b: 0.63761085, a: 1}
     - _SssScatterRadius: {r: 0.5, g: 0.2, b: 0.1, a: 0}
     - _VolumeInvSize: {r: 1000001, g: 1000001, b: 1000001, a: 1}
     - _VolumeMin: {r: 0, g: 0, b: 0, a: 1}

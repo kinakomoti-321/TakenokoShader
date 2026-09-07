@@ -79,24 +79,15 @@ Shader "Takenoko/Standard"
         _ThinFilmIor ("Ior", Range(1, 3)) = 1.5
 
         [Toggle] _Sss ("Subsurface scattering", Int) = 0
-        _SssFrontStrength ("Front SSS Strength", Range(0, 1)) = 0
-        _SssCurvatureTex ("Curvature (R)", 2D) = "white" { }
-        _SssCurvature ("Curvature", Range(0, 4)) = 1
-        [Enum(Fast, 0, HG, 1)] _SssModel ("Scattering Model", Int) = 0
         _SssAnisotropy ("Anisotropy", Range(-0.95, 0.95)) = 0.5
-        _SssDirectionalWeight ("Directional Weight", Range(0, 1)) = 0.75
         _SssShadowStrength ("Shadow Strength", Range(0, 1)) = 0
-        [Enum(Volume, 0, ThinWall, 1)] _SssMode ("SSS Mode", Int) = 0
         _SssThickness ("Thickness", Range(0, 1)) = 0.5
         _SssThicknessTex ("Thickness", 2D) = "white" { }
         [Enum(R, 0, G, 1, B, 2, A, 3)] _SssThicknessChannel ("Thickness Channel", Int) = 0
         _SssColor ("SSS Color", Color) = (0.9, 0.4, 0.3, 1)
         _SssColorTex ("SSS Color", 2D) = "white" { }
-        _SssScatterDistance ("Scatter Distance", Range(0.001, 1)) = 0.5
-        _SssDistortion ("Distortion", Range(0, 1)) = 0.2
-        _SssPower ("Power", Range(1, 16)) = 4.0
-        _SssScale ("Scale", Range(0, 4)) = 1.0
-        _SssAmbient ("Ambient", Range(0, 1)) = 0.0
+        _SssFrontPower ("Front Power", Range(0, 1)) = 1.0
+        _SssBackPower ("Back Power", Range(0, 1)) = 1.0
 
         [Toggle] _ClearCoat ("Clear Coat", Int) = 0
         _ClearCoatStrength ("Strength", Range(0, 1)) = 1.0
@@ -221,8 +212,6 @@ Shader "Takenoko/Standard"
             #pragma shader_feature_local _IRIDESCENCE_ON
             #pragma shader_feature_local _THINFILM_CHANNEL_R _THINFILM_CHANNEL_G _THINFILM_CHANNEL_B _THINFILM_CHANNEL_A
             #pragma shader_feature_local _SSS_ON
-            #pragma shader_feature_local _SSS_MODEL_FAST _SSS_MODEL_HG
-            #pragma shader_feature_local _SSS_MODE_VOLUME _SSS_MODE_THINWALL
             #pragma shader_feature_local _SSS_THICKNESS_CHANNEL_R _SSS_THICKNESS_CHANNEL_G _SSS_THICKNESS_CHANNEL_B _SSS_THICKNESS_CHANNEL_A
             #pragma shader_feature_local _CLEARCOAT_ON
             #pragma shader_feature_local _CLEARCOAT_MASK_CHANNEL_R _CLEARCOAT_MASK_CHANNEL_G _CLEARCOAT_MASK_CHANNEL_B _CLEARCOAT_MASK_CHANNEL_A
@@ -281,8 +270,6 @@ Shader "Takenoko/Standard"
             #pragma shader_feature_local _IRIDESCENCE_ON
             #pragma shader_feature_local _THINFILM_CHANNEL_R _THINFILM_CHANNEL_G _THINFILM_CHANNEL_B _THINFILM_CHANNEL_A
             #pragma shader_feature_local _SSS_ON
-            #pragma shader_feature_local _SSS_MODEL_FAST _SSS_MODEL_HG
-            #pragma shader_feature_local _SSS_MODE_VOLUME _SSS_MODE_THINWALL
             #pragma shader_feature_local _SSS_THICKNESS_CHANNEL_R _SSS_THICKNESS_CHANNEL_G _SSS_THICKNESS_CHANNEL_B _SSS_THICKNESS_CHANNEL_A
             #pragma shader_feature_local _CLEARCOAT_ON
             #pragma shader_feature_local _CLEARCOAT_MASK_CHANNEL_R _CLEARCOAT_MASK_CHANNEL_G _CLEARCOAT_MASK_CHANNEL_B _CLEARCOAT_MASK_CHANNEL_A

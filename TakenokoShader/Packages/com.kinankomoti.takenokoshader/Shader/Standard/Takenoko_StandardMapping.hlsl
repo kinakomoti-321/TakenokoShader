@@ -156,6 +156,11 @@ float Standard_Height(float2 texcoord, float2 dx, float2 dy)
 #endif
 
 #if defined(_SSS_ON)
+    float3 Standard_SssColor(float2 texcoord)
+    {
+        return _SssColor.rgb * TAKENOKO_SAMPLE(_SssColorTex, texcoord).rgb;
+    }
+
     float Standard_SssThickness(float2 texcoord)
     {
         float4 thickness = TAKENOKO_SAMPLE(_SssThicknessTex, texcoord);
