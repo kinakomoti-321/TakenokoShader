@@ -24,13 +24,35 @@ struct UnityLightData
     float3 color;
     float attenuation;
 
+    // Kept apart from attenuation because transmission through a surface has to
+    // survive the shadow that surface casts on itself. A back lit face is always
+    // inside its own shadow, so folding the two together erases the effect.
+    float shadow;
+    float distanceAttenuation;
+
     RefProbeData probe;
 };
 
-inline float LightAttenuation(in VertexOutput v)
+// The cookie and distance falloff half of UNITY_LIGHT_ATTENUATION, without the
+// shadow term it multiplies in. Mirrors the per light type expansions in
+// AutoLight.cginc, so shadow * distanceAttenuation reproduces the macro exactly.
+inline float LightDistanceAttenuation(float3 positionWS)
 {
-    UNITY_LIGHT_ATTENUATION(attenuation, v, v.positionWS);
-    return attenuation;
+    #if defined(POINT)
+        float3 lightCoord = mul(unity_WorldToLight, float4(positionWS, 1.0)).xyz;
+        return tex2D(_LightTexture0, dot(lightCoord, lightCoord).rr).r;
+    #elif defined(SPOT)
+        float4 lightCoord = mul(unity_WorldToLight, float4(positionWS, 1.0));
+        return (lightCoord.z > 0.0) * UnitySpotCookie(lightCoord) * UnitySpotAttenuate(lightCoord.xyz);
+    #elif defined(POINT_COOKIE)
+        float3 lightCoord = mul(unity_WorldToLight, float4(positionWS, 1.0)).xyz;
+        return tex2D(_LightTextureB0, dot(lightCoord, lightCoord).rr).r * texCUBE(_LightTexture0, lightCoord).w;
+    #elif defined(DIRECTIONAL_COOKIE)
+        float2 lightCoord = mul(unity_WorldToLight, float4(positionWS, 1.0)).xy;
+        return tex2D(_LightTexture0, lightCoord).w;
+    #else
+        return 1.0;
+    #endif
 }
 
 inline float3 LightDirection(float3 positionWS)
@@ -42,7 +64,9 @@ UnityLightData GetUnityLightData(in VertexOutput v)
 {
     UnityLightData lightData;
     lightData.direction = LightDirection(v.positionWS);
-    lightData.attenuation = LightAttenuation(v);
+    lightData.shadow = UNITY_SHADOW_ATTENUATION(v, v.positionWS);
+    lightData.distanceAttenuation = LightDistanceAttenuation(v.positionWS);
+    lightData.attenuation = lightData.shadow * lightData.distanceAttenuation;
     lightData.color = _LightColor0.rgb;
 
     lightData.probe.probeHDR[0] = unity_SpecCube0_HDR;
@@ -73,6 +97,12 @@ float3 EvaluateSH(float3 normalWS, float3 positionWS)
     return sh;
 }
 
+
+inline float HgPhase(float cosTheta, float g)
+{
+    float d = 1.0 + g * g - 2.0 * g * cosTheta;
+    return (1.0 - g * g) / max(4.0 * TAKE_PI * d * sqrt(d), 1.0e-4);
+}
 
 inline float3 DiffuseBRDF(float3 basecolor, float roughness, float dotLH, float dotNL, float dotNV)
 {

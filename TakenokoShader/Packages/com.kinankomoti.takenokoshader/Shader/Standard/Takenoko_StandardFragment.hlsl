@@ -24,6 +24,23 @@ struct MaterialData
     float3 normalTS;
 };
 
+#if defined(_SSS_ON)
+    float3 EvaluateSss(float3 normalWS, float3 lightWS, float3 viewWS, float3 sssColor, float thickness)
+    {
+        float3 w = saturate(sssColor);
+        float3 sssFront = max(dot(normalWS, lightWS) + w, 0.0) / ((1.0 + w) * (1.0 + w));
+
+        float3 distortedL = Unity_SafeNormalize(lightWS);
+        float cosTheta = clamp(dot(viewWS, -distortedL), -1.0, 1.0);
+        float phase = HgPhase(cosTheta, clamp(_SssAnisotropy, -0.95, 0.95));
+        float transmission = 1.0 - saturate(thickness);
+        float3 sssBack = sssColor * transmission * phase;
+
+        return sssFront + sssBack;
+    }
+
+#endif
+
 inline MaterialData GetMaterialData(float2 texcoord, float3 positionWS, float3 normalWS)
 {
     MaterialData materialData;
@@ -281,17 +298,15 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
         {
             F = ShlickFresnel(F0, dotNV);
         }
-        // F = IridescenceF;
     #endif
 
     float3 lightDiffuse = DiffuseBRDF(basecolor, roughness, dotNH, dotNV, dotNL) * dotNL * lightColor;
     float3 lightSpecular = SpecularBRDF(F, roughness, dotNH, dotNV, dotNL) * dotNL * lightColor;
     float3 lightSss = 0.0;
     #if defined(_SSS_ON)
-        float sssThickness = saturate((_SssThickness * Standard_SssThickness(texcoord)) / max(dot(shadingNormal, viewDirection), 0.01));
-        float backDotNL = saturate(dot(-shadingNormal, lightDirection));
-        float3 sssDiffuse = (backDotNL * lightColor) * basecolor;
-        lightSss = saturate(sssDiffuse * smoothstep(0.0, 1.0, 1.0 - sssThickness) * 0.5);
+        float3 sssColor = _SssColor;
+        float thickness = _SssThickness * Standard_SssThickness(texcoord);
+        lightSss += max(EvaluateSss(shadingNormal, lightDirection, viewDirection, sssColor, thickness) - lightDiffuse, 0.0) * lightData.color;
     #endif
     float3 lightCoat = 0.0;
     #if defined(_CLEARCOAT_ON)

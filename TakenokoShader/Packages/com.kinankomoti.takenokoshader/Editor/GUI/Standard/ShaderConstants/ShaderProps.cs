@@ -110,6 +110,20 @@ public enum ShaderProps
     ThinFilmIor,
     [Description("_Sss")]
     Sss,
+    [Description("_SssFrontStrength")]
+    SssFrontStrength,
+    [Description("_SssCurvatureTex")]
+    SssCurvatureTex,
+    [Description("_SssCurvature")]
+    SssCurvature,
+    [Description("_SssModel")]
+    SssModel,
+    [Description("_SssAnisotropy")]
+    SssAnisotropy,
+    [Description("_SssDirectionalWeight")]
+    SssDirectionalWeight,
+    [Description("_SssShadowStrength")]
+    SssShadowStrength,
     [Description("_SssMode")]
     SssMode,
     [Description("_SssThickness")]
@@ -118,6 +132,20 @@ public enum ShaderProps
     SssThicknessTex,
     [Description("_SssThicknessChannel")]
     SssThicknessChannel,
+    [Description("_SssColor")]
+    SssColor,
+    [Description("_SssColorTex")]
+    SssColorTex,
+    [Description("_SssScatterDistance")]
+    SssScatterDistance,
+    [Description("_SssDistortion")]
+    SssDistortion,
+    [Description("_SssPower")]
+    SssPower,
+    [Description("_SssScale")]
+    SssScale,
+    [Description("_SssAmbient")]
+    SssAmbient,
     [Description("_ClearCoat")]
     ClearCoat,
     [Description("_ClearCoatStrength")]
@@ -277,10 +305,24 @@ public static class ShaderPropsName
         { ShaderProps.ThinFilmThicknessMax, "_ThinFilmThicknessMax" },
         { ShaderProps.ThinFilmIor, "_ThinFilmIor" },
         { ShaderProps.Sss, "_Sss" },
+        { ShaderProps.SssFrontStrength, "_SssFrontStrength" },
+        { ShaderProps.SssCurvatureTex, "_SssCurvatureTex" },
+        { ShaderProps.SssCurvature, "_SssCurvature" },
+        { ShaderProps.SssModel, "_SssModel" },
+        { ShaderProps.SssAnisotropy, "_SssAnisotropy" },
+        { ShaderProps.SssDirectionalWeight, "_SssDirectionalWeight" },
+        { ShaderProps.SssShadowStrength, "_SssShadowStrength" },
         { ShaderProps.SssMode, "_SssMode" },
         { ShaderProps.SssThickness, "_SssThickness" },
         { ShaderProps.SssThicknessTex, "_SssThicknessTex" },
         { ShaderProps.SssThicknessChannel, "_SssThicknessChannel" },
+        { ShaderProps.SssColor, "_SssColor" },
+        { ShaderProps.SssColorTex, "_SssColorTex" },
+        { ShaderProps.SssScatterDistance, "_SssScatterDistance" },
+        { ShaderProps.SssDistortion, "_SssDistortion" },
+        { ShaderProps.SssPower, "_SssPower" },
+        { ShaderProps.SssScale, "_SssScale" },
+        { ShaderProps.SssAmbient, "_SssAmbient" },
         { ShaderProps.ClearCoat, "_ClearCoat" },
         { ShaderProps.ClearCoatStrength, "_ClearCoatStrength" },
         { ShaderProps.ClearCoatMask, "_ClearCoatMask" },
