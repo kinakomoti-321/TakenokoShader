@@ -84,32 +84,19 @@ float Luminance(float3 color)
 
 float3 RGB2HSV(float3 rgb)
 {
-    float3 hsv;
     float cmax = max(rgb.r, max(rgb.g, rgb.b));
     float cmin = min(rgb.r, min(rgb.g, rgb.b));
-    
-    hsv.z = cmax; // value
-
     float chroma = cmax - cmin;
-    hsv.y = chroma / cmax; // saturation
 
-    if (rgb.r > rgb.g && rgb.r > rgb.b)
-    {
-        hsv.x = (0.0 + (rgb.g - rgb.b) / chroma) / 6.0; // hue
+    // Hue is undefined for achromatic colors, including black.
+    if (chroma == 0.0)
+        return float3(0.0, 0.0, cmax);
 
-    }
-    else if (rgb.g > rgb.b)
-    {
-        hsv.x = (2.0 + (rgb.b - rgb.r) / chroma) / 6.0; // hue
+    float hue = rgb.r == cmax ? (rgb.g - rgb.b) / chroma
+        : rgb.g == cmax ? 2.0 + (rgb.b - rgb.r) / chroma
+        : 4.0 + (rgb.r - rgb.g) / chroma;
 
-    }
-    else
-    {
-        hsv.x = (4.0 + (rgb.r - rgb.g) / chroma) / 6.0; // hue
-
-    }
-    hsv.x = frac(hsv.x);
-    return hsv;
+    return float3(frac(hue / 6.0), chroma / cmax, cmax);
 }
 
 // smooth hsv: https://www.shadertoy.com/view/MsS3Wc

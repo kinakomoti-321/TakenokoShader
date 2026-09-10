@@ -146,7 +146,6 @@ float Standard_Occlusion(float2 texcoord)
         occlusion = (TAKENOKO_SAMPLE(_OcclusionTex, texcoord)).a;
     #endif
 
-    occlusion = pow(occlusion, _OcclusionPower);
     occlusion = lerp(1.0, occlusion, _Occlusion);
 
     return occlusion;

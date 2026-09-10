@@ -85,9 +85,9 @@ public enum ShaderKeywords
     HeightChannelB,
     [Description("_HEIGHT_CHANNEL_A")]
     HeightChannelA,
-    [Description("_SPECULAR_OCCLUSION_ON")]
+    [Description("_SPECULAROCCLUSION_ON")]
     SpecularOcclusionOn,
-    [Description("_SPECULAR_OCCLUSION_LIGHTMAP_ON")]
+    [Description("_SPECULAROCCLUSIONLIGHTMAP_ON")]
     SpecularOcclusionLightmapOn,
     [Description("_SKYBOXFOG_ON")]
     SkyboxfogOn,
@@ -227,8 +227,8 @@ public static class ShaderKeywordsNames
         { ShaderKeywords.HeightChannelG, "_HEIGHT_CHANNEL_G" },
         { ShaderKeywords.HeightChannelB, "_HEIGHT_CHANNEL_B" },
         { ShaderKeywords.HeightChannelA, "_HEIGHT_CHANNEL_A" },
-        { ShaderKeywords.SpecularOcclusionOn, "_SPECULAR_OCCLUSION_ON" },
-        { ShaderKeywords.SpecularOcclusionLightmapOn, "_SPECULAR_OCCLUSION_LIGHTMAP_ON" },
+        { ShaderKeywords.SpecularOcclusionOn, "_SPECULAROCCLUSION_ON" },
+        { ShaderKeywords.SpecularOcclusionLightmapOn, "_SPECULAROCCLUSIONLIGHTMAP_ON" },
         { ShaderKeywords.SkyboxfogOn, "_SKYBOXFOG_ON" },
         { ShaderKeywords.SkyboxfogDistance, "_SKYBOXFOG_DISTANCE" },
         { ShaderKeywords.SkyboxfogBox, "_SKYBOXFOG_BOX" },

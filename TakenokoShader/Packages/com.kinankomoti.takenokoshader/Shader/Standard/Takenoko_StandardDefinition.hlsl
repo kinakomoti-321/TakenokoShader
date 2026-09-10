@@ -34,7 +34,6 @@ TAKENOKO_TEXTURE2D(_EmissionMap); // name Unity expectes
 
 float _Occlusion;
 TAKENOKO_TEXTURE2D(_OcclusionTex);
-float _OcclusionPower;
 
 float4 _MainTexOffset;
 float4 _MainTexScale;
@@ -75,8 +74,6 @@ float _HeightSubStep;
     TAKENOKO_TEXTURE2D(_ClearCoatMask);
 #endif
 
-float _SpecularOcclusionStrength;
-float _SpecularOcclusionPower;
 
 float _MaskLightProbe;
 float _MaskLightmap;
@@ -97,9 +94,7 @@ float _FilterResultHueShift;
 float _FilterResultSaturateShift;
 float _FilterResultValueShift;
 
-float _Wetness;
-float3 _WetnessColor;
-float _WetnessHeight;
+int _CheckParameterMode;
 
 float _SkyboxFog;
 float _SkyboxFogStrength;

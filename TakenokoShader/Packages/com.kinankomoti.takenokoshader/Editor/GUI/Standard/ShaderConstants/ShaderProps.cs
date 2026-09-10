@@ -84,8 +84,6 @@ public enum ShaderProps
     Occlusion,
     [Description("_OcclusionTex")]
     OcclusionTex,
-    [Description("_OcclusionPower")]
-    OcclusionPower,
     [Description("_BumpScale")]
     BumpScale,
     [Description("_BumpMap")]
@@ -162,12 +160,10 @@ public enum ShaderProps
     SpecularOcclusion,
     [Description("_SpecularOcclusionLightmap")]
     SpecularOcclusionLightmap,
-    [Description("_SpecularOcclusionStrength")]
-    SpecularOcclusionStrength,
-    [Description("_SpecularOcclusionPower")]
-    SpecularOcclusionPower,
     [Description("_MaskLightProbe")]
     MaskLightProbe,
+    [Description("_EstimateSHDirection")]
+    EstimateSHDirection,
     [Description("_MaskLightmap")]
     MaskLightmap,
     [Description("_LightmapMode")]
@@ -202,10 +198,10 @@ public enum ShaderProps
     FilterResultSaturateShift,
     [Description("_FilterResultValueShift")]
     FilterResultValueShift,
-    [Description("_Wetness")]
-    Wetness,
-    [Description("_WetnessColor")]
-    WetnessColor,
+    [Description("_CheckParameter")]
+    CheckParameter,
+    [Description("_CheckParameterMode")]
+    CheckParameterMode,
     [Description("_SkyboxFog")]
     SkyboxFog,
     [Description("_SkyboxFogStrength")]
@@ -292,7 +288,6 @@ public static class ShaderPropsName
         { ShaderProps.OcclusionChannel, "_OcclusionChannel" },
         { ShaderProps.Occlusion, "_Occlusion" },
         { ShaderProps.OcclusionTex, "_OcclusionTex" },
-        { ShaderProps.OcclusionPower, "_OcclusionPower" },
         { ShaderProps.BumpScale, "_BumpScale" },
         { ShaderProps.BumpMap, "_BumpMap" },
         { ShaderProps.Height, "_Height" },
@@ -331,9 +326,8 @@ public static class ShaderPropsName
         { ShaderProps.FuzzMask, "_FuzzMask" },
         { ShaderProps.SpecularOcclusion, "_SpecularOcclusion" },
         { ShaderProps.SpecularOcclusionLightmap, "_SpecularOcclusionLightmap" },
-        { ShaderProps.SpecularOcclusionStrength, "_SpecularOcclusionStrength" },
-        { ShaderProps.SpecularOcclusionPower, "_SpecularOcclusionPower" },
         { ShaderProps.MaskLightProbe, "_MaskLightProbe" },
+        { ShaderProps.EstimateSHDirection, "_EstimateSHDirection" },
         { ShaderProps.MaskLightmap, "_MaskLightmap" },
         { ShaderProps.LightmapMode, "_LightmapMode" },
         { ShaderProps.LightmapNonLinearSh, "_LightmapNonLinearSh" },
@@ -351,8 +345,8 @@ public static class ShaderPropsName
         { ShaderProps.FilterResultHueShift, "_FilterResultHueShift" },
         { ShaderProps.FilterResultSaturateShift, "_FilterResultSaturateShift" },
         { ShaderProps.FilterResultValueShift, "_FilterResultValueShift" },
-        { ShaderProps.Wetness, "_Wetness" },
-        { ShaderProps.WetnessColor, "_WetnessColor" },
+        { ShaderProps.CheckParameter, "_CheckParameter" },
+        { ShaderProps.CheckParameterMode, "_CheckParameterMode" },
         { ShaderProps.SkyboxFog, "_SkyboxFog" },
         { ShaderProps.SkyboxFogStrength, "_SkyboxFogStrength" },
         { ShaderProps.SkyboxFogMode, "_SkyboxFogMode" },

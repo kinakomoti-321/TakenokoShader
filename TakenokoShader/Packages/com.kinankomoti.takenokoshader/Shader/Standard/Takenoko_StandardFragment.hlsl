@@ -28,8 +28,6 @@ struct MaterialData
 #if defined(_SSS_ON)
     float3 EvaluateSss(float3 normalWS, float3 lightWS, float3 viewWS, float3 sssColor, float thickness, float anisotropy, float3 basecolor, float frontPower, float backPower)
     {
-        // Front scattering is light re-emerging near where it entered, so it carries
-        // the surface albedo. The back lobe below is tinted by sssColor instead.
         float3 w = saturate(sssColor);
         float3 sssFront = frontPower * basecolor * max(dot(normalWS, lightWS) + w, 0.0) / ((1.0 + w) * (1.0 + w));
 
@@ -224,19 +222,6 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float2 parallaxOffset = 0.0;
     texcoord += parallaxOffset;
 
-    float wetness = 0.0;
-    float3 wetnessNoise = 0.0;
-
-    if (_Wetness > 0.5)
-    {
-        if (i.positionWS.y < _WetnessHeight)
-        {
-            wetnessNoise = Cyclic(float3(i.positionWS.xz * 5.0, _Time.y), 1.0, 1.0);
-            wetness = saturate((-i.positionWS.y + _WetnessHeight) * 10.0);
-            texcoord += wetnessNoise.xy * 0.005 * wetness;
-        }
-    }
-
     MaterialData materialData = GetMaterialData(texcoord, i.positionWS, n);
     #if defined(_SECONDTEXTURE_ON)
         Standard_SecondTexture(SecondTexcoord(i), texcoord, materialData.basecolor, materialData.normalTS);
@@ -251,19 +236,6 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     {
         shadingNormal = -shadingNormal;
     }
-    //---------------------------------------------------
-    // Pre-Effect
-    //---------------------------------------------------
-    if (wetness > 0.0)
-    {
-        if (i.positionWS.y < _WetnessHeight)
-        {
-            materialData.basecolor = lerp(materialData.basecolor, materialData.basecolor * _WetnessColor, wetness);
-            materialData.roughness = lerp(materialData.roughness, 0.1, wetness);
-            shadingNormal = normalize(float3(0, 1, 0) + (2.0 * wetnessNoise - 1.0) * 0.01);
-        }
-    }
-
     //---------------------------------------------------
     // Lighting
     //---------------------------------------------------
@@ -283,6 +255,19 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float roughness = materialData.roughness;
     float metallic = materialData.metallic;
     float occlusion = materialData.occlusion;
+
+    #if defined(_CHECKPARAMETER_ON)
+        #if defined(_TAKENOKO_FOWARD_ADD)
+            return 0.0;
+        #else
+            float3 parameter = basecolor;
+            if (_CheckParameterMode == 1) parameter = roughness.xxx;
+            else if (_CheckParameterMode == 2) parameter = metallic.xxx;
+            else if (_CheckParameterMode == 3) parameter = occlusion.xxx;
+            else if (_CheckParameterMode == 4) parameter = normalize(shadingNormal) * 0.5 + 0.5;
+                return float4(parameter, materialData.alpha);
+        #endif
+    #endif
 
     float3 F0 = lerp(0.04, basecolor, metallic);
     float3 F = ShlickFresnel(F0, dotNV);
@@ -359,19 +344,21 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
             environmentDiffuse += EvaluateSH(shadingNormal, positionWS, environmentLight) * basecolor * _MaskLightProbe;
         #endif
 
-        float3 envLightDirection = environmentLight.direction;
-        float3 envHalfVector = Unity_SafeNormalize(envLightDirection + viewDirection);
-        float envDotNL = saturate(dot(shadingNormal, envLightDirection));
-        float envDotNH = saturate(dot(shadingNormal, envHalfVector));
+        #if !defined(_ESTIMATE_SH_DIRECTION_OFF)
+            float3 envLightDirection = environmentLight.direction;
+            float3 envHalfVector = Unity_SafeNormalize(envLightDirection + viewDirection);
+            float envDotNL = saturate(dot(shadingNormal, envLightDirection));
+            float envDotNH = saturate(dot(shadingNormal, envHalfVector));
 
-        environmentSpecular += SpecularBRDF(F, roughness, envDotNH, dotNV, envDotNL) * envDotNL * environmentLight.color;
+            environmentSpecular += SpecularBRDF(F, roughness, envDotNH, dotNV, envDotNL) * envDotNL * environmentLight.color;
 
-        #if defined(_CLEARCOAT_ON)
-            environmentCoat += SpecularBRDF(ShlickFresnel(0.04, dotNV), 0.25, envDotNH, dotNV, envDotNL) * envDotNL * environmentLight.color * clearcoat;
-        #endif
+            #if defined(_CLEARCOAT_ON)
+                environmentCoat += SpecularBRDF(ShlickFresnel(0.04, dotNV), 0.25, envDotNH, dotNV, envDotNL) * envDotNL * environmentLight.color * clearcoat;
+            #endif
 
-        #if defined(_SSS_ON)
-            environmentSss += max(EvaluateSss(shadingNormal, envLightDirection, viewDirection, sssColor, thickness, _SssAnisotropy, basecolor, _SssFrontPower, _SssBackPower) - basecolor * envDotNL, 0.0) * environmentLight.color;
+            #if defined(_SSS_ON)
+                environmentSss += max(EvaluateSss(shadingNormal, envLightDirection, viewDirection, sssColor, thickness, _SssAnisotropy, basecolor, _SssFrontPower, _SssBackPower) - basecolor * envDotNL, 0.0) * environmentLight.color;
+            #endif
         #endif
     #endif
 
@@ -393,10 +380,10 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float3 sss = lightSss + environmentSss;
     float3 emission = materialData.emission;
 
-    #if defined(_SPECULAR_OCCLUSION_ON)
-        specular *= lerp(1.0, pow(occlusion, _SpecularOcclusionPower), _SpecularOcclusionStrength);
-        #if defined(_SPECULAR_OCCLUSION_LIGHTMAP_ON)
-            specular *= lerp(1.0, pow(saturate(Luminance(environmentDiffuse)), _SpecularOcclusionPower), _SpecularOcclusionStrength);
+    #if defined(_SPECULAROCCLUSION_ON)
+        specular *= occlusion;
+        #if defined(_SPECULAROCCLUSIONLIGHTMAP_ON)
+            specular *= saturate(Luminance(environmentDiffuse));
         #endif
     #endif
 
@@ -406,7 +393,8 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     //---------------------------------------------------
     // Post-Effect
     //---------------------------------------------------
-    // Color Filter
+    // Color filter
+    result = ShiftHSV(result, float3(_FilterResultHueShift, _FilterResultSaturateShift, _FilterResultValueShift));
 
     // Skybox Filter
     #if defined(_SKYBOXFOG_ON)

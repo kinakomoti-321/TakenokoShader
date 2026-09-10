@@ -60,7 +60,6 @@ Shader "Takenoko/Standard"
         [Enum(R, 0, G, 1, B, 2, A, 3)] _OcclusionChannel ("Occlusion Channel", Int) = 2
         _Occlusion ("Occlusion Scale", Range(0, 1)) = 1
         _OcclusionTex ("Occlusion Texture", 2D) = "white" { }
-        _OcclusionPower ("Occlusion Power", Range(1, 20)) = 1.0
 
         _BumpScale ("Bump Scale", Range(0, 2)) = 1.0
         [Normal] _BumpMap ("Normal Texture", 2D) = "bump" { }
@@ -109,14 +108,13 @@ Shader "Takenoko/Standard"
         // -------------
         // Effect
         // -------------
-        [Toggle] _SpecularOcclusion ("Specular Occlusion [Experimental]", Int) = 0
-        [Toggle] _SpecularOcclusionLightmap ("Lightmap Occlusion[Experimental]", Int) = 1
-        _SpecularOcclusionStrength ("Power", Range(0, 1)) = 1.0
-        _SpecularOcclusionPower ("Power", Range(1, 20)) = 5.0
+        [Toggle(_SPECULAROCCLUSION_ON)] _SpecularOcclusion ("Specular Occlusion [Experimental]", Int) = 0
+        [Toggle(_SPECULAROCCLUSIONLIGHTMAP_ON)] _SpecularOcclusionLightmap ("Lightmap Occlusion[Experimental]", Int) = 1
 
         _MaskLightProbe ("Light Probe Mask", Range(0, 2)) = 1.0
+        [ToggleOff(_ESTIMATE_SH_DIRECTION_OFF)] _EstimateSHDirection ("Estimate SH direction", Float) = 1
         _MaskLightmap ("Lightmap Mask", Range(0, 2)) = 1.0
-        [Enum(Default,0,RNM,1,SH,2,MonoSH,3)] _LightmapMode ("Lightmap", Float) = 0
+        [Enum(Default, 0, RNM, 1, SH, 2, MonoSH, 3)] _LightmapMode ("Lightmap", Float) = 0
         [Toggle(_LIGHTMAP_NONLINEAR_SH_ON)] _LightmapNonLinearSh ("Non-Linear SH", Int) = 1
         [HideInInspector][Toggle(BAKERY_RNM)] _BAKERY_RNM ("Allow RNM Lightmaps", Float) = 0
         [HideInInspector][Toggle(BAKERY_SH)] _BAKERY_SH ("Enable SH", Float) = 0
@@ -139,8 +137,8 @@ Shader "Takenoko/Standard"
         _FilterResultSaturateShift ("Saturate", Range(-1, 1)) = 0.0
         _FilterResultValueShift ("Value", Range(-1, 1)) = 0.0
 
-        [Toggle] _Wetness ("Wetness", Int) = 0
-        _WetnessColor ("Wetness Color", Color) = (1, 1, 1, 0)
+        [Toggle(_CHECKPARAMETER_ON)] _CheckParameter ("CheckParameter", Int) = 0
+        [Enum(Basecolor, 0, Roughness, 1, Metallic, 2, Occlusion, 3, Normal, 4)] _CheckParameterMode ("Parameter", Int) = 0
 
         [Toggle] _SkyboxFog ("Skybox Fog", Int) = 0
         _SkyboxFogStrength ("Skybox Strength", Range(0, 1)) = 0.5
@@ -201,6 +199,7 @@ Shader "Takenoko/Standard"
             // Main Texture
             #pragma shader_feature_local _MAINTEX_TILING_SIMPLE _MAINTEX_TILING_HEX
             #pragma shader_feature_local _SECONDTEXTURE_ON
+            #pragma shader_feature_local _CHECKPARAMETER_ON
             #pragma shader_feature_local _SECOND_MASK_CHANNEL_R _SECOND_MASK_CHANNEL_G _SECOND_MASK_CHANNEL_B _SECOND_MASK_CHANNEL_A
             #pragma shader_feature_local _SECOND_UV0 _SECOND_UV1 _SECOND_UV2 _SECOND_UV3
             #pragma shader_feature_local _SECOND_BLEND_ADD _SECOND_BLEND_MULTIPLY _SECOND_BLEND_OVERLAY _SECOND_BLEND_REPLACE
@@ -217,8 +216,8 @@ Shader "Takenoko/Standard"
 
             #pragma shader_feature _EMISSION_ON
 
-            #pragma shader_feature_local _SPECULAR_OCCLUSION_ON
-            #pragma shader_feature_local _SPECULAR_OCCLUSION_LIGHTMAP_ON
+            #pragma shader_feature_local _SPECULAROCCLUSION_ON
+            #pragma shader_feature_local _SPECULAROCCLUSIONLIGHTMAP_ON
             #pragma shader_feature_local _SKYBOXFOG_ON
             #pragma shader_feature_local _SKYBOXFOG_DISTANCE _SKYBOXFOG_BOX _SKYBOXFOG_SPHERE
 
@@ -230,6 +229,7 @@ Shader "Takenoko/Standard"
             #pragma shader_feature_local _CLEARCOAT_MASK_CHANNEL_R _CLEARCOAT_MASK_CHANNEL_G _CLEARCOAT_MASK_CHANNEL_B _CLEARCOAT_MASK_CHANNEL_A
 
             #pragma shader_feature_local _LIGHTMAP_DEFAULT _LIGHTMAP_RNM _LIGHTMAP_SH _LIGHTMAP_MONOSH
+            #pragma shader_feature_local _ESTIMATE_SH_DIRECTION_OFF
             #pragma shader_feature_local _LIGHTMAP_NONLINEAR_SH_ON
             
             // VRC Light Volume
@@ -272,6 +272,7 @@ Shader "Takenoko/Standard"
             // Main Texture
             #pragma shader_feature_local _MAINTEX_TILING_SIMPLE _MAINTEX_TILING_HEX
             #pragma shader_feature_local _SECONDTEXTURE_ON
+            #pragma shader_feature_local _CHECKPARAMETER_ON
             #pragma shader_feature_local _SECOND_MASK_CHANNEL_R _SECOND_MASK_CHANNEL_G _SECOND_MASK_CHANNEL_B _SECOND_MASK_CHANNEL_A
             #pragma shader_feature_local _SECOND_UV0 _SECOND_UV1 _SECOND_UV2 _SECOND_UV3
             #pragma shader_feature_local _SECOND_BLEND_ADD _SECOND_BLEND_MULTIPLY _SECOND_BLEND_OVERLAY _SECOND_BLEND_REPLACE

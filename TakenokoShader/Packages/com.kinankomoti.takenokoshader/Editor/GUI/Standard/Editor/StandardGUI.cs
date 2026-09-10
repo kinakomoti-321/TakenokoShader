@@ -78,7 +78,7 @@ namespace Takenoko.Standard
                 $"{label} はリニアデータ用テクスチャです。Texture Import Settings の sRGB (Color Texture) を無効にしてください。",
                 MessageType.Warning);
 
-            if (GUILayout.Button("Fix Now", EditorStyles.miniButton))
+            if (GUILayout.Button("Fix now", EditorStyles.miniButton))
             {
                 foreach (TextureImporter importer in importers)
                 {
@@ -115,7 +115,7 @@ namespace Takenoko.Standard
                     TempuraGui.Space2();
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        TempuraGui.Popup<AlphaMode>("Alpha Mode", props[ShaderProps.AlphaMode], materialEditor);
+                        TempuraGui.Popup<AlphaMode>("Alpha mode", props[ShaderProps.AlphaMode], materialEditor);
                         var alphaMode = (AlphaMode)(int)props[ShaderProps.AlphaMode].floatValue;
                         if (alphaMode == AlphaMode.Cutout)
                         {
@@ -124,15 +124,15 @@ namespace Takenoko.Standard
                                 materialEditor.ShaderProperty(props[ShaderProps.Cutoff], new GUIContent("Cutout"));
                             }
                         }
-                        TempuraGui.Popup<CullMode>("Cull Mode", props[ShaderProps.UnityCullMode], materialEditor);
+                        TempuraGui.Popup<CullMode>("Cull mode", props[ShaderProps.UnityCullMode], materialEditor);
 
                         materialEditor.EnableInstancingField();
                     }
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        EditorGUILayout.LabelField("Render Queue", material.renderQueue.ToString());
-                        TempuraGui.IntField("Render Queue Offset", props[ShaderProps.RenderQueueOffset], materialEditor);
+                        EditorGUILayout.LabelField("Render queue", material.renderQueue.ToString());
+                        TempuraGui.IntField("Render queue offset", props[ShaderProps.RenderQueueOffset], materialEditor);
                     }
                 }
                 TempuraGui.Space2();
@@ -144,7 +144,7 @@ namespace Takenoko.Standard
             // Material Parameter
             //-----------------------------------------------
             #region MaterialParameter
-            settings.foldMaterialMenu = TempuraGui.FoldOut("Material Parameter", "", settings.foldMaterialMenu);
+            settings.foldMaterialMenu = TempuraGui.FoldOut("Material parameter", "", settings.foldMaterialMenu);
             if (settings.foldMaterialMenu)
             {
                 using (new VerticalScope(TempuraGui.largeBox))
@@ -155,28 +155,28 @@ namespace Takenoko.Standard
                         using (new VerticalScope(TempuraGui.borderBox))
                         {
                             // MainTex
-                            TempuraGui.Popup<TilingMode>("Tiling Mode", props[ShaderProps.MainTexTilingMode], materialEditor);
+                            TempuraGui.Popup<TilingMode>("Tiling mode", props[ShaderProps.MainTexTilingMode], materialEditor);
 
                             var tilingMode = Cast<TilingMode>(material, ShaderProps.MainTexTilingMode.Name());
                             if (tilingMode == TilingMode.HexTiling)
                             {
                                 using (new VerticalScope(TempuraGui.borderBox))
                                 {
-                                    materialEditor.ShaderProperty(props[ShaderProps.HexRotationStrength], new GUIContent("Rotation Strength"));
-                                    materialEditor.ShaderProperty(props[ShaderProps.HexFallOff], new GUIContent("Fall Off"));
+                                    materialEditor.ShaderProperty(props[ShaderProps.HexRotationStrength], new GUIContent("Rotation strength"));
+                                    materialEditor.ShaderProperty(props[ShaderProps.HexFallOff], new GUIContent("Fall off"));
                                     materialEditor.ShaderProperty(props[ShaderProps.HexExponent], new GUIContent("Exponent"));
-                                    materialEditor.ShaderProperty(props[ShaderProps.HexEdgeSmoothness], new GUIContent("Edge Smoothness"));
+                                    materialEditor.ShaderProperty(props[ShaderProps.HexEdgeSmoothness], new GUIContent("Edge smoothness"));
                                 }
                             }
 
-                            TempuraGui.Popup<Texcoord>("MainTex Texcoord", props[ShaderProps.MainTexcoord], materialEditor);
-                            materialEditor.ShaderProperty(props[ShaderProps.MainTexOffset], new GUIContent("MainTex Offset"));
-                            materialEditor.ShaderProperty(props[ShaderProps.MainTexScale], new GUIContent("MainTex Scale"));
+                            TempuraGui.Popup<Texcoord>("MainTex texcoord", props[ShaderProps.MainTexcoord], materialEditor);
+                            materialEditor.ShaderProperty(props[ShaderProps.MainTexOffset], new GUIContent("MainTex offset"));
+                            materialEditor.ShaderProperty(props[ShaderProps.MainTexScale], new GUIContent("MainTex scale"));
                         }
 
                         using (new VerticalScope(TempuraGui.borderBox))
                         {
-                            materialEditor.TexturePropertySingleLine(new GUIContent("Base Color"), props[ShaderProps.MainTex], props[ShaderProps.Color]);
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Basecolor"), props[ShaderProps.MainTex], props[ShaderProps.Color]);
                             TempuraGui.Popup<RoughnessModel>("Workflow", props[ShaderProps.RoughnessModel], materialEditor);
                             RoughnessModel roughnessModel = Cast<RoughnessModel>(material, ShaderProps.RoughnessModel.Name());
                             if (roughnessModel == RoughnessModel.Roughness)
@@ -192,7 +192,6 @@ namespace Takenoko.Standard
                             materialEditor.TexturePropertyTwoLines(new GUIContent("Metallic"), props[ShaderProps.MetallicTex], props[ShaderProps.Metallic], new GUIContent("Channel"), props[ShaderProps.MetallicChannel]);
                             DrawLinearTextureWarning(materials, ShaderProps.MetallicTex.Name(), "Metallic");
                             materialEditor.TexturePropertyTwoLines(new GUIContent("Occlusion"), props[ShaderProps.OcclusionTex], props[ShaderProps.Occlusion], new GUIContent("Channel"), props[ShaderProps.OcclusionChannel]);
-                            materialEditor.ShaderProperty(props[ShaderProps.OcclusionPower], new GUIContent("Occlusion Power"));
                             materialEditor.TexturePropertySingleLine(new GUIContent("Normal"), props[ShaderProps.BumpMap], props[ShaderProps.BumpScale]);
                         }
 
@@ -200,17 +199,17 @@ namespace Takenoko.Standard
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        materialEditor.ShaderProperty(props[ShaderProps.SecondTexture], new GUIContent("Second Texture"));
+                        materialEditor.ShaderProperty(props[ShaderProps.SecondTexture], new GUIContent("Second texture"));
                         if (props[ShaderProps.SecondTexture].hasMixedValue || Cast(props[ShaderProps.SecondTexture].floatValue))
                         {
-                            TempuraGui.Popup<Texcoord>("Second Texture UV", props[ShaderProps.SecondTexcoord], materialEditor);
-                            materialEditor.TexturePropertySingleLine(new GUIContent("Albedo"), props[ShaderProps.SecondAlbedo], props[ShaderProps.SecondColor]);
-                            materialEditor.ShaderProperty(props[ShaderProps.SecondBlendMode], new GUIContent("Blend Mode"));
-                            materialEditor.TexturePropertySingleLine(new GUIContent("Normal"), props[ShaderProps.SecondNormal], props[ShaderProps.SecondNormalScale]);
-                            materialEditor.TextureScaleOffsetProperty(props[ShaderProps.SecondAlbedo]);
                             materialEditor.TexturePropertySingleLine(new GUIContent("Mask"), props[ShaderProps.SecondMask]);
-                            TempuraGui.Popup<TextureChannel>("Mask Channel", props[ShaderProps.SecondMaskChannel], materialEditor);
-                            DrawLinearTextureWarning(materials, ShaderProps.SecondMask.Name(), "Second Texture Mask");
+                            TempuraGui.Popup<TextureChannel>("Channel", props[ShaderProps.SecondMaskChannel], materialEditor);
+                            TempuraGui.Popup<Texcoord>("UV", props[ShaderProps.SecondTexcoord], materialEditor);
+                            materialEditor.TextureScaleOffsetProperty(props[ShaderProps.SecondAlbedo]);
+                            DrawLinearTextureWarning(materials, ShaderProps.SecondMask.Name(), "Mask");
+                            materialEditor.ShaderProperty(props[ShaderProps.SecondBlendMode], new GUIContent("Blend mode"));
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Basecolor"), props[ShaderProps.SecondAlbedo], props[ShaderProps.SecondColor]);
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Normal"), props[ShaderProps.SecondNormal], props[ShaderProps.SecondNormalScale]);
                         }
                     }
 
@@ -224,10 +223,10 @@ namespace Takenoko.Standard
                     //         TempuraGui.Space2();
                     //         materialEditor.TexturePropertySingleLine(new GUIContent("Height"), props[ShaderProps.HeightTex], props[ShaderProps.HeightStrength]);
                     //         DrawLinearTextureWarning(materials, ShaderProps.HeightTex.Name(), "Height");
-                    //         TempuraGui.Popup<TextureChannel>("Height Channel", props[ShaderProps.HeightChannel], materialEditor);
-                    //         materialEditor.ShaderProperty(props[ShaderProps.HeightOffset], new GUIContent("Height Offset"));
-                    //         materialEditor.ShaderProperty(props[ShaderProps.HeightStep], new GUIContent("Height Step"));
-                    //         materialEditor.ShaderProperty(props[ShaderProps.HeightSubStep], new GUIContent("Height Sub Step"));
+                    //         TempuraGui.Popup<TextureChannel>("Height channel", props[ShaderProps.HeightChannel], materialEditor);
+                    //         materialEditor.ShaderProperty(props[ShaderProps.HeightOffset], new GUIContent("Height offset"));
+                    //         materialEditor.ShaderProperty(props[ShaderProps.HeightStep], new GUIContent("Height step"));
+                    //         materialEditor.ShaderProperty(props[ShaderProps.HeightSubStep], new GUIContent("Height sub step"));
                     //     }
                     // }
 
@@ -250,28 +249,28 @@ namespace Takenoko.Standard
                         {
                             TempuraGui.Space2();
                             materialEditor.TexturePropertyTwoLines(new GUIContent("Film thickness"), props[ShaderProps.ThinFilmThicknessTex], props[ShaderProps.ThinFilmThickness], new GUIContent("Channel"), props[ShaderProps.ThinFilmChannel]);
-                            DrawLinearTextureWarning(materials, ShaderProps.ThinFilmThicknessTex.Name(), "Thin Film Thickness");
-                            materialEditor.ShaderProperty(props[ShaderProps.ThinFilmThicknessMin], new GUIContent("Thickness Min"));
-                            materialEditor.ShaderProperty(props[ShaderProps.ThinFilmThicknessMax], new GUIContent("Thickness Max"));
+                            DrawLinearTextureWarning(materials, ShaderProps.ThinFilmThicknessTex.Name(), "Thin film thickness");
+                            materialEditor.ShaderProperty(props[ShaderProps.ThinFilmThicknessMin], new GUIContent("Thickness min"));
+                            materialEditor.ShaderProperty(props[ShaderProps.ThinFilmThicknessMax], new GUIContent("Thickness max"));
                             materialEditor.ShaderProperty(props[ShaderProps.ThinFilmIor], new GUIContent("Ior"));
                         }
                     }
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        materialEditor.ShaderProperty(props[ShaderProps.Sss], new GUIContent("Subsurface Scattering"));
+                        materialEditor.ShaderProperty(props[ShaderProps.Sss], new GUIContent("Subsurface scattering"));
                         bool useSss = Cast(props[ShaderProps.Sss].floatValue);
                         if (useSss)
                         {
                             TempuraGui.Space2();
 
-                            DrawLinearTextureWarning(materials, ShaderProps.SssThicknessTex.Name(), "SSS Thickness");
+                            DrawLinearTextureWarning(materials, ShaderProps.SssThicknessTex.Name(), "SSS thickness");
                             materialEditor.TexturePropertyTwoLines(new GUIContent("Thickness"), props[ShaderProps.SssThicknessTex], props[ShaderProps.SssThickness], new GUIContent("Channel"), props[ShaderProps.SssThicknessChannel]);
-                            materialEditor.TexturePropertySingleLine(new GUIContent("SSS Color"), props[ShaderProps.SssColorTex], props[ShaderProps.SssColor]);
-                            materialEditor.ShaderProperty(props[ShaderProps.SssFrontPower], new GUIContent("Front Power", "Multiplies the front scattering lobe."));
-                            materialEditor.ShaderProperty(props[ShaderProps.SssBackPower], new GUIContent("Back Power", "Multiplies the transmitted lobe."));
+                            materialEditor.TexturePropertySingleLine(new GUIContent("SSS color"), props[ShaderProps.SssColorTex], props[ShaderProps.SssColor]);
+                            materialEditor.ShaderProperty(props[ShaderProps.SssFrontPower], new GUIContent("Front strength"));
+                            materialEditor.ShaderProperty(props[ShaderProps.SssBackPower], new GUIContent("Back strength"));
                             materialEditor.ShaderProperty(props[ShaderProps.SssAnisotropy], new GUIContent("Anisotropy"));
-                            materialEditor.ShaderProperty(props[ShaderProps.SssShadowStrength], new GUIContent("Shadow Strength"));
+                            materialEditor.ShaderProperty(props[ShaderProps.SssShadowStrength], new GUIContent("Shadow strength"));
                         }
                     }
 
@@ -302,24 +301,24 @@ namespace Takenoko.Standard
                 {
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        materialEditor.ShaderProperty(props[ShaderProps.SpecularOcclusion], new GUIContent("Specular Occlusion"));
+                        materialEditor.ShaderProperty(props[ShaderProps.SpecularOcclusion], new GUIContent("Specular occlusion"));
                         bool useSpecularOcclusion = Cast(props[ShaderProps.SpecularOcclusion].floatValue);
                         if (useSpecularOcclusion)
                         {
-                            using (new VerticalScope(TempuraGui.borderBox))
-                            {
-                                materialEditor.ShaderProperty(props[ShaderProps.SpecularOcclusionStrength], new GUIContent("Strength"));
-                                materialEditor.ShaderProperty(props[ShaderProps.SpecularOcclusionPower], new GUIContent("Power"));
-                                materialEditor.ShaderProperty(props[ShaderProps.SpecularOcclusionLightmap], new GUIContent("Light map"));
-                            }
+                            materialEditor.ShaderProperty(props[ShaderProps.SpecularOcclusionLightmap], new GUIContent("Use light map"));
                         }
                     }
 
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        materialEditor.ShaderProperty(props[ShaderProps.MaskLightProbe], new GUIContent("Mask Light Probe"));
-                        materialEditor.ShaderProperty(props[ShaderProps.MaskLightmap], new GUIContent("Mask Lightmap"));
+                        materialEditor.ShaderProperty(props[ShaderProps.EstimateSHDirection], new GUIContent("Estimate SH direction"));
+                    }
+
+                    using (new VerticalScope(TempuraGui.borderBox))
+                    {
+                        materialEditor.ShaderProperty(props[ShaderProps.MaskLightProbe], new GUIContent("Light probe strength"));
+                        materialEditor.ShaderProperty(props[ShaderProps.MaskLightmap], new GUIContent("Lightmap strength"));
                     }
 
                     using (new VerticalScope(TempuraGui.borderBox))
@@ -330,7 +329,7 @@ namespace Takenoko.Standard
                         var lightmapMode = Cast<LightmapMode>(material, ShaderProps.LightmapMode.Name());
                         if (lightmapMode == LightmapMode.SH || lightmapMode == LightmapMode.MonoSH)
                         {
-                            materialEditor.ShaderProperty(props[ShaderProps.LightmapNonLinearSh], new GUIContent("Non-Linear SH"));
+                            materialEditor.ShaderProperty(props[ShaderProps.LightmapNonLinearSh], new GUIContent("Non-linear SH"));
                         }
 
                         TempuraGui.Space2();
@@ -358,62 +357,45 @@ namespace Takenoko.Standard
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
                         EditorGUILayout.LabelField("Filter", EditorStyles.boldLabel);
-                        using (new VerticalScope(TempuraGui.borderBox))
-                        {
-                            EditorGUILayout.LabelField("Material Parameter", EditorStyles.boldLabel);
-                            materialEditor.ShaderProperty(props[ShaderProps.FilterMainTexHueShift], new GUIContent("Hue Shift"));
-                            materialEditor.ShaderProperty(props[ShaderProps.FilterMainTexSaturateShift], new GUIContent("Saturate"));
-                            materialEditor.ShaderProperty(props[ShaderProps.FilterMainTexValueShift], new GUIContent("Value"));
-                        }
-                        using (new VerticalScope(TempuraGui.borderBox))
-                        {
-                            EditorGUILayout.LabelField("Result", EditorStyles.boldLabel);
-                            materialEditor.ShaderProperty(props[ShaderProps.FilterResultHueShift], new GUIContent("Hue Shift"));
-                            materialEditor.ShaderProperty(props[ShaderProps.FilterResultSaturateShift], new GUIContent("Saturate"));
-                            materialEditor.ShaderProperty(props[ShaderProps.FilterResultValueShift], new GUIContent("Value"));
-                        }
+                        EditorGUILayout.LabelField("Basecolor", EditorStyles.boldLabel);
+                        materialEditor.ShaderProperty(props[ShaderProps.FilterMainTexHueShift], new GUIContent("Hue shift"));
+                        materialEditor.ShaderProperty(props[ShaderProps.FilterMainTexSaturateShift], new GUIContent("Saturate"));
+                        materialEditor.ShaderProperty(props[ShaderProps.FilterMainTexValueShift], new GUIContent("Value"));
+
+                        EditorGUILayout.LabelField("Result", EditorStyles.boldLabel);
+                        materialEditor.ShaderProperty(props[ShaderProps.FilterResultHueShift], new GUIContent("Hue shift"));
+                        materialEditor.ShaderProperty(props[ShaderProps.FilterResultSaturateShift], new GUIContent("Saturate"));
+                        materialEditor.ShaderProperty(props[ShaderProps.FilterResultValueShift], new GUIContent("Value"));
                     }
+
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        materialEditor.ShaderProperty(props[ShaderProps.Wetness], new GUIContent("Wetness"));
-                        bool useWetness = Cast(props[ShaderProps.Wetness].floatValue);
-                        if (useWetness)
-                        {
-                            using (new VerticalScope(TempuraGui.borderBox))
-                            {
-                                materialEditor.ShaderProperty(props[ShaderProps.WetnessColor], new GUIContent("Wetness Color"));
-                            }
-                        }
-                    }
-
-                    using (new VerticalScope(TempuraGui.borderBox))
-                    {
-                        materialEditor.ShaderProperty(props[ShaderProps.SkyboxFog], new GUIContent("Skybox Fog"));
+                        materialEditor.ShaderProperty(props[ShaderProps.SkyboxFog], new GUIContent("Skybox fog"));
                         bool useSkyboxFog = Cast(props[ShaderProps.SkyboxFog].floatValue);
 
                         if (useSkyboxFog)
                         {
                             using (new VerticalScope(TempuraGui.borderBox))
                             {
-                                TempuraGui.Popup<SkyboxFogMode>("Skybox Fog Mode", props[ShaderProps.SkyboxFogMode], materialEditor);
+                                TempuraGui.Popup<SkyboxFogMode>("Skybox fog mode", props[ShaderProps.SkyboxFogMode], materialEditor);
                                 var skyboxFogMode = (SkyboxFogMode)(int)props[ShaderProps.SkyboxFogMode].floatValue;
 
-                                materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogStrength], new GUIContent("Skybox Strength"));
+                                materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogStrength], new GUIContent("Skybox strength"));
                                 if (skyboxFogMode == SkyboxFogMode.Distance)
                                 {
-                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogDistance], new GUIContent("Skybox Distance"));
+                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogDistance], new GUIContent("Skybox distance"));
                                 }
                                 else if (skyboxFogMode == SkyboxFogMode.Box)
                                 {
-                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogBoxSizeMin], new GUIContent("Skybox Box Size Min"));
-                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogBoxSizeMax], new GUIContent("Skybox Box Size Max"));
+                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogBoxSizeMin], new GUIContent("Skybox box size min"));
+                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogBoxSizeMax], new GUIContent("Skybox box size max"));
                                     SkyboxFogSceneHandle.DrawEditButton(materials);
                                 }
                                 else if (skyboxFogMode == SkyboxFogMode.Sphere)
                                 {
-                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogSphereCenter], new GUIContent("Skybox Sphere Center"));
-                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogSphereRadius], new GUIContent("Skybox Sphere Radius"));
+                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogSphereCenter], new GUIContent("Skybox sphere center"));
+                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogSphereRadius], new GUIContent("Skybox sphere radius"));
                                     SkyboxFogSceneHandle.DrawEditButton(materials);
                                 }
                             }
@@ -429,32 +411,31 @@ namespace Takenoko.Standard
             // Area Light
             //-----------------------------------------------
             #region Area Light
-            settings.foldAreaLightMenu = TempuraGui.FoldOut("Area Light", "", settings.foldAreaLightMenu);
+            settings.foldAreaLightMenu = TempuraGui.FoldOut("Area light", "", settings.foldAreaLightMenu);
             if (settings.foldAreaLightMenu)
             {
                 using (new VerticalScope(TempuraGui.largeBox))
                 {
-
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
                         materialEditor.ShaderProperty(props[ShaderProps.AreaLight], new GUIContent("AreaLight"));
                         bool useAreaLight = Cast(props[ShaderProps.AreaLight].floatValue);
                         if (useAreaLight)
                         {
-                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightMask], new GUIContent("Area Light Mask"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightMask], new GUIContent("Area light mask"));
                             if (Cast(props[ShaderProps.AreaLightMask].floatValue))
                             {
-                                materialEditor.TexturePropertySingleLine(new GUIContent("Area Light Mask 1"), props[ShaderProps.AreaLightMask1]);
-                                materialEditor.TexturePropertySingleLine(new GUIContent("Area Light Mask 2"), props[ShaderProps.AreaLightMask2]);
+                                materialEditor.TexturePropertySingleLine(new GUIContent("Area light mask 1"), props[ShaderProps.AreaLightMask1]);
+                                materialEditor.TexturePropertySingleLine(new GUIContent("Area light mask 2"), props[ShaderProps.AreaLightMask2]);
                             }
-                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity1], new GUIContent("Area Light Intensity 1"));
-                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity2], new GUIContent("Area Light Intensity 2"));
-                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity3], new GUIContent("Area Light Intensity 3"));
-                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity4], new GUIContent("Area Light Intensity 4"));
-                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity5], new GUIContent("Area Light Intensity 5"));
-                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity6], new GUIContent("Area Light Intensity 6"));
-                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity7], new GUIContent("Area Light Intensity 7"));
-                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity8], new GUIContent("Area Light Intensity 8"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity1], new GUIContent("Area light intensity 1"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity2], new GUIContent("Area light intensity 2"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity3], new GUIContent("Area light intensity 3"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity4], new GUIContent("Area light intensity 4"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity5], new GUIContent("Area light intensity 5"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity6], new GUIContent("Area light intensity 6"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity7], new GUIContent("Area light intensity 7"));
+                            materialEditor.ShaderProperty(props[ShaderProps.AreaLightIntensity8], new GUIContent("Area light intensity 8"));
                         }
                     }
                 }
@@ -473,13 +454,18 @@ namespace Takenoko.Standard
                 {
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
+                        materialEditor.ShaderProperty(props[ShaderProps.CheckParameter], new GUIContent("CheckParameter"));
+                        if (props[ShaderProps.CheckParameter].hasMixedValue || Cast(props[ShaderProps.CheckParameter].floatValue))
+                        {
+                            materialEditor.ShaderProperty(props[ShaderProps.CheckParameterMode], new GUIContent("Parameter"));
+                        }
                         EditorGUILayout.LabelField("RenderQueue", material.renderQueue.ToString());
                         EditorGUILayout.LabelField("Cull", ((CullMode)props[ShaderProps.UnityCullMode].floatValue).ToString());
                         EditorGUILayout.LabelField("SrcBlend", ((BlendMode)props[ShaderProps.UnitySrcBlend].floatValue).ToString());
                         EditorGUILayout.LabelField("DstBlend", ((BlendMode)props[ShaderProps.UnityDstBlend].floatValue).ToString());
                         EditorGUILayout.LabelField("ZWrite", ((UnityZWriteMode)props[ShaderProps.UnityZWrite].floatValue).ToString());
                         EditorGUILayout.LabelField("AlphaToMask", ((UnityAlphaToMaskMode)props[ShaderProps.UnityAlphaToMask].floatValue).ToString());
-                        EditorGUILayout.LabelField("Enabled Keywords", string.Join("\n", material.shaderKeywords), EditorStyles.textArea);
+                        EditorGUILayout.LabelField("Enabled keywords", string.Join("\n", material.shaderKeywords), EditorStyles.textArea);
                     }
                 }
                 TempuraGui.Space2();
@@ -580,7 +566,12 @@ namespace Takenoko.Standard
                     break;
             }
 
+            TempuraGui.ToggleKeyward(material, "_CHECKPARAMETER_ON",
+                Cast(material.GetFloat(ShaderProps.CheckParameter.Name())));
+
             // Shader Keyward
+            TempuraGui.ToggleKeyward(material, "_ESTIMATE_SH_DIRECTION_OFF",
+                !Cast(material.GetFloat(ShaderProps.EstimateSHDirection.Name())));
             if (Cast(material.GetFloat(ShaderProps.SecondTexture.Name())))
                 material.EnableKeyword("_SECONDTEXTURE_ON");
             else

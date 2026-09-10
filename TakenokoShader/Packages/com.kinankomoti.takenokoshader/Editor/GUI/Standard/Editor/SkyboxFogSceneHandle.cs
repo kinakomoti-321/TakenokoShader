@@ -25,7 +25,7 @@ namespace Takenoko.Standard
         public static void DrawEditButton(Material[] materials)
         {
             bool editing = materials.Length > 0 && IsEditing(materials[0]);
-            bool next = GUILayout.Toggle(editing, editing ? "Finish Editing" : "Edit in Scene", GUI.skin.button);
+            bool next = GUILayout.Toggle(editing, editing ? "Finish editing" : "Edit in scene", GUI.skin.button);
             if (next == editing) return;
 
             if (next)
@@ -101,7 +101,7 @@ namespace Takenoko.Standard
                 Vector3 newMin = Vector3.Min(center - half, center + half);
                 Vector3 newMax = Vector3.Max(center - half, center + half);
 
-                Undo.RecordObjects(targets, "Edit Skybox Fog Box");
+                Undo.RecordObjects(targets, "Edit skybox fog box");
                 foreach (var target in targets)
                 {
                     target.SetVector(ShaderProps.SkyboxFogBoxSizeMin.Name(), newMin);
@@ -122,7 +122,7 @@ namespace Takenoko.Standard
             radius = Handles.RadiusHandle(Quaternion.identity, center, radius);
             if (EditorGUI.EndChangeCheck())
             {
-                Undo.RecordObjects(targets, "Edit Skybox Fog Sphere");
+                Undo.RecordObjects(targets, "Edit skybox fog sphere");
                 foreach (var target in targets)
                 {
                     target.SetVector(ShaderProps.SkyboxFogSphereCenter.Name(), center);
