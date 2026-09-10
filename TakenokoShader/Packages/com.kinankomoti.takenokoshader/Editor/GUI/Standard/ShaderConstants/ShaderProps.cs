@@ -46,6 +46,24 @@ public enum ShaderProps
     Color,
     [Description("_MainTex")]
     MainTex,
+    [Description("_SecondTexture")]
+    SecondTexture,
+    [Description("_SecondTexcoord")]
+    SecondTexcoord,
+    [Description("_SecondAlbedo")]
+    SecondAlbedo,
+    [Description("_SecondColor")]
+    SecondColor,
+    [Description("_SecondBlendMode")]
+    SecondBlendMode,
+    [Description("_SecondNormal")]
+    SecondNormal,
+    [Description("_SecondNormalScale")]
+    SecondNormalScale,
+    [Description("_SecondMask")]
+    SecondMask,
+    [Description("_SecondMaskChannel")]
+    SecondMaskChannel,
     [Description("_RoughnessModel")]
     RoughnessModel,
     [Description("_RoughnessChannel")]
@@ -255,6 +273,15 @@ public static class ShaderPropsName
         { ShaderProps.HexEdgeSmoothness, "_HexEdgeSmoothness" },
         { ShaderProps.Color, "_Color" },
         { ShaderProps.MainTex, "_MainTex" },
+        { ShaderProps.SecondTexture, "_SecondTexture" },
+        { ShaderProps.SecondTexcoord, "_SecondTexcoord" },
+        { ShaderProps.SecondAlbedo, "_SecondAlbedo" },
+        { ShaderProps.SecondColor, "_SecondColor" },
+        { ShaderProps.SecondBlendMode, "_SecondBlendMode" },
+        { ShaderProps.SecondNormal, "_SecondNormal" },
+        { ShaderProps.SecondNormalScale, "_SecondNormalScale" },
+        { ShaderProps.SecondMask, "_SecondMask" },
+        { ShaderProps.SecondMaskChannel, "_SecondMaskChannel" },
         { ShaderProps.RoughnessModel, "_RoughnessModel" },
         { ShaderProps.RoughnessChannel, "_RoughnessChannel" },
         { ShaderProps.Roughness, "_Roughness" },

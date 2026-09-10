@@ -3,6 +3,53 @@
 
 #include "../Core/Takenoko_Utils.hlsl"
 
+#if defined(_SECONDTEXTURE_ON)
+float2 SecondTexcoord(VertexOutput i)
+{
+    #if defined(_SECOND_UV1)
+        return i.texcoord1;
+    #elif defined(_SECOND_UV2)
+        return i.texcoord2;
+    #elif defined(_SECOND_UV3)
+        return i.texcoord3;
+    #else
+        return i.texcoord0;
+    #endif
+}
+
+void Standard_SecondTexture(float2 texcoord, float2 maskUV, inout float3 albedo, inout float3 normalTS)
+{
+    float2 secondUV = texcoord * _SecondAlbedo_ST.xy + _SecondAlbedo_ST.zw;
+    // Share existing samplers to stay within the D3D11 sampler limit.
+    float4 maskSample = saturate(_SecondMask.Sample(sampler__MainTex, maskUV));
+    #if defined(_SECOND_MASK_CHANNEL_G)
+        float mask = maskSample.g;
+    #elif defined(_SECOND_MASK_CHANNEL_B)
+        float mask = maskSample.b;
+    #elif defined(_SECOND_MASK_CHANNEL_A)
+        float mask = maskSample.a;
+    #else
+        float mask = maskSample.r;
+    #endif
+    float3 second = _SecondAlbedo.Sample(sampler__MainTex, secondUV).rgb * _SecondColor.rgb;
+    float3 blended;
+    #if defined(_SECOND_BLEND_REPLACE)
+        blended = second;
+    #elif defined(_SECOND_BLEND_ADD)
+        blended = albedo + second;
+    #elif defined(_SECOND_BLEND_OVERLAY)
+        blended = lerp(2.0 * albedo * second,
+            1.0 - 2.0 * (1.0 - albedo) * (1.0 - second), step(0.5, albedo));
+    #else
+        blended = albedo * second;
+    #endif
+    albedo = lerp(albedo, blended, mask);
+    float3 detailNormal = UnpackScaleNormal(_SecondNormal.Sample(sampler__BumpMap, secondUV), _SecondNormalScale);
+    detailNormal = normalize(lerp(float3(0.0, 0.0, 1.0), detailNormal, mask));
+    normalTS = BlendNormals(normalTS, detailNormal);
+}
+#endif
+
 inline float4 Standard_BaseColor(float2 texcoord)
 {
     return TAKENOKO_SAMPLE(_MainTex, texcoord) * _Color;

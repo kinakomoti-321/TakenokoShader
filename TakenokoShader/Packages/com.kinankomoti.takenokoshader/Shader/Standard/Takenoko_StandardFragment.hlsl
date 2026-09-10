@@ -11,6 +11,7 @@
 #include "Takenoko_StandardMapping.hlsl"
 #include "Takenoko_StandardAreaLight.hlsl"
 #include "../ThirdParty/Bakery.hlsl"
+#include "../ThirdParty/VRCLightVolume.hlsl"
 
 struct MaterialData
 {
@@ -53,6 +54,7 @@ inline MaterialData GetMaterialData(float2 texcoord, float3 positionWS, float3 n
     materialData.occlusion = Standard_Occlusion(texcoord);
     materialData.emission = Standard_Emission(texcoord);
     materialData.normalTS = Standard_Normal(texcoord);
+
 
     return materialData;
 }
@@ -236,6 +238,9 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     }
 
     MaterialData materialData = GetMaterialData(texcoord, i.positionWS, n);
+    #if defined(_SECONDTEXTURE_ON)
+        Standard_SecondTexture(SecondTexcoord(i), texcoord, materialData.basecolor, materialData.normalTS);
+    #endif
 
     #if defined(_ALPHATEST_ON)
         clip(materialData.alpha - _Cutoff);
@@ -332,23 +337,7 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
             environmentCoat += SpecularEnvironment(ShlickFresnel(0.04, dotNV), 0.25, reflUVW, lightData.probe, positionWS, dotNV) * clearcoat;
         #endif
 
-        #if defined(LIGHTVOLUME_SUPPORT) && defined(_LIGHTVOLUME_ON)
-            float3 lightVolumeDiffuse = 0.0;
-            float3 L0, L1r, L1g, L1b;
-            float4 lightVolumeOcclusion;
-
-            LV_LightVolumeSH(positionWS, L0, L1r, L1g, L1b, lightVolumeOcclusion);
-            LV_PointLightVolumeSH(positionWS, lightVolumeOcclusion, L0, L1r, L1g, L1b);
-
-            lightVolumeDiffuse = LV_EvaluateSH(L0, L1r, L1g, L1b, shadingNormal);
-            lightVolumeDiffuse *= lightVolumeOcclusion.rgb;
-            lightVolumeDiffuse *= _LightVolumeColorModulation.rgb * _LightVolumeIntensityMultiplier;
-        #endif
-
-        #if defined(LIGHTVOLUME_SUPPORT) && defined(_LIGHTVOLUME_ON) && defined(_LIGHTVOLUME_MODE_REPLACE)
-            // Use VRC Light Volume instead of lightmap/SH
-            environmentDiffuse += lightVolumeDiffuse * basecolor;
-        #elif defined(LIGHTMAP_ON)
+        #if defined(LIGHTMAP_ON)
             float3 lightmapDiffuse = 0.0;
 
             EvaluateLightmap(i.lightmapUV, shadingNormal, materialData.normalTS, tbn, lightmapDiffuse, environmentLight);
@@ -358,13 +347,16 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
             environmentDiffuse += EvaluateLightmapDiffuse(_AdditionalLightmap4, i.lightmapUV) * _AdditionalLightmapStrength4;
             environmentDiffuse += lightmapDiffuse * basecolor * _MaskLightmap;
 
+        #elif defined(LIGHTVOLUME_SUPPORT)
+            float3 lightVolumeDiffuse = 0.0;
+            ShDirectionalLight lightVolumeLight = NoShDirectionalLight();
+
+            VRCLightVolume_EvaluateSH(positionWS, shadingNormal, lightVolumeDiffuse, lightVolumeLight);
+
+            environmentDiffuse += lightVolumeDiffuse * basecolor;
+            environmentLight = lightVolumeLight;
         #else
             environmentDiffuse += EvaluateSH(shadingNormal, positionWS, environmentLight) * basecolor * _MaskLightProbe;
-        #endif
-
-        #if defined(LIGHTVOLUME_SUPPORT) && defined(_LIGHTVOLUME_ON) && defined(_LIGHTVOLUME_MODE_ADDITIVE)
-            // Additive Light Volume support (blend with existing lighting)
-            environmentDiffuse += lightVolumeDiffuse * basecolor * _LightVolumeStrength * _MaskLightProbe;
         #endif
 
         float3 envLightDirection = environmentLight.direction;

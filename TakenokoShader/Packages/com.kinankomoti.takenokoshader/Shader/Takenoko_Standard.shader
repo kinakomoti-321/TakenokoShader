@@ -38,6 +38,15 @@ Shader "Takenoko/Standard"
 
         _Color ("Color", Color) = (1, 1, 1, 1) // name Unity expectes
         _MainTex ("Texture", 2D) = "white" { }// name Unity expectes
+        [Toggle] _SecondTexture ("Second Texture", Int) = 0
+        [Enum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _SecondTexcoord ("Second Texture UV", Int) = 0
+        _SecondAlbedo ("Albedo", 2D) = "white" { }
+        _SecondColor ("Albedo Color", Color) = (1, 1, 1, 1)
+        [Enum(Replace, 3, Add, 0, Multiply, 1, Overlay, 2)] _SecondBlendMode ("Blend Mode", Int) = 1
+        [Normal] _SecondNormal ("Normal", 2D) = "bump" { }
+        _SecondNormalScale ("Normal Strength", Range(0, 2)) = 1
+        _SecondMask ("Mask", 2D) = "white" { }
+        [Enum(R, 0, G, 1, B, 2, A, 3)] _SecondMaskChannel ("Mask Channel", Int) = 0
         
         [Enum(Roughness, 0, Smoothness, 1)] _RoughnessModel ("Material Mode", Int) = 0
         [Enum(R, 0, G, 1, B, 2, A, 3)] _RoughnessChannel ("Roughness Channel", Int) = 0
@@ -191,6 +200,10 @@ Shader "Takenoko/Standard"
 
             // Main Texture
             #pragma shader_feature_local _MAINTEX_TILING_SIMPLE _MAINTEX_TILING_HEX
+            #pragma shader_feature_local _SECONDTEXTURE_ON
+            #pragma shader_feature_local _SECOND_MASK_CHANNEL_R _SECOND_MASK_CHANNEL_G _SECOND_MASK_CHANNEL_B _SECOND_MASK_CHANNEL_A
+            #pragma shader_feature_local _SECOND_UV0 _SECOND_UV1 _SECOND_UV2 _SECOND_UV3
+            #pragma shader_feature_local _SECOND_BLEND_ADD _SECOND_BLEND_MULTIPLY _SECOND_BLEND_OVERLAY _SECOND_BLEND_REPLACE
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local _MAINTEX_UV0 _MAINTEX_UV1 _MAINTEX_UV2 _MAINTEX_UV3
             #pragma shader_feature_local _ROUGHNESS_MODEL_ROUGHNESS _ROUGHNESS_MODEL_SMOOTHNESS
@@ -220,9 +233,7 @@ Shader "Takenoko/Standard"
             #pragma shader_feature_local _LIGHTMAP_NONLINEAR_SH_ON
             
             // VRC Light Volume
-            #pragma shader_feature_local _LIGHTVOLUME_OFF _LIGHTVOLUME_ON
-            #pragma shader_feature_local _LIGHTVOLUME_MODE_REPLACE _LIGHTVOLUME_MODE_ADDITIVE
-            #pragma multi_compile _ LIGHTVOLUME_SUPPORT
+            #pragma shader_feature_local _ LIGHTVOLUME_SUPPORT
             
             // VRC Area Light
             #pragma shader_feature_local _AREALIGHT_ON
@@ -260,6 +271,10 @@ Shader "Takenoko/Standard"
 
             // Main Texture
             #pragma shader_feature_local _MAINTEX_TILING_SIMPLE _MAINTEX_TILING_HEX
+            #pragma shader_feature_local _SECONDTEXTURE_ON
+            #pragma shader_feature_local _SECOND_MASK_CHANNEL_R _SECOND_MASK_CHANNEL_G _SECOND_MASK_CHANNEL_B _SECOND_MASK_CHANNEL_A
+            #pragma shader_feature_local _SECOND_UV0 _SECOND_UV1 _SECOND_UV2 _SECOND_UV3
+            #pragma shader_feature_local _SECOND_BLEND_ADD _SECOND_BLEND_MULTIPLY _SECOND_BLEND_OVERLAY _SECOND_BLEND_REPLACE
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local _MAINTEX_UV0 _MAINTEX_UV1 _MAINTEX_UV2 _MAINTEX_UV3
             #pragma shader_feature_local _ROUGHNESS_MODEL_ROUGHNESS _ROUGHNESS_MODEL_SMOOTHNESS

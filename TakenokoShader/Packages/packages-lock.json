@@ -278,6 +278,14 @@
       },
       "hash": "da86c17ccdb2b5c2a1b01c1c9a5399f3c26c33dd"
     },
+    "red.sim.lightvolumes": {
+      "version": "file:red.sim.lightvolumes",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.editorcoroutines": "1.0.0"
+      }
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,

@@ -18,7 +18,7 @@ namespace Takenoko.Standard
         public class Settings : ScriptableSingleton<Settings>
         {
             public bool foldRenderMenu = false;
-            public bool foldMainMenu = false;
+            public bool foldMaterialMenu = false;
             public bool foldLightingMenu = false;
             public bool foldEffectMenu = false;
             public bool foldAreaLightMenu = false;
@@ -26,6 +26,19 @@ namespace Takenoko.Standard
         }
 
         public static Settings settings { get { return Settings.instance; } }
+
+        // VRC Light Volumes defines VRC_LIGHT_VOLUMES itself from an
+        // [InitializeOnLoad] hook, so nothing here has to go looking for it:
+        // installing or removing the package recompiles this file with the other
+        // branch, and the shader keyword follows on the next material inspection.
+        private static bool IsLightVolumeAvailable()
+        {
+#if VRC_LIGHT_VOLUMES
+            return true;
+#else
+            return false;
+#endif
+        }
 
         private static bool IsSrgbTexture(Texture texture)
         {
@@ -128,55 +141,77 @@ namespace Takenoko.Standard
 
 
             //-----------------------------------------------
-            // Main Texture
+            // Material Parameter
             //-----------------------------------------------
-            #region Main Texture
-            settings.foldMainMenu = TempuraGui.FoldOut("Main Texture", "", settings.foldMainMenu);
-            if (settings.foldMainMenu)
+            #region MaterialParameter
+            settings.foldMaterialMenu = TempuraGui.FoldOut("Material Parameter", "", settings.foldMaterialMenu);
+            if (settings.foldMaterialMenu)
             {
                 using (new VerticalScope(TempuraGui.largeBox))
                 {
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        TempuraGui.Popup<TilingMode>("Tiling Mode", props[ShaderProps.MainTexTilingMode], materialEditor);
-
-                        var tilingMode = Cast<TilingMode>(material, ShaderProps.MainTexTilingMode.Name());
-                        if (tilingMode == TilingMode.HexTiling)
+                        EditorGUILayout.LabelField("Main texture", EditorStyles.boldLabel);
+                        using (new VerticalScope(TempuraGui.borderBox))
                         {
-                            using (new VerticalScope(TempuraGui.borderBox))
+                            // MainTex
+                            TempuraGui.Popup<TilingMode>("Tiling Mode", props[ShaderProps.MainTexTilingMode], materialEditor);
+
+                            var tilingMode = Cast<TilingMode>(material, ShaderProps.MainTexTilingMode.Name());
+                            if (tilingMode == TilingMode.HexTiling)
                             {
-                                materialEditor.ShaderProperty(props[ShaderProps.HexRotationStrength], new GUIContent("Rotation Strength"));
-                                materialEditor.ShaderProperty(props[ShaderProps.HexFallOff], new GUIContent("Fall Off"));
-                                materialEditor.ShaderProperty(props[ShaderProps.HexExponent], new GUIContent("Exponent"));
-                                materialEditor.ShaderProperty(props[ShaderProps.HexEdgeSmoothness], new GUIContent("Edge Smoothness"));
+                                using (new VerticalScope(TempuraGui.borderBox))
+                                {
+                                    materialEditor.ShaderProperty(props[ShaderProps.HexRotationStrength], new GUIContent("Rotation Strength"));
+                                    materialEditor.ShaderProperty(props[ShaderProps.HexFallOff], new GUIContent("Fall Off"));
+                                    materialEditor.ShaderProperty(props[ShaderProps.HexExponent], new GUIContent("Exponent"));
+                                    materialEditor.ShaderProperty(props[ShaderProps.HexEdgeSmoothness], new GUIContent("Edge Smoothness"));
+                                }
                             }
+
+                            TempuraGui.Popup<Texcoord>("MainTex Texcoord", props[ShaderProps.MainTexcoord], materialEditor);
+                            materialEditor.ShaderProperty(props[ShaderProps.MainTexOffset], new GUIContent("MainTex Offset"));
+                            materialEditor.ShaderProperty(props[ShaderProps.MainTexScale], new GUIContent("MainTex Scale"));
                         }
 
-                        TempuraGui.Popup<Texcoord>("MainTex Texcoord", props[ShaderProps.MainTexcoord], materialEditor);
-                        materialEditor.ShaderProperty(props[ShaderProps.MainTexOffset], new GUIContent("MainTex Offset"));
-                        materialEditor.ShaderProperty(props[ShaderProps.MainTexScale], new GUIContent("MainTex Scale"));
+                        using (new VerticalScope(TempuraGui.borderBox))
+                        {
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Base Color"), props[ShaderProps.MainTex], props[ShaderProps.Color]);
+                            TempuraGui.Popup<RoughnessModel>("Workflow", props[ShaderProps.RoughnessModel], materialEditor);
+                            RoughnessModel roughnessModel = Cast<RoughnessModel>(material, ShaderProps.RoughnessModel.Name());
+                            if (roughnessModel == RoughnessModel.Roughness)
+                            {
+                                materialEditor.TexturePropertyTwoLines(new GUIContent("Roughness"), props[ShaderProps.RoughnessTex], props[ShaderProps.Roughness], new GUIContent("Channel"), props[ShaderProps.RoughnessChannel]);
+                            }
+                            else
+                            {
+                                materialEditor.TexturePropertyTwoLines(new GUIContent("Smoothness"), props[ShaderProps.RoughnessTex], props[ShaderProps.Roughness], new GUIContent("Channel"), props[ShaderProps.RoughnessChannel]);
+                            }
+                            DrawLinearTextureWarning(materials, ShaderProps.RoughnessTex.Name(), "Roughness");
+
+                            materialEditor.TexturePropertyTwoLines(new GUIContent("Metallic"), props[ShaderProps.MetallicTex], props[ShaderProps.Metallic], new GUIContent("Channel"), props[ShaderProps.MetallicChannel]);
+                            DrawLinearTextureWarning(materials, ShaderProps.MetallicTex.Name(), "Metallic");
+                            materialEditor.TexturePropertyTwoLines(new GUIContent("Occlusion"), props[ShaderProps.OcclusionTex], props[ShaderProps.Occlusion], new GUIContent("Channel"), props[ShaderProps.OcclusionChannel]);
+                            materialEditor.ShaderProperty(props[ShaderProps.OcclusionPower], new GUIContent("Occlusion Power"));
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Normal"), props[ShaderProps.BumpMap], props[ShaderProps.BumpScale]);
+                        }
+
                     }
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        materialEditor.TexturePropertySingleLine(new GUIContent("Base Color"), props[ShaderProps.MainTex], props[ShaderProps.Color]);
-                        TempuraGui.Popup<RoughnessModel>("Workflow", props[ShaderProps.RoughnessModel], materialEditor);
-                        RoughnessModel roughnessModel = Cast<RoughnessModel>(material, ShaderProps.RoughnessModel.Name());
-                        if (roughnessModel == RoughnessModel.Roughness)
+                        materialEditor.ShaderProperty(props[ShaderProps.SecondTexture], new GUIContent("Second Texture"));
+                        if (props[ShaderProps.SecondTexture].hasMixedValue || Cast(props[ShaderProps.SecondTexture].floatValue))
                         {
-                            materialEditor.TexturePropertyTwoLines(new GUIContent("Roughness"), props[ShaderProps.RoughnessTex], props[ShaderProps.Roughness], new GUIContent("Channel"), props[ShaderProps.RoughnessChannel]);
+                            TempuraGui.Popup<Texcoord>("Second Texture UV", props[ShaderProps.SecondTexcoord], materialEditor);
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Albedo"), props[ShaderProps.SecondAlbedo], props[ShaderProps.SecondColor]);
+                            materialEditor.ShaderProperty(props[ShaderProps.SecondBlendMode], new GUIContent("Blend Mode"));
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Normal"), props[ShaderProps.SecondNormal], props[ShaderProps.SecondNormalScale]);
+                            materialEditor.TextureScaleOffsetProperty(props[ShaderProps.SecondAlbedo]);
+                            materialEditor.TexturePropertySingleLine(new GUIContent("Mask"), props[ShaderProps.SecondMask]);
+                            TempuraGui.Popup<TextureChannel>("Mask Channel", props[ShaderProps.SecondMaskChannel], materialEditor);
+                            DrawLinearTextureWarning(materials, ShaderProps.SecondMask.Name(), "Second Texture Mask");
                         }
-                        else
-                        {
-                            materialEditor.TexturePropertyTwoLines(new GUIContent("Smoothness"), props[ShaderProps.RoughnessTex], props[ShaderProps.Roughness], new GUIContent("Channel"), props[ShaderProps.RoughnessChannel]);
-                        }
-                        DrawLinearTextureWarning(materials, ShaderProps.RoughnessTex.Name(), "Roughness");
-
-                        materialEditor.TexturePropertyTwoLines(new GUIContent("Metallic"), props[ShaderProps.MetallicTex], props[ShaderProps.Metallic], new GUIContent("Channel"), props[ShaderProps.MetallicChannel]);
-                        DrawLinearTextureWarning(materials, ShaderProps.MetallicTex.Name(), "Metallic");
-                        materialEditor.TexturePropertyTwoLines(new GUIContent("Occlusion"), props[ShaderProps.OcclusionTex], props[ShaderProps.Occlusion], new GUIContent("Channel"), props[ShaderProps.OcclusionChannel]);
-                        materialEditor.ShaderProperty(props[ShaderProps.OcclusionPower], new GUIContent("Occlusion Power"));
-                        materialEditor.TexturePropertySingleLine(new GUIContent("Normal"), props[ShaderProps.BumpMap], props[ShaderProps.BumpScale]);
                     }
 
                     // TODO : Height
@@ -230,17 +265,10 @@ namespace Takenoko.Standard
                         {
                             TempuraGui.Space2();
 
+                            DrawLinearTextureWarning(materials, ShaderProps.SssThicknessTex.Name(), "SSS Thickness");
+                            materialEditor.TexturePropertyTwoLines(new GUIContent("Thickness"), props[ShaderProps.SssThicknessTex], props[ShaderProps.SssThickness], new GUIContent("Channel"), props[ShaderProps.SssThicknessChannel]);
                             materialEditor.TexturePropertySingleLine(new GUIContent("SSS Color"), props[ShaderProps.SssColorTex], props[ShaderProps.SssColor]);
                             materialEditor.ShaderProperty(props[ShaderProps.SssFrontPower], new GUIContent("Front Power", "Multiplies the front scattering lobe."));
-
-                            TempuraGui.Space2();
-
-                            EditorGUILayout.LabelField("Transmission", EditorStyles.boldLabel);
-                            materialEditor.TexturePropertyTwoLines(new GUIContent("Thickness"), props[ShaderProps.SssThicknessTex], props[ShaderProps.SssThickness], new GUIContent("Channel"), props[ShaderProps.SssThicknessChannel]);
-                            DrawLinearTextureWarning(materials, ShaderProps.SssThicknessTex.Name(), "SSS Thickness");
-
-                            TempuraGui.Space2();
-
                             materialEditor.ShaderProperty(props[ShaderProps.SssBackPower], new GUIContent("Back Power", "Multiplies the transmitted lobe."));
                             materialEditor.ShaderProperty(props[ShaderProps.SssAnisotropy], new GUIContent("Anisotropy"));
                             materialEditor.ShaderProperty(props[ShaderProps.SssShadowStrength], new GUIContent("Shadow Strength"));
@@ -332,7 +360,7 @@ namespace Takenoko.Standard
                         EditorGUILayout.LabelField("Filter", EditorStyles.boldLabel);
                         using (new VerticalScope(TempuraGui.borderBox))
                         {
-                            EditorGUILayout.LabelField("Main Texture", EditorStyles.boldLabel);
+                            EditorGUILayout.LabelField("Material Parameter", EditorStyles.boldLabel);
                             materialEditor.ShaderProperty(props[ShaderProps.FilterMainTexHueShift], new GUIContent("Hue Shift"));
                             materialEditor.ShaderProperty(props[ShaderProps.FilterMainTexSaturateShift], new GUIContent("Saturate"));
                             materialEditor.ShaderProperty(props[ShaderProps.FilterMainTexValueShift], new GUIContent("Value"));
@@ -553,11 +581,33 @@ namespace Takenoko.Standard
             }
 
             // Shader Keyward
+            if (Cast(material.GetFloat(ShaderProps.SecondTexture.Name())))
+                material.EnableKeyword("_SECONDTEXTURE_ON");
+            else
+                material.DisableKeyword("_SECONDTEXTURE_ON");
+            TempuraGui.ExcusiveKeyward<SecondTextureBlendMode>(material, ShaderProps.SecondBlendMode.Name(), new string[]
+            {
+                "_SECOND_BLEND_ADD", "_SECOND_BLEND_MULTIPLY", "_SECOND_BLEND_OVERLAY", "_SECOND_BLEND_REPLACE"
+            });
+            TempuraGui.ExcusiveKeyward<Texcoord>(material, ShaderProps.SecondTexcoord.Name(), new string[]
+            {
+                "_SECOND_UV0", "_SECOND_UV1", "_SECOND_UV2", "_SECOND_UV3"
+            });
+            TempuraGui.ExcusiveKeyward<TextureChannel>(material, ShaderProps.SecondMaskChannel.Name(), new string[]
+            {
+                "_SECOND_MASK_CHANNEL_R", "_SECOND_MASK_CHANNEL_G", "_SECOND_MASK_CHANNEL_B", "_SECOND_MASK_CHANNEL_A"
+            });
+
             TempuraGui.ExcusiveKeyward<RoughnessModel>(material, ShaderProps.RoughnessModel.Name(), new string[]
             {
                 ShaderKeywords.RoughnessModelRoughness.Name(),
                 ShaderKeywords.RoughnessModelSmoothness.Name()
             });
+
+            // LIGHTVOLUME_SUPPORT gates the include of the package's own cginc, so it
+            // tracks whether the package is actually in the project rather than being
+            // something the user toggles.
+            TempuraGui.ToggleKeyward(material, ShaderKeywords.LightvolumeSupport.Name(), IsLightVolumeAvailable());
 
             TempuraGui.ExcusiveKeyward<LightmapMode>(material, ShaderProps.LightmapMode.Name(), new string[]
             {

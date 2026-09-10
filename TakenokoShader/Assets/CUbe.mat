@@ -12,10 +12,13 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - LIGHTVOLUME_SUPPORT
   - _CLEARCOAT_MASK_CHANNEL_R
   - _HEIGHT_CHANNEL_G
   - _LIGHTMAP_DEFAULT
   - _LIGHTMAP_NONLINEAR_SH_ON
+  - _LIGHTVOLUME_MODE_REPLACE
+  - _LIGHTVOLUME_ON
   - _MAINTEX_TILING_SIMPLE
   - _MAINTEX_UV0
   - _METALLIC_CHANNEL_G
@@ -225,13 +228,17 @@ Material:
     - _HexFallOff: 0.5
     - _HexRotationStrength: 0.5
     - _Iridescence: 0
+    - _LightVolume: 1
+    - _LightVolumeIntensityMultiplier: 1
+    - _LightVolumeMode: 0
+    - _LightVolumeStrength: 1
     - _LightmapMode: 0
     - _LightmapNonLinearSh: 1
     - _MainTexTilingMode: 0
     - _MainTexcoord: 0
     - _MaskLightProbe: 1
     - _MaskLightmap: 1
-    - _Metallic: 0
+    - _Metallic: 0.769
     - _MetallicChannel: 1
     - _Mode: 0
     - _Occlusion: 1
@@ -240,7 +247,7 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _RenderQueueOffset: 0
-    - _Roughness: 1
+    - _Roughness: 0.148
     - _RoughnessChannel: 0
     - _RoughnessModel: 0
     - _SkyboxFog: 0
@@ -258,9 +265,11 @@ Material:
     - _Sss: 1
     - _SssAmbient: 0
     - _SssAnisotropy: 0.61
+    - _SssBackPower: 1
     - _SssCurvature: 1
     - _SssDirectionalWeight: 1
     - _SssDistortion: 0.773
+    - _SssFrontPower: 0
     - _SssFrontStrength: 0.565
     - _SssMode: 0
     - _SssModel: 1
@@ -288,6 +297,7 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 0}
+    - _LightVolumeColorModulation: {r: 1, g: 1, b: 1, a: 1}
     - _MainTexOffset: {r: 0, g: 0, b: 1, a: 1}
     - _MainTexScale: {r: 1, g: 1, b: 1, a: 1}
     - _SkyboxFogBoxSizeMax: {r: 1, g: 1, b: 1, a: 0}

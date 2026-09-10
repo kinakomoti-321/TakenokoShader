@@ -137,14 +137,6 @@ public enum ShaderKeywords
     LightmapMonosh,
     [Description("_LIGHTMAP_NONLINEAR_SH_ON")]
     LightmapNonlinearShOn,
-    [Description("_LIGHTVOLUME_OFF")]
-    LightvolumeOff,
-    [Description("_LIGHTVOLUME_ON")]
-    LightvolumeOn,
-    [Description("_LIGHTVOLUME_MODE_REPLACE")]
-    LightvolumeModeReplace,
-    [Description("_LIGHTVOLUME_MODE_ADDITIVE")]
-    LightvolumeModeAdditive,
     [Description("_VRC_AREALIGHT_ON")]
     VrcArealightOn,
     [Description("_AREA_LIGHT_MASK_ON")]
@@ -261,10 +253,6 @@ public static class ShaderKeywordsNames
         { ShaderKeywords.LightmapSh, "_LIGHTMAP_SH" },
         { ShaderKeywords.LightmapMonosh, "_LIGHTMAP_MONOSH" },
         { ShaderKeywords.LightmapNonlinearShOn, "_LIGHTMAP_NONLINEAR_SH_ON" },
-        { ShaderKeywords.LightvolumeOff, "_LIGHTVOLUME_OFF" },
-        { ShaderKeywords.LightvolumeOn, "_LIGHTVOLUME_ON" },
-        { ShaderKeywords.LightvolumeModeReplace, "_LIGHTVOLUME_MODE_REPLACE" },
-        { ShaderKeywords.LightvolumeModeAdditive, "_LIGHTVOLUME_MODE_ADDITIVE" },
         { ShaderKeywords.VrcArealightOn, "_VRC_AREALIGHT_ON" },
         { ShaderKeywords.AreaLightMaskOn, "_AREA_LIGHT_MASK_ON" },
         { ShaderKeywords.Directional, "DIRECTIONAL" },

@@ -11,6 +11,15 @@ float _Cutoff;
 float4 _Color;
 TAKENOKO_TEXTURE2D(_MainTex)
 
+#if defined(_SECONDTEXTURE_ON)
+    Texture2D _SecondAlbedo;
+    Texture2D _SecondNormal;
+    Texture2D _SecondMask;
+    float4 _SecondAlbedo_ST;
+    float4 _SecondColor;
+    float _SecondNormalScale;
+#endif
+
 float _Roughness;
 TAKENOKO_TEXTURE2D(_RoughnessTex);
 
@@ -113,20 +122,5 @@ float _AreaLightIntensity5;
 float _AreaLightIntensity6;
 float _AreaLightIntensity7;
 float _AreaLightIntensity8;
-
-//--------------------------------------------
-// VRC Light Volume Properties
-//--------------------------------------------
-
-#if defined(LIGHTVOLUME_SUPPORT)
-    // Light Volume strength for additive blending
-    float _LightVolumeStrength;
-    
-    // Light Volume color modulation
-    float4 _LightVolumeColorModulation;
-    
-    // Light Volume intensity multiplier
-    float _LightVolumeIntensityMultiplier;
-#endif
 
 #endif
