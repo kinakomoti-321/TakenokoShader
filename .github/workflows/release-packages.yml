@@ -47,25 +47,51 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.tag || github.ref_name }}
+      - name: Check out packaging tools from the workflow revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: .release-tools
+          sparse-checkout: TakenokoShader/Tools~
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+      - name: Verify package builder
+        run: python -m unittest discover -s .release-tools/TakenokoShader/Tools~ -p 'test_*.py'
       - name: Build packages and preserve previous versions
         env:
           RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
           RELEASE_REPOSITORY: ${{ github.repository }}
         run: >-
-          python TakenokoShader/Tools~/build_packages.py
+          python .release-tools/TakenokoShader/Tools~/build_packages.py
+          --project TakenokoShader
+          --output TakenokoShader/Build/Packages
           --tag "$RELEASE_TAG"
           --repository "$RELEASE_REPOSITORY"
           --previous-index-url "https://github.com/$RELEASE_REPOSITORY/releases/latest/download/index.json"
-      - name: Create release with the two public VPM packages
+      - name: Publish VPM packages and unitypackages
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
-        run: >-
-          gh release create "$RELEASE_TAG"
-          TakenokoShader/Build/Packages/com.kinankomoti.takenokoshader-*.zip
-          TakenokoShader/Build/Packages/com.kinankomoti.takenokoshaderarealight-*.zip
-          TakenokoShader/Build/Packages/index.json
-          --verify-tag --generate-notes --title "$RELEASE_TAG"
+          RELEASE_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          unitypackages=(
+            TakenokoShader/Build/Packages/com.kinankomoti.takenokoshader-*.unitypackage
+            TakenokoShader/Build/Packages/com.kinankomoti.takenokoshaderarealight-*.unitypackage
+          )
+          if gh release view "$RELEASE_TAG" --repo "$RELEASE_REPOSITORY" --json assets > "$RUNNER_TEMP/release-assets.json"; then
+            # Keep published assets intact; only add missing unitypackages.
+            for file in "${unitypackages[@]}"; do
+              if ! jq -e --arg name "$(basename "$file")" '.assets | any(.name == $name)' "$RUNNER_TEMP/release-assets.json" > /dev/null; then
+                gh release upload "$RELEASE_TAG" "$file" --repo "$RELEASE_REPOSITORY"
+              fi
+            done
+          else
+            gh release create "$RELEASE_TAG" \
+              TakenokoShader/Build/Packages/com.kinankomoti.takenokoshader-*.zip \
+              TakenokoShader/Build/Packages/com.kinankomoti.takenokoshaderarealight-*.zip \
+              "${unitypackages[@]}" \
+              TakenokoShader/Build/Packages/index.json \
+              --repo "$RELEASE_REPOSITORY" --verify-tag --generate-notes --title "$RELEASE_TAG"
+          fi
