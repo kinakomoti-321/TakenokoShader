@@ -155,21 +155,11 @@ namespace Takenoko.Standard
                         using (new VerticalScope(TempuraGui.borderBox))
                         {
                             // MainTex
-                            TempuraGui.Popup<TilingMode>("Tiling mode", props[ShaderProps.MainTexTilingMode], materialEditor);
+                            materialEditor.ShaderProperty(props[ShaderProps.MainTexTilingMode], new GUIContent("Tiling mode"));
 
-                            var tilingMode = Cast<TilingMode>(material, ShaderProps.MainTexTilingMode.Name());
-                            if (tilingMode == TilingMode.HexTiling)
-                            {
-                                using (new VerticalScope(TempuraGui.borderBox))
-                                {
-                                    materialEditor.ShaderProperty(props[ShaderProps.HexRotationStrength], new GUIContent("Rotation strength"));
-                                    materialEditor.ShaderProperty(props[ShaderProps.HexFallOff], new GUIContent("Fall off"));
-                                    materialEditor.ShaderProperty(props[ShaderProps.HexExponent], new GUIContent("Exponent"));
-                                    materialEditor.ShaderProperty(props[ShaderProps.HexEdgeSmoothness], new GUIContent("Edge smoothness"));
-                                }
-                            }
-
-                            TempuraGui.Popup<Texcoord>("MainTex texcoord", props[ShaderProps.MainTexcoord], materialEditor);
+                            if (props[ShaderProps.MainTexTilingMode].hasMixedValue ||
+                                (TilingMode)(int)props[ShaderProps.MainTexTilingMode].floatValue != TilingMode.Triplanar)
+                                TempuraGui.Popup<Texcoord>("MainTex texcoord", props[ShaderProps.MainTexcoord], materialEditor);
                             materialEditor.ShaderProperty(props[ShaderProps.MainTexOffset], new GUIContent("MainTex offset"));
                             materialEditor.ShaderProperty(props[ShaderProps.MainTexScale], new GUIContent("MainTex scale"));
                         }
@@ -267,10 +257,10 @@ namespace Takenoko.Standard
                             DrawLinearTextureWarning(materials, ShaderProps.SssThicknessTex.Name(), "SSS thickness");
                             materialEditor.TexturePropertyTwoLines(new GUIContent("Thickness"), props[ShaderProps.SssThicknessTex], props[ShaderProps.SssThickness], new GUIContent("Channel"), props[ShaderProps.SssThicknessChannel]);
                             materialEditor.TexturePropertySingleLine(new GUIContent("SSS color"), props[ShaderProps.SssColorTex], props[ShaderProps.SssColor]);
-                            materialEditor.ShaderProperty(props[ShaderProps.SssFrontPower], new GUIContent("Front strength"));
-                            materialEditor.ShaderProperty(props[ShaderProps.SssBackPower], new GUIContent("Back strength"));
+                            materialEditor.ShaderProperty(props[ShaderProps.SssFrontPower], new GUIContent("Front intensity"));
+                            materialEditor.ShaderProperty(props[ShaderProps.SssBackPower], new GUIContent("Back intensity"));
                             materialEditor.ShaderProperty(props[ShaderProps.SssAnisotropy], new GUIContent("Anisotropy"));
-                            materialEditor.ShaderProperty(props[ShaderProps.SssShadowStrength], new GUIContent("Shadow strength"));
+                            materialEditor.ShaderProperty(props[ShaderProps.SssShadowStrength], new GUIContent("Shadow intensity"));
                         }
                     }
 
@@ -281,7 +271,7 @@ namespace Takenoko.Standard
                         if (useClearCoat)
                         {
                             TempuraGui.Space2();
-                            materialEditor.ShaderProperty(props[ShaderProps.ClearCoatStrength], new GUIContent("Strength"));
+                            materialEditor.ShaderProperty(props[ShaderProps.ClearCoatStrength], new GUIContent("Intensity"));
                             // materialEditor.TexturePropertyTwoLines(new GUIContent("Mask"), props[ShaderProps.ClearCoatMask], null, new GUIContent("Channel"), props[ShaderProps.ClearCoatMaskChannel]);
                         }
                     }
@@ -305,6 +295,7 @@ namespace Takenoko.Standard
                         bool useSpecularOcclusion = Cast(props[ShaderProps.SpecularOcclusion].floatValue);
                         if (useSpecularOcclusion)
                         {
+                            materialEditor.ShaderProperty(props[ShaderProps.OcclusionIntesity], new GUIContent("Intensity"));
                             materialEditor.ShaderProperty(props[ShaderProps.SpecularOcclusionLightmap], new GUIContent("Use light map"));
                         }
                     }
@@ -317,8 +308,8 @@ namespace Takenoko.Standard
 
                     using (new VerticalScope(TempuraGui.borderBox))
                     {
-                        materialEditor.ShaderProperty(props[ShaderProps.MaskLightProbe], new GUIContent("Light probe strength"));
-                        materialEditor.ShaderProperty(props[ShaderProps.MaskLightmap], new GUIContent("Lightmap strength"));
+                        materialEditor.ShaderProperty(props[ShaderProps.MaskLightProbe], new GUIContent("Light probe intensity"));
+                        materialEditor.ShaderProperty(props[ShaderProps.MaskLightmap], new GUIContent("Lightmap intensity"));
                     }
 
                     using (new VerticalScope(TempuraGui.borderBox))
@@ -381,7 +372,7 @@ namespace Takenoko.Standard
                                 TempuraGui.Popup<SkyboxFogMode>("Skybox fog mode", props[ShaderProps.SkyboxFogMode], materialEditor);
                                 var skyboxFogMode = (SkyboxFogMode)(int)props[ShaderProps.SkyboxFogMode].floatValue;
 
-                                materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogStrength], new GUIContent("Skybox strength"));
+                                materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogStrength], new GUIContent("Skybox intensity"));
                                 if (skyboxFogMode == SkyboxFogMode.Distance)
                                 {
                                     materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogDistance], new GUIContent("Skybox distance"));
@@ -611,11 +602,11 @@ namespace Takenoko.Standard
             TempuraGui.ToggleKeyward(material, ShaderKeywords.LightmapNonlinearShOn.Name(),
                 Cast(material.GetFloat(ShaderProps.LightmapNonLinearSh.Name())));
 
-            TempuraGui.ExcusiveKeyward<TilingMode>(material, ShaderProps.MainTexTilingMode.Name(), new string[]
-            {
-                ShaderKeywords.MaintexTilingSimple.Name(),
-                ShaderKeywords.MaintexTilingHex.Name()
-            });
+            bool triplanar = (TilingMode)material.GetInt(ShaderProps.MainTexTilingMode.Name()) == TilingMode.Triplanar;
+            material.SetInt(ShaderProps.MainTexTilingMode.Name(), (int)(triplanar ? TilingMode.Triplanar : TilingMode.Simple));
+            TempuraGui.ToggleKeyward(material, ShaderKeywords.MaintexTilingSimple.Name(), !triplanar);
+            TempuraGui.ToggleKeyward(material, ShaderKeywords.MaintexTilingTriplanar.Name(), triplanar);
+            material.DisableKeyword(ShaderKeywords.MaintexTilingHex.Name());
 
             TempuraGui.ExcusiveKeyward<Texcoord>(material, ShaderProps.MainTexcoord.Name(), new string[]{
                 ShaderKeywords.MaintexUv0.Name(),
@@ -701,13 +692,13 @@ namespace Takenoko.Standard
             bool useEmission = Cast(material.GetFloat(ShaderProps.Emission.Name()));
             if (useEmission)
             {
-                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.AnyEmissive;
-                // material.EnableKeyword(ShaderKeywords.Emission.Name());
+                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+                material.EnableKeyword("_EMISSION_ON");
             }
             else
             {
                 material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
-                // material.DisableKeyword(ShaderKeywords.Emission.Name());
+                material.DisableKeyword("_EMISSION_ON");
             }
 
         }

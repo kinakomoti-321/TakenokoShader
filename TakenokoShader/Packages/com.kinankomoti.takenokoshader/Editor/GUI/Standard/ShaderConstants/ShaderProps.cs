@@ -158,6 +158,8 @@ public enum ShaderProps
     FuzzMask,
     [Description("_SpecularOcclusion")]
     SpecularOcclusion,
+    [Description("_OcclusionIntesity")]
+    OcclusionIntesity,
     [Description("_SpecularOcclusionLightmap")]
     SpecularOcclusionLightmap,
     [Description("_MaskLightProbe")]
@@ -325,6 +327,7 @@ public static class ShaderPropsName
         { ShaderProps.Fuzz, "_Fuzz" },
         { ShaderProps.FuzzMask, "_FuzzMask" },
         { ShaderProps.SpecularOcclusion, "_SpecularOcclusion" },
+        { ShaderProps.OcclusionIntesity, "_OcclusionIntesity" },
         { ShaderProps.SpecularOcclusionLightmap, "_SpecularOcclusionLightmap" },
         { ShaderProps.MaskLightProbe, "_MaskLightProbe" },
         { ShaderProps.EstimateSHDirection, "_EstimateSHDirection" },

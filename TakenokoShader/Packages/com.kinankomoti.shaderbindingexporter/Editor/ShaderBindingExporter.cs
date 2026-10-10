@@ -1,10 +1,7 @@
 using System;
-using System.Diagnostics.Eventing.Reader;
 using System.IO;
-using NUnit.Framework.Constraints;
 using UnityEditor;
 using UnityEngine;
-using Tempura;
 
 namespace ShaderBindingExporter
 {
@@ -35,7 +32,7 @@ namespace ShaderBindingExporter
 
         bool updated = false;
 
-        [MenuItem("Takenoko/Development/Shader Binding Exporte")]
+        [MenuItem("Tools/Shader Binding Exporter")]
         public static void ShowWindow()
         {
             GetWindow<ShaderBindingExporter>("Shader Binding Exporter");
@@ -131,12 +128,12 @@ namespace ShaderBindingExporter
             showProperties = EditorGUILayout.Foldout(showProperties, "bindings");
             if (showProperties)
             {
-                using (new VerticalScope(TempuraGui.largeBox))
+                using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
                 {
                     EditorGUILayout.LabelField("Property", EditorStyles.boldLabel);
                     EditorGUILayout.LabelField("Property Number : " + shaderInfo.propertyNames.Count);
 
-                    using (new BoxScope(TempuraGui.noMarginBoxB, 0.8f))
+                    using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
                     {
                         propScroll = EditorGUILayout.BeginScrollView(propScroll, GUILayout.Height(150));
                         foreach (var prop in shaderInfo.propertyNames)
@@ -148,7 +145,7 @@ namespace ShaderBindingExporter
 
                     EditorGUILayout.LabelField("Keyword", EditorStyles.boldLabel);
                     EditorGUILayout.LabelField("Keyword Number : " + shaderInfo.keywordNames.Count);
-                    using (new BoxScope(TempuraGui.noMarginBoxB, 0.8f))
+                    using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
                     {
                         keywordScroll = EditorGUILayout.BeginScrollView(keywordScroll, GUILayout.Height(200));
                         foreach (var keyword in shaderInfo.keywordNames)
@@ -163,7 +160,7 @@ namespace ShaderBindingExporter
 
             // Config
             EditorGUILayout.Space();
-            TempuraGui.DrawHorizontalLine(2.0f);
+            EditorGUILayout.LabelField(GUIContent.none, GUI.skin.horizontalSlider);
             EditorGUILayout.LabelField("Output Config", EditorStyles.boldLabel);
 
             nameSpace = EditorGUILayout.TextField("Namespace", nameSpace);

@@ -4,7 +4,7 @@
 #if defined(_AREALIGHT_ON)
     float _UdonEnableLtcSystem;
 
-    TAKENOKO_TEXTURE2D(_UdonLtcLut);
+    Texture2D _UdonLtcLut;
 
     float _UdonLightVertex1[12]; // 4 vertices * 3 components
     Texture2D _UdonLightTexture1;

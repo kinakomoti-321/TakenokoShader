@@ -1,5 +1,5 @@
 {
-  "name": "TakenokoShader",
+  "name": "TakenokoShaderAreaLight",
   "rootNamespace": "Kinankomoti.TakenokoShader",
   "references": [
     "VRC.Udon",

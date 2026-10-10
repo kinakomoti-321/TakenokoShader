@@ -6,6 +6,8 @@
 //--------------------------------------------
 // Shader Properties
 //--------------------------------------------
+
+
 float _Cutoff;
 
 float4 _Color;
@@ -33,6 +35,7 @@ float4 _EmissionColor; // name Unity expectes
 TAKENOKO_TEXTURE2D(_EmissionMap); // name Unity expectes
 
 float _Occlusion;
+float _OcclusionIntesity;
 TAKENOKO_TEXTURE2D(_OcclusionTex);
 
 float4 _MainTexOffset;
@@ -52,7 +55,7 @@ float _HeightSubStep;
 
 #if defined(_IRIDESCENCE_ON)
     float _ThinFilmThickness;
-    TAKENOKO_TEXTURE2D(_ThinFilmThicknessTex);
+    Texture2D _ThinFilmThicknessTex;
     float _ThinFilmThicknessMin;
     float _ThinFilmThicknessMax;
     float _ThinFilmIor;
@@ -60,9 +63,9 @@ float _HeightSubStep;
 
 #if defined(_SSS_ON)
     float _SssThickness;
-    TAKENOKO_TEXTURE2D(_SssThicknessTex);
+    Texture2D _SssThicknessTex;
     float4 _SssColor;
-    TAKENOKO_TEXTURE2D(_SssColorTex);
+    Texture2D _SssColorTex;
     float _SssFrontPower;
     float _SssBackPower;
     float _SssAnisotropy;
@@ -71,7 +74,7 @@ float _HeightSubStep;
 
 #if defined(_CLEARCOAT_ON)
     float _ClearCoatStrength;
-    TAKENOKO_TEXTURE2D(_ClearCoatMask);
+    Texture2D _ClearCoatMask;
 #endif
 
 
@@ -104,9 +107,9 @@ float4 _SkyboxFogBoxSizeMax;
 float4 _SkyboxFogSphereCenter;
 float _SkyboxFogSphereRadius;
 
-#if defined(_AREA_LIGHT_MASK_ON)
-    TAKENOKO_TEXTURE2D(_AreaLightMask1);
-    TAKENOKO_TEXTURE2D(_AreaLightMask2);
+#if defined(_AREALIGHTMASK_ON)
+    Texture2D _AreaLightMask1;
+    Texture2D _AreaLightMask2;
 #endif
 
 float _AreaLightIntensity1;

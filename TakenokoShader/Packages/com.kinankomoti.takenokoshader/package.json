@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "unity": "2022.3",
   "description": "Standard shader",
+  "license": "MIT",
+  "url": "https://github.com/kinakomoti-321/TakenokoShader/releases/download/v0.1.0/com.kinankomoti.takenokoshader-0.1.0.zip",
+  "vpmDependencies": {},
   "author": {
     "name": "kinankomoti"
   },

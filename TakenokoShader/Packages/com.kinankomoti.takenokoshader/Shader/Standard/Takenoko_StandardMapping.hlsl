@@ -20,8 +20,8 @@ float2 SecondTexcoord(VertexOutput i)
 void Standard_SecondTexture(float2 texcoord, float2 maskUV, inout float3 albedo, inout float3 normalTS)
 {
     float2 secondUV = texcoord * _SecondAlbedo_ST.xy + _SecondAlbedo_ST.zw;
-    // Share existing samplers to stay within the D3D11 sampler limit.
-    float4 maskSample = saturate(_SecondMask.Sample(sampler__MainTex, maskUV));
+    // Share the linear clamp sampler for secondary textures.
+    float4 maskSample = saturate(_SecondMask.Sample(sampler_LinearClamp, maskUV));
     #if defined(_SECOND_MASK_CHANNEL_G)
         float mask = maskSample.g;
     #elif defined(_SECOND_MASK_CHANNEL_B)
@@ -31,7 +31,7 @@ void Standard_SecondTexture(float2 texcoord, float2 maskUV, inout float3 albedo,
     #else
         float mask = maskSample.r;
     #endif
-    float3 second = _SecondAlbedo.Sample(sampler__MainTex, secondUV).rgb * _SecondColor.rgb;
+    float3 second = _SecondAlbedo.Sample(sampler_LinearClamp, secondUV).rgb * _SecondColor.rgb;
     float3 blended;
     #if defined(_SECOND_BLEND_REPLACE)
         blended = second;
@@ -44,7 +44,7 @@ void Standard_SecondTexture(float2 texcoord, float2 maskUV, inout float3 albedo,
         blended = albedo * second;
     #endif
     albedo = lerp(albedo, blended, mask);
-    float3 detailNormal = UnpackScaleNormal(_SecondNormal.Sample(sampler__BumpMap, secondUV), _SecondNormalScale);
+    float3 detailNormal = UnpackScaleNormal(_SecondNormal.Sample(sampler_LinearClamp, secondUV), _SecondNormalScale);
     detailNormal = normalize(lerp(float3(0.0, 0.0, 1.0), detailNormal, mask));
     normalTS = BlendNormals(normalTS, detailNormal);
 }
@@ -186,7 +186,7 @@ float Standard_Height(float2 texcoord, float2 dx, float2 dy)
 #if defined(_IRIDESCENCE_ON)
     float Standard_ThinFilmThickness(float2 texcoord)
     {
-        float4 thickness = TAKENOKO_SAMPLE(_ThinFilmThicknessTex, texcoord);
+        float4 thickness = TAKENOKO_SAMPLE_SAMPLER(_ThinFilmThicknessTex, sampler_LinearClamp, texcoord);
         #if defined(_THINFILM_CHANNEL_R)
             return thickness.r;
         #elif defined(_THINFILM_CHANNEL_G)
@@ -204,12 +204,12 @@ float Standard_Height(float2 texcoord, float2 dx, float2 dy)
 #if defined(_SSS_ON)
     float3 Standard_SssColor(float2 texcoord)
     {
-        return _SssColor.rgb * TAKENOKO_SAMPLE(_SssColorTex, texcoord).rgb;
+        return _SssColor.rgb * TAKENOKO_SAMPLE_SAMPLER(_SssColorTex, sampler_LinearClamp, texcoord).rgb;
     }
 
     float Standard_SssThickness(float2 texcoord)
     {
-        float4 thickness = TAKENOKO_SAMPLE(_SssThicknessTex, texcoord);
+        float4 thickness = TAKENOKO_SAMPLE_SAMPLER(_SssThicknessTex, sampler_LinearClamp, texcoord);
         #if defined(_SSS_THICKNESS_CHANNEL_R)
             return thickness.r;
         #elif defined(_SSS_THICKNESS_CHANNEL_G)
@@ -227,7 +227,7 @@ float Standard_Height(float2 texcoord, float2 dx, float2 dy)
 #if defined(_CLEARCOAT_ON)
     float Standard_Clearcoat(float2 texcoord)
     {
-        float4 clearcoat = TAKENOKO_SAMPLE(_ClearCoatMask, texcoord);
+        float4 clearcoat = TAKENOKO_SAMPLE_SAMPLER(_ClearCoatMask, sampler_LinearClamp, texcoord);
         #if defined(_CLEARCOAT_MASK_CHANNEL_R)
             return clearcoat.r;
         #elif defined(_CLEARCOAT_MASK_CHANNEL_G)
@@ -263,7 +263,7 @@ float Standard_Occlusion(float2 texcoord, float2 dx, float2 dy)
 inline float4 Standard_Emission(float2 texcoord)
 {
     float4 emission = 0;
-    #if defined(_TAKENOKO_FOWARD_BASE) && defined(_EMISSION_ON)
+    #if (defined(_TAKENOKO_FOWARD_BASE) || defined(_TAKENOKO_META)) && defined(_EMISSION_ON)
         emission = _EmissionColor * TAKENOKO_SAMPLE(_EmissionMap, texcoord);
     #endif
     return emission;
@@ -272,7 +272,7 @@ inline float4 Standard_Emission(float2 texcoord)
 inline float4 Standard_Emission(float2 texcoord, float2 dx, float2 dy)
 {
     float4 emission = 0;
-    #if defined(_TAKENOKO_FOWARD_BASE) && defined(_EMISSION_ON)
+    #if (defined(_TAKENOKO_FOWARD_BASE) || defined(_TAKENOKO_META)) && defined(_EMISSION_ON)
         emission = _EmissionColor * TAKENOKO_SAMPLE_GRAD(_EmissionMap, texcoord, dx, dy);
     #endif
     return emission;
@@ -304,5 +304,7 @@ inline float2 MainTexcoord(VertexOutput i)
         return i.texcoord0 * float2(_MainTexScale.x, _MainTexScale.y) + float2(_MainTexOffset.x, _MainTexOffset.y);
     #endif
 }
+
+#include "Takenoko_StandardTriplanar.hlsl"
 
 #endif // _TAKENOKO_STANDARD_TEXTURE_HLSL

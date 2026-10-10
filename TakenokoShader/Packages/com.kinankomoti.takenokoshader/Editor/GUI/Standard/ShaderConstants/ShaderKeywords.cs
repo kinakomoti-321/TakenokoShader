@@ -29,6 +29,8 @@ public enum ShaderKeywords
     InstancingOn,
     [Description("_MAINTEX_TILING_SIMPLE")]
     MaintexTilingSimple,
+    [Description("_MAINTEX_TILING_TRIPLANAR")]
+    MaintexTilingTriplanar,
     [Description("_MAINTEX_TILING_HEX")]
     MaintexTilingHex,
     [Description("_ALPHATEST_ON")]
@@ -199,6 +201,7 @@ public static class ShaderKeywordsNames
         { ShaderKeywords.FogExp2, "FOG_EXP2" },
         { ShaderKeywords.InstancingOn, "INSTANCING_ON" },
         { ShaderKeywords.MaintexTilingSimple, "_MAINTEX_TILING_SIMPLE" },
+        { ShaderKeywords.MaintexTilingTriplanar, "_MAINTEX_TILING_TRIPLANAR" },
         { ShaderKeywords.MaintexTilingHex, "_MAINTEX_TILING_HEX" },
         { ShaderKeywords.AlphatestOn, "_ALPHATEST_ON" },
         { ShaderKeywords.AlphablendOn, "_ALPHABLEND_ON" },

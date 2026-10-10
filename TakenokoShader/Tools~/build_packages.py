@@ -1,0 +1,136 @@
+"""Build VPM ZIPs, a development UPM tarball, and a cumulative VPM listing."""
+
+import argparse
+import copy
+import gzip
+import hashlib
+import io
+import json
+from pathlib import Path
+import re
+import tarfile
+from urllib.error import HTTPError
+from urllib.request import urlopen
+import zipfile
+
+
+PROJECT = Path(__file__).resolve().parents[1]
+VPM_PACKAGES = (
+    "com.kinankomoti.takenokoshader",
+    "com.kinankomoti.takenokoshaderarealight",
+)
+DEVELOPMENT_PACKAGE = "com.kinankomoti.shaderbindingexporter"
+DEFAULT_REPOSITORY = "kinakomoti-321/TakenokoShader"
+
+
+def json_bytes(value):
+    return (json.dumps(value, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+
+
+def package_files(directory):
+    for path in sorted(directory.rglob("*")):
+        relative = path.relative_to(directory)
+        if any(part.startswith(".") or part.endswith("~") for part in relative.parts):
+            continue
+        if path.is_file():
+            yield relative.as_posix(), path.read_bytes()
+
+
+def load_previous(args):
+    if args.previous_index:
+        return json.loads(args.previous_index.read_text(encoding="utf-8"))
+    if args.previous_index_url:
+        try:
+            with urlopen(args.previous_index_url, timeout=30) as response:
+                return json.load(response)
+        except HTTPError as error:
+            if error.code != 404:
+                raise
+            print("No previous listing found; creating the initial listing.")
+    return {"packages": {}}
+
+
+def build(args):
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", args.repository):
+        raise ValueError("--repository must be owner/repository")
+    if not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?", args.tag):
+        raise ValueError("--tag must be a version tag, such as v0.1.0")
+
+    base_url = f"https://github.com/{args.repository}/releases"
+    index = load_previous(args)
+    index.update({
+        "name": "TakenokoShader Packages",
+        "author": "kinankomoti",
+        "id": "com.kinankomoti.takenokoshader.repository",
+        "url": f"{base_url}/latest/download/index.json",
+    })
+    # Exporter is deliberately excluded even if an old listing included it.
+    index["packages"].pop(DEVELOPMENT_PACKAGE, None)
+    args.output.mkdir(parents=True, exist_ok=True)
+
+    for name in (*VPM_PACKAGES, DEVELOPMENT_PACKAGE):
+        directory = PROJECT / "Packages" / name
+        manifest = json.loads((directory / "package.json").read_text(encoding="utf-8"))
+        if manifest["name"] != name or manifest.get("license") != "MIT":
+            raise ValueError(f"Invalid package name or license: {name}")
+        if not (directory / "LICENSE.md").is_file():
+            raise ValueError(f"Missing LICENSE.md: {name}")
+        version = manifest["version"]
+        files = dict(package_files(directory))
+        # Ensure Unity assets keep their stable GUIDs in distributed packages.
+        for relative in files:
+            if relative.endswith((".cs", ".asmdef", ".asset", ".prefab", ".mat", ".exr")):
+                if relative + ".meta" not in files:
+                    raise ValueError(f"Missing .meta: {name}/{relative}")
+
+        if name in VPM_PACKAGES:
+            versions = index["packages"].setdefault(name, {"versions": {}})["versions"]
+            filename = f"{name}-{version}.zip"
+            if version in versions:
+                # An unchanged package keeps its original download URL when
+                # another package is released under a newer repository tag.
+                manifest["url"] = versions[version]["url"]
+            else:
+                manifest["url"] = f"{base_url}/download/{args.tag}/{filename}"
+            files["package.json"] = json_bytes(manifest)
+            archive = args.output / filename
+            with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as output:
+                for relative, data in sorted(files.items()):
+                    entry = zipfile.ZipInfo(relative, date_time=(2026, 1, 1, 0, 0, 0))
+                    entry.compress_type = zipfile.ZIP_DEFLATED
+                    entry.external_attr = 0o100644 << 16
+                    output.writestr(entry, data)
+            entry = copy.deepcopy(manifest)
+            entry["zipSHA256"] = hashlib.sha256(archive.read_bytes()).hexdigest()
+            if version in versions and versions[version] != entry:
+                raise ValueError(f"Published version is immutable; increment version: {name} {version}")
+            versions[version] = entry
+        else:
+            archive = args.output / f"{name}-{version}.tgz"
+            with archive.open("wb") as raw:
+                with gzip.GzipFile(fileobj=raw, mode="wb", filename="", mtime=0) as compressed:
+                    with tarfile.open(fileobj=compressed, mode="w") as output:
+                        for relative, data in sorted(files.items()):
+                            entry = tarfile.TarInfo(f"package/{relative}")
+                            entry.size = len(data)
+                            entry.mode = 0o644
+                            output.addfile(entry, io.BytesIO(data))
+        print(f"Built {archive}")
+
+    (args.output / "index.json").write_bytes(json_bytes(index))
+    print(f"Built {args.output / 'index.json'}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--tag", required=True)
+    parser.add_argument("--repository", default=DEFAULT_REPOSITORY)
+    parser.add_argument("--output", type=Path, default=PROJECT / "Build" / "Packages")
+    previous = parser.add_mutually_exclusive_group()
+    previous.add_argument("--previous-index", type=Path)
+    previous.add_argument("--previous-index-url")
+    build(parser.parse_args())
+
+
+if __name__ == "__main__":
+    main()

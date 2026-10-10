@@ -5,8 +5,6 @@
 #include "Takenoko_Lighting.hlsl"
 #include "../ThirdParty/Bakery.hlsl"
 
-SamplerState sampler_LinearClamp;
-
 void EvaluateLightmap(float2 lightmapUV, float3 normalWS, float3 normalTS, float3x3 tbn, out float3 diffuse, out ShDirectionalLight directionalLight)
 {
     Bakery_EvaluateLightmap(lightmapUV, normalWS, normalTS, tbn, diffuse, directionalLight);

@@ -1,9 +1,7 @@
 {
   "name": "TakenokoShader.Editor",
   "rootNamespace": "Kinankomoti.TakenokoShader.Editor",
-  "references": [
-    "TakenokoShader"
-  ],
+  "references": [],
   "includePlatforms": [
     "Editor"
   ],

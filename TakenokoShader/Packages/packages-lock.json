@@ -1,7 +1,19 @@
 {
   "dependencies": {
+    "com.kinankomoti.shaderbindingexporter": {
+      "version": "file:com.kinankomoti.shaderbindingexporter",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.kinankomoti.takenokoshader": {
       "version": "file:com.kinankomoti.takenokoshader",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "com.kinankomoti.takenokoshaderarealight": {
+      "version": "file:com.kinankomoti.takenokoshaderarealight",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}

@@ -5,6 +5,8 @@
 // Texture Sample
 //--------------------------------------------
 
+SamplerState sampler_LinearClamp;
+
 #define TAKENOKO_TEXTURE2D(name) Texture2D name; SamplerState sampler_##name;
 #define TAKENOKO_SAMPLE(tex, uv) tex.Sample(sampler_##tex, uv)
 #define TAKENOKO_SAMPLE_LOD(tex, uv, lod) tex.SampleLevel(sampler_##tex, uv, lod)

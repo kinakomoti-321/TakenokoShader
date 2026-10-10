@@ -1,9 +1,9 @@
 #ifndef TAKENOKO_BAKERY_HLSL
 #define TAKENOKO_BAKERY_HLSL
 
-sampler2D _RNM0;
-sampler2D _RNM1;
-sampler2D _RNM2;
+Texture2D _RNM0;
+Texture2D _RNM1;
+Texture2D _RNM2;
 float4 _RNM0_TexelSize;
 
 static const float3 BAKERY_LUMA_CONV = float3(0.2125, 0.7154, 0.0721);
@@ -43,9 +43,9 @@ float3 Bakery_EvaluateSHDiffuse(float3 L0, float3 L1x, float3 L1y, float3 L1z, f
 
 void Bakery_EvaluateRNM(float2 lightmapUV, float3 normalTS, out float3 diffuse, out float3 directionTS, out float3 directionColor)
 {
-    float3 rnm0 = DecodeLightmap(tex2D(_RNM0, lightmapUV));
-    float3 rnm1 = DecodeLightmap(tex2D(_RNM1, lightmapUV));
-    float3 rnm2 = DecodeLightmap(tex2D(_RNM2, lightmapUV));
+    float3 rnm0 = DecodeLightmap(_RNM0.Sample(sampler_LinearClamp, lightmapUV));
+    float3 rnm1 = DecodeLightmap(_RNM1.Sample(sampler_LinearClamp, lightmapUV));
+    float3 rnm2 = DecodeLightmap(_RNM2.Sample(sampler_LinearClamp, lightmapUV));
 
     diffuse = saturate(dot(BAKERY_RNM_BASIS0, normalTS)) * rnm0
     + saturate(dot(BAKERY_RNM_BASIS1, normalTS)) * rnm1
@@ -73,17 +73,17 @@ void Bakery_EvaluateRNM(float2 lightmapUV, float3 normalTS, out float3 diffuse, 
 
 void Bakery_EvaluateSH(float2 lightmapUV, float3 normalWS, out float3 diffuse, out ShDirectionalLight directionalLight)
 {
-    float3 L0 = DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, lightmapUV)).xyz;
+    float3 L0 = DecodeLightmap(unity_Lightmap.Sample(sampler_LinearClamp, lightmapUV)).xyz;
 
     #if defined(_LIGHTMAP_MONOSH)
-        float3 nL1 = UNITY_SAMPLE_TEX2D_SAMPLER(unity_LightmapInd, unity_Lightmap, lightmapUV).xyz * 2.0 - 1.0;
+        float3 nL1 = unity_LightmapInd.Sample(sampler_LinearClamp, lightmapUV).xyz * 2.0 - 1.0;
         float3 L1x = nL1.x * L0 * 2.0;
         float3 L1y = nL1.y * L0 * 2.0;
         float3 L1z = nL1.z * L0 * 2.0;
     #else
-        float3 nL1x = tex2D(_RNM0, lightmapUV).xyz * 2.0 - 1.0;
-        float3 nL1y = tex2D(_RNM1, lightmapUV).xyz * 2.0 - 1.0;
-        float3 nL1z = tex2D(_RNM2, lightmapUV).xyz * 2.0 - 1.0;
+        float3 nL1x = _RNM0.Sample(sampler_LinearClamp, lightmapUV).xyz * 2.0 - 1.0;
+        float3 nL1y = _RNM1.Sample(sampler_LinearClamp, lightmapUV).xyz * 2.0 - 1.0;
+        float3 nL1z = _RNM2.Sample(sampler_LinearClamp, lightmapUV).xyz * 2.0 - 1.0;
         float3 L1x = nL1x * L0 * 2.0;
         float3 L1y = nL1y * L0 * 2.0;
         float3 L1z = nL1z * L0 * 2.0;
@@ -105,7 +105,7 @@ out float3 diffuse, out ShDirectionalLight directionalLight)
     #elif defined(_LIGHTMAP_SH) || defined(_LIGHTMAP_MONOSH)
         Bakery_EvaluateSH(lightmapUV, normalWS, diffuse, directionalLight);
     #else
-        diffuse = DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, lightmapUV)).xyz;
+        diffuse = DecodeLightmap(unity_Lightmap.Sample(sampler_LinearClamp, lightmapUV)).xyz;
         directionalLight = NoShDirectionalLight();
     #endif
 }

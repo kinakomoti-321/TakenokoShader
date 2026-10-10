@@ -25,13 +25,13 @@ Shader "Takenoko/Standard"
         //------------
         // Material
         //------------
-        [Enum(Simple, 0, HexTiling, 1)] _MainTexTilingMode ("Tiling Mode", Int) = 0
+        [Enum(Simple, 0, Triplanar, 2)] _MainTexTilingMode ("Tiling mode", Int) = 0
         [Enum(UV0, 0, UV1, 1, UV2, 2, UV3, 3)] _MainTexcoord ("Tiling Channel", Int) = 0
         _MainTexOffset ("Tilling Offset", Vector) = (0, 0, 1, 1)
         _MainTexScale ("Tilling Offset", Vector) = (1, 1, 1, 1)
 
         // hex tiling
-        _HexRotationStrength ("Hex Tiling Rotation Strength", Range(0, 10)) = 0.5
+        _HexRotationStrength ("Hex tiling rotation intensity", Range(0, 10)) = 0.5
         _HexFallOff ("Hex Tiling Fall Off", Range(0, 1)) = 0.5
         _HexExponent ("Hex Tiling Exponent", Range(0, 10)) = 1.0
         _HexEdgeSmoothness ("Hex Tiling Edge Smoothness", Range(0, 1)) = 0.5
@@ -44,7 +44,7 @@ Shader "Takenoko/Standard"
         _SecondColor ("Albedo Color", Color) = (1, 1, 1, 1)
         [Enum(Replace, 3, Add, 0, Multiply, 1, Overlay, 2)] _SecondBlendMode ("Blend Mode", Int) = 1
         [Normal] _SecondNormal ("Normal", 2D) = "bump" { }
-        _SecondNormalScale ("Normal Strength", Range(0, 2)) = 1
+        _SecondNormalScale ("Normal intensity", Range(0, 2)) = 1
         _SecondMask ("Mask", 2D) = "white" { }
         [Enum(R, 0, G, 1, B, 2, A, 3)] _SecondMaskChannel ("Mask Channel", Int) = 0
         
@@ -67,7 +67,7 @@ Shader "Takenoko/Standard"
         [Toggle] _Height ("Height", Int) = 0
         [Enum(R, 0, G, 1, B, 2, A, 3)] _HeightChannel ("Height Channel", Int) = 1
         _HeightTex ("Height Texture", 2D) = "white" { }
-        _HeightStrength ("Height Strength", Range(0.0, 0.1)) = 0.01
+        _HeightStrength ("Height intensity", Range(0.0, 0.1)) = 0.01
         _HeightOffset ("Height Offset", Range(0.0, 1.0)) = 0.0
         _HeightStep ("Height Step", Range(1.0, 50.0)) = 10.0
         _HeightSubStep ("Height Sub-Step", Range(1.0, 10.0)) = 3.0
@@ -88,17 +88,17 @@ Shader "Takenoko/Standard"
 
         [Toggle] _Sss ("Subsurface scattering", Int) = 0
         _SssAnisotropy ("Anisotropy", Range(-0.95, 0.95)) = 0.5
-        _SssShadowStrength ("Shadow Strength", Range(0, 1)) = 0
+        _SssShadowStrength ("Shadow intensity", Range(0, 1)) = 0
         _SssThickness ("Thickness", Range(0, 1)) = 0.5
         _SssThicknessTex ("Thickness", 2D) = "white" { }
         [Enum(R, 0, G, 1, B, 2, A, 3)] _SssThicknessChannel ("Thickness Channel", Int) = 0
         _SssColor ("SSS Color", Color) = (0.9, 0.4, 0.3, 1)
         _SssColorTex ("SSS Color", 2D) = "white" { }
-        _SssFrontPower ("Front Power", Range(0, 1)) = 1.0
-        _SssBackPower ("Back Power", Range(0, 1)) = 1.0
+        _SssFrontPower ("Front intensity", Range(0, 1)) = 1.0
+        _SssBackPower ("Back intensity", Range(0, 1)) = 1.0
 
         [Toggle] _ClearCoat ("Clear Coat", Int) = 0
-        _ClearCoatStrength ("Strength", Range(0, 1)) = 1.0
+        _ClearCoatStrength ("Intensity", Range(0, 1)) = 1.0
         _ClearCoatMask ("Clear Coat Mask", 2D) = "white" { }
         [Enum(R, 0, G, 1, B, 2, A, 3)] _ClearCoatMaskChannel ("Mask Channel", Int) = 0
 
@@ -109,6 +109,7 @@ Shader "Takenoko/Standard"
         // Effect
         // -------------
         [Toggle(_SPECULAROCCLUSION_ON)] _SpecularOcclusion ("Specular Occlusion [Experimental]", Int) = 0
+        _OcclusionIntesity ("Intensity", Range(0, 1)) = 1.0
         [Toggle(_SPECULAROCCLUSIONLIGHTMAP_ON)] _SpecularOcclusionLightmap ("Lightmap Occlusion[Experimental]", Int) = 1
 
         _MaskLightProbe ("Light Probe Mask", Range(0, 2)) = 1.0
@@ -121,13 +122,13 @@ Shader "Takenoko/Standard"
         [HideInInspector][Toggle(BAKERY_MONOSH)] _BAKERY_MONOSH ("Enable MonoSH", Float) = 0
         [HideInInspector][Toggle(BAKERY_SHNONLINEAR)] _BAKERY_SHNONLINEAR ("SH non-linear mode", Float) = 1
         _AdditionalLightmap1 ("Additional Lightmap 1", 2D) = "black" { }
-        _AdditionalLightmapStrength1 ("Additional Lightmap Strength 1", Range(0, 1)) = 1.0
+        _AdditionalLightmapStrength1 ("Additional lightmap intensity 1", Range(0, 1)) = 1.0
         _AdditionalLightmap2 ("Additional Lightmap 2", 2D) = "black" { }
-        _AdditionalLightmapStrength2 ("Additional Lightmap Strength 2", Range(0, 1)) = 1.0
+        _AdditionalLightmapStrength2 ("Additional lightmap intensity 2", Range(0, 1)) = 1.0
         _AdditionalLightmap3 ("Additional Lightmap 3", 2D) = "black" { }
-        _AdditionalLightmapStrength3 ("Additional Lightmap Strength 3", Range(0, 1)) = 1.0
+        _AdditionalLightmapStrength3 ("Additional lightmap intensity 3", Range(0, 1)) = 1.0
         _AdditionalLightmap4 ("Additional Lightmap 4", 2D) = "black" { }
-        _AdditionalLightmapStrength4 ("Additional Lightmap Strength 4", Range(0, 1)) = 1.0
+        _AdditionalLightmapStrength4 ("Additional lightmap intensity 4", Range(0, 1)) = 1.0
 
         _FilterMainTexHueShift ("Hue Shift", Range(-1, 1)) = 0.0
         _FilterMainTexSaturateShift ("Saturate", Range(-1, 1)) = 0.0
@@ -141,7 +142,7 @@ Shader "Takenoko/Standard"
         [Enum(Basecolor, 0, Roughness, 1, Metallic, 2, Occlusion, 3, Normal, 4)] _CheckParameterMode ("Parameter", Int) = 0
 
         [Toggle] _SkyboxFog ("Skybox Fog", Int) = 0
-        _SkyboxFogStrength ("Skybox Strength", Range(0, 1)) = 0.5
+        _SkyboxFogStrength ("Skybox intensity", Range(0, 1)) = 0.5
         [Enum(Distance, 0, Box, 1, Sphere, 2)] _SkyboxFogMode ("Skybox Fog Mode", Int) = 0
         _SkyboxFogDistance ("Skybox Fog Distance", Range(0, 1000)) = 100.0
         _SkyboxFogBoxSizeMin ("Skybox Fog Box Size Min", Vector) = (-1, -1, -1, 0)
@@ -197,7 +198,7 @@ Shader "Takenoko/Standard"
             #pragma shader_feature _EMISSION
 
             // Main Texture
-            #pragma shader_feature_local _MAINTEX_TILING_SIMPLE _MAINTEX_TILING_HEX
+            #pragma shader_feature_local _MAINTEX_TILING_SIMPLE _MAINTEX_TILING_TRIPLANAR
             #pragma shader_feature_local _SECONDTEXTURE_ON
             #pragma shader_feature_local _CHECKPARAMETER_ON
             #pragma shader_feature_local _SECOND_MASK_CHANNEL_R _SECOND_MASK_CHANNEL_G _SECOND_MASK_CHANNEL_B _SECOND_MASK_CHANNEL_A
@@ -237,7 +238,7 @@ Shader "Takenoko/Standard"
             
             // VRC Area Light
             #pragma shader_feature_local _AREALIGHT_ON
-            #pragma shader_feature_local _AREA_LIGHT_MASK_ON
+            #pragma shader_feature_local _AREALIGHTMASK_ON
 
             #define _TAKENOKO_FOWARD_BASE
 
@@ -270,7 +271,7 @@ Shader "Takenoko/Standard"
             #pragma multi_compile_instancing
 
             // Main Texture
-            #pragma shader_feature_local _MAINTEX_TILING_SIMPLE _MAINTEX_TILING_HEX
+            #pragma shader_feature_local _MAINTEX_TILING_SIMPLE _MAINTEX_TILING_TRIPLANAR
             #pragma shader_feature_local _SECONDTEXTURE_ON
             #pragma shader_feature_local _CHECKPARAMETER_ON
             #pragma shader_feature_local _SECOND_MASK_CHANNEL_R _SECOND_MASK_CHANNEL_G _SECOND_MASK_CHANNEL_B _SECOND_MASK_CHANNEL_A
@@ -313,7 +314,8 @@ Shader "Takenoko/Standard"
             ZWrite On ZTest LEqual
 
             CGPROGRAM
-            #pragma target 2.0
+            #pragma target 3.5
+            #pragma shader_feature_local _MAINTEX_TILING_SIMPLE _MAINTEX_TILING_TRIPLANAR
 
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local _METALLICGLOSSMAP
@@ -325,7 +327,11 @@ Shader "Takenoko/Standard"
             #pragma vertex vertShadowCaster
             #pragma fragment fragShadowCaster
 
-            #include "UnityStandardShadow.cginc"
+            #if defined(_MAINTEX_TILING_TRIPLANAR)
+                #include "Standard/Takenoko_StandardTriplanarShadow.hlsl"
+            #else
+                #include "UnityStandardShadow.cginc"
+            #endif
 
             ENDCG
         }
@@ -335,26 +341,33 @@ Shader "Takenoko/Standard"
         //-------------------------------------------------
         Pass
         {
-            // TODO : Original Meta Pass for Metalness Workflow
-
             Name "META"
             Tags { "LightMode" = "Meta" }
 
             Cull Off
 
             CGPROGRAM
-            #pragma vertex vert_meta
-            #pragma fragment frag_meta
+            #pragma target 3.5
+            #pragma shader_feature_local _MAINTEX_TILING_SIMPLE _MAINTEX_TILING_TRIPLANAR
+            #pragma vertex Takenoko_VertexMeta
+            #pragma fragment Takenoko_FragmentMeta
 
             #pragma multi_compile_instancing
             
-            #pragma shader_feature _EMISSION
-            #pragma shader_feature _METALLICGLOSSMAP
-            #pragma shader_feature _ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-            #pragma shader_feature ___ _DETAIL_MULX2
+            #pragma shader_feature _EMISSION_ON
+            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local _MAINTEX_UV0 _MAINTEX_UV1 _MAINTEX_UV2 _MAINTEX_UV3
+            #pragma shader_feature_local _ROUGHNESS_MODEL_ROUGHNESS _ROUGHNESS_MODEL_SMOOTHNESS
+            #pragma shader_feature_local _ROUGHNESS_CHANNEL_R _ROUGHNESS_CHANNEL_G _ROUGHNESS_CHANNEL_B _ROUGHNESS_CHANNEL_A
+            #pragma shader_feature_local _METALLIC_CHANNEL_R _METALLIC_CHANNEL_G _METALLIC_CHANNEL_B _METALLIC_CHANNEL_A
+            #pragma shader_feature_local _SECONDTEXTURE_ON
+            #pragma shader_feature_local _SECOND_UV0 _SECOND_UV1 _SECOND_UV2 _SECOND_UV3
+            #pragma shader_feature_local _SECOND_BLEND_ADD _SECOND_BLEND_MULTIPLY _SECOND_BLEND_OVERLAY _SECOND_BLEND_REPLACE
+            #pragma shader_feature_local _SECOND_MASK_CHANNEL_R _SECOND_MASK_CHANNEL_G _SECOND_MASK_CHANNEL_B _SECOND_MASK_CHANNEL_A
             #pragma shader_feature EDITOR_VISUALIZATION
 
-            #include "UnityStandardMeta.cginc"
+            #define _TAKENOKO_META
+            #include "Standard/Takenoko_StandardMeta.hlsl"
             ENDCG
         }
     }

@@ -61,7 +61,7 @@ MonoBehaviour:
       Data: 3|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: Kinankomoti.TakenokoShader.TakenokoAreaLight[], TakenokoShader
+      Data: Kinankomoti.TakenokoShader.TakenokoAreaLight[], TakenokoShaderAreaLight
     - Name: 
       Entry: 8
       Data: 
