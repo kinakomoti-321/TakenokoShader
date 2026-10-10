@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | `com.kinankomoti.takenokoshader` | VPM | なし |
 | `com.kinankomoti.takenokoshaderarealight` | VPM | TakenokoShader / VRChat Worlds 3.10.x |
-| `com.kinankomoti.shaderbindingexporter` | 開発用 UPM | なし（Editor 専用） |
+| `com.kinankomoti.shaderbindingexporter` | 開発用（配布対象外） | なし（Editor 専用） |
 
 各パッケージに MIT ライセンス本文を含めます。
 AreaLight の既存スクリプト、Prefab、マテリアル、LUT の GUID は移動前と同じです。
@@ -24,10 +24,11 @@ Python 3.10 以降を使用します。追加の Python ライブラリは不要
 python Tools~/build_packages.py --tag v0.1.0
 ```
 
-`Build/Packages/` に本体と AreaLight の ZIP、Exporter の UPM tarball（`.tgz`）、
-VPM 配布一覧 `index.json` を生成します。Exporter は VPM 一覧に含めません。
+`Build/Packages/` に本体と AreaLight の ZIP と VPM 配布一覧 `index.json` を生成します。
+Exporter は配布物を生成せず、VPM 一覧と GitHub Release の添付対象から除外します。
+以前のビルドで生成された Exporter の `.tgz` は、再ビルド時に出力フォルダから削除します。
 新しい配布バージョンでは、変更したパッケージの `package.json` の `version` を更新してください。
-3 パッケージのバージョンはそれぞれ管理できます。変更のない配布済みパッケージは、
+公開する 2 パッケージのバージョンはそれぞれ管理できます。変更のない配布済みパッケージは、
 前回の一覧を渡すことで元のダウンロード先とバージョンを維持します。
 依存範囲を超える場合は AreaLight の `vpmDependencies` も更新してください。
 
@@ -47,6 +48,12 @@ python Tools~/build_packages.py --tag v0.1.1 --previous-index Build/previous-ind
 前回の `index.json` を取得して過去のバージョンを維持します。
 配布先リポジトリは workflow の `github.repository` から取得します。
 初回のみ、前回の一覧が存在しない 404 を許容します。
+
+この workflow またはビルドスクリプトの変更を `main` に push した際は、既存 Release の
+`com.kinankomoti.shaderbindingexporter-*.tgz` 添付ファイルを削除します。
+本体・AreaLight・`index.json` の添付ファイルは削除対象に含めません。
+タグ公開や手動実行の際も、このクリーンアップを先に実行します。
+Exporter のソースコードは開発用としてリポジトリに残ります。
 
 設定ファイルをコミットする前にタグを push した場合は、設定ファイルを `main` に
 コミットして push した後、GitHub の **Actions > Release packages > Run workflow** から
