@@ -6,7 +6,8 @@
   "description": "UdonSharp area light system for TakenokoShader in VRChat worlds.",
   "license": "MIT",
   "author": {
-    "name": "kinankomoti"
+    "name": "kinankomoti",
+    "email": "kinakomoti743@gmail.com"
   },
   "keywords": ["unity", "shader", "vrchat", "udonsharp", "area-light"],
   "vpmDependencies": {

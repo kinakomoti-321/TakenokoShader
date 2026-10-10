@@ -8,7 +8,8 @@
   "url": "https://github.com/kinakomoti-321/TakenokoShader/releases/download/v0.1.0/com.kinankomoti.takenokoshader-0.1.0.zip",
   "vpmDependencies": {},
   "author": {
-    "name": "kinankomoti"
+    "name": "kinankomoti",
+    "email": "kinakomoti743@gmail.com"
   },
   "keywords": [
     "unity",
