@@ -1,0 +1,50 @@
+name: Release packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag (for example v0.1.0)'
+        required: true
+        default: 'v0.1.0'
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-packages
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Build packages and preserve previous versions
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          RELEASE_REPOSITORY: ${{ github.repository }}
+        run: >-
+          python TakenokoShader/Tools~/build_packages.py
+          --tag "$RELEASE_TAG"
+          --repository "$RELEASE_REPOSITORY"
+          --previous-index-url "https://github.com/$RELEASE_REPOSITORY/releases/latest/download/index.json"
+      - name: Create release with VPM listing and UPM development tool
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: >-
+          gh release create "$RELEASE_TAG"
+          TakenokoShader/Build/Packages/*.zip
+          TakenokoShader/Build/Packages/*.tgz
+          TakenokoShader/Build/Packages/index.json
+          --verify-tag --generate-notes --title "$RELEASE_TAG"

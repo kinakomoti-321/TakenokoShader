@@ -48,6 +48,11 @@ python Tools~/build_packages.py --tag v0.1.1 --previous-index Build/previous-ind
 配布先リポジトリは workflow の `github.repository` から取得します。
 初回のみ、前回の一覧が存在しない 404 を許容します。
 
+設定ファイルをコミットする前にタグを push した場合は、設定ファイルを `main` に
+コミットして push した後、GitHub の **Actions > Release packages > Run workflow** から
+手動実行できます。ブランチは `main`、`tag` は既存のタグ（例: `v0.1.0`）を指定します。
+ビルド対象のソースコードは指定したタグから取得します。
+
 最初の Release 作成後、VCC の **Settings > Packages > Add Repository** に次の URL を登録します。
 
 ```text
