@@ -5,38 +5,47 @@
     float _UdonEnableLtcSystem;
 
     Texture2D _UdonLtcLut;
+    Texture2D _UdonFresnelLut;
 
     float _UdonLightVertex1[12]; // 4 vertices * 3 components
     Texture2D _UdonLightTexture1;
     float4 _UdonLightEmission1;
+    float _UdonIsActiveAreaLight1;
 
     float _UdonLightVertex2[12]; // 4 vertices * 3 components
     Texture2D _UdonLightTexture2;
     float4 _UdonLightEmission2;
+    float _UdonIsActiveAreaLight2;
 
     float _UdonLightVertex3[12]; // 4 vertices * 3 components
     Texture2D _UdonLightTexture3;
     float4 _UdonLightEmission3;
+    float _UdonIsActiveAreaLight3;
 
     float _UdonLightVertex4[12]; // 4 vertices * 3 components
     Texture2D _UdonLightTexture4;
     float4 _UdonLightEmission4;
+    float _UdonIsActiveAreaLight4;
 
     float _UdonLightVertex5[12]; // 4 vertices * 3 components
     Texture2D _UdonLightTexture5;
     float4 _UdonLightEmission5;
+    float _UdonIsActiveAreaLight5;
 
     float _UdonLightVertex6[12]; // 4 vertices * 3 components
     Texture2D _UdonLightTexture6;
     float4 _UdonLightEmission6;
+    float _UdonIsActiveAreaLight6;
 
     float _UdonLightVertex7[12]; // 4 vertices * 3 components
     Texture2D _UdonLightTexture7;
     float4 _UdonLightEmission7;
+    float _UdonIsActiveAreaLight7;
 
     float _UdonLightVertex8[12]; // 4 vertices * 3 components
     Texture2D _UdonLightTexture8;
     float4 _UdonLightEmission8;
+    float _UdonIsActiveAreaLight8;
 
     static const float LUT_SIZE = 64;
     static const float LUT_SCALE = (LUT_SIZE - 1.0) / LUT_SIZE;
@@ -246,8 +255,8 @@
         float delta = dotV1V1 * dotV2V2 - dotV1V2 * dotV1V2;
 
         float2 uv;
-        uv.y = (dotV2V2 * dotP1V1 - dotV1V2 * dotP1V2) / delta;
-        uv.x = (-dotV1V2 * dotP1V1 + dotV1V1 * dotP1V2) / delta;
+        uv.x = (dotV2V2 * dotP1V1 - dotV1V2 * dotP1V2) / delta;
+        uv.y = (-dotV1V2 * dotP1V1 + dotV1V1 * dotP1V2) / delta;
         uv.x = 1.0 - uv.x;
 
         // Blur sigma

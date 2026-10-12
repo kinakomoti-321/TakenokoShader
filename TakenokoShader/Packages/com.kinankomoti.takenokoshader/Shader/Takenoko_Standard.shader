@@ -194,6 +194,7 @@ Shader "Takenoko/Standard"
             #pragma multi_compile_fog
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing
+            #pragma shader_feature_local _NORMALMAP
             
             #pragma shader_feature _EMISSION
 
@@ -269,6 +270,7 @@ Shader "Takenoko/Standard"
             #pragma multi_compile_fog
             #pragma multi_compile_fwdadd_fullshadows
             #pragma multi_compile_instancing
+            #pragma shader_feature_local _NORMALMAP
 
             // Main Texture
             #pragma shader_feature_local _MAINTEX_TILING_SIMPLE _MAINTEX_TILING_TRIPLANAR

@@ -9,10 +9,5 @@
     "name": "kinankomoti",
     "email": "kinakomoti743@gmail.com"
   },
-  "keywords": ["unity", "shader", "vrchat", "udonsharp", "area-light"],
-  "vpmDependencies": {
-    "com.kinankomoti.takenokoshader": "0.1.x",
-    "com.vrchat.worlds": "3.10.x"
-  },
-  "url": "https://github.com/kinakomoti-321/TakenokoShader/releases/download/v0.1.0/com.kinankomoti.takenokoshaderarealight-0.1.0.zip"
+  "keywords": ["unity", "shader", "vrchat", "udonsharp", "area-light"]
 }

@@ -7,6 +7,8 @@
 // Shader Properties
 //--------------------------------------------
 
+SamplerState sampler_LinearClamp;
+SamplerState sampler_TrilinearClamp;
 
 float _Cutoff;
 

@@ -104,7 +104,6 @@ float3 EvaluateSH(float3 normalWS, float3 positionWS, out ShDirectionalLight dir
     return sh;
 }
 
-
 inline float HgPhase(float cosTheta, float g)
 {
     float d = 1.0 + g * g - 2.0 * g * cosTheta;
@@ -120,6 +119,11 @@ inline float3 DiffuseBRDF(float3 basecolor, float roughness, float dotLH, float 
     return basecolor * lightScatter * viewScatter;
 }
 
+float ReflectivityFromMetallic(float metallic)
+{
+    return lerp(0.04, 1.0, metallic);
+}
+
 // Shlick Fresnel Approximation
 float3 ShlickFresnel(float3 F0, float cosine)
 {
@@ -131,6 +135,13 @@ float3 ShlickFresnel(float3 F0, float3 F90, float cosine)
 {
     float x = saturate(1.0 - cosine);
     return lerp(F0, F90, x * x * x * x * x);
+}
+
+float3 EstimateF0(float3 F, float cosine)
+{
+    float x = saturate(1.0 - cosine);
+    float x5 = min(x * x * x * x * x, 0.9999);
+    return saturate((F - x5) / (1.0 - x5));
 }
 
 // Filament
@@ -154,14 +165,14 @@ float VFastIsoGGX(float dotNV, float dotNL, float alpha)
 
 // Microfacet BRDF
 // f_{microfacet}(l, v) =  D G F / 4(<n,v> <n,l>) = D V F
-inline float3 SpecularBRDF(float3 F, float roughness, float dotNH, float dotNV, float dotNL)
+inline float3 SpecularBRDF(float3 F0, float roughness, float dotNH, float dotNV, float dotNL, float dotLH)
 {
     float alpha = clamp(roughness * roughness, 0.0001, 1.0);
 
     float D = DIsoGGX(dotNH, alpha);
     float V = VFastIsoGGX(clamp(dotNV, 0.01, 1.0), clamp(dotNL, 0.01, 1.0), alpha); // avoid nan
 
-    float3 specular = (D * V * TAKE_PI) * F;
+    float3 specular = (D * V * TAKE_PI) * ShlickFresnel(F0, dotLH);
 
     return specular;
 
@@ -228,6 +239,27 @@ inline float3 IndirectSpecular(float roughness, float3 reflUVW, RefProbeData pro
     return specular;
 }
 
+inline float3 SpecularEnvironment(float3 F0, float metallic, float roughness, float3 reflUVW, RefProbeData probe, float3 positionWS, float dotNV)
+{
+    // Unity BSDF
+    float realRoughness = max(roughness * roughness, 0.001);
+    float perceptualRoughness = roughness;
+    float smoothness = 1.0 - perceptualRoughness;
+
+    half surfaceReduction = 0.0;
+    #ifdef UNITY_COLORSPACE_GAMMA
+        surfaceReduction = 1.0 - 0.28 * realRoughness * perceptualRoughness;
+    #else
+        surfaceReduction = 1.0 / (realRoughness * realRoughness + 1.0);
+    #endif
+
+    float oneMinusReflectivity = 0.96 - metallic * 0.96;
+    float3 grazingTerm = saturate(smoothness + (1.0 - oneMinusReflectivity));
+    float3 fresnel = ShlickFresnel(F0, grazingTerm, dotNV);
+    return IndirectSpecular(roughness, reflUVW, probe, positionWS) * fresnel * surfaceReduction;
+}
+
+
 void ColorToComplexIor(float3 r, float3 g, inout float3 n, inout float3 k)
 {
     r = clamp(r, 0.0, 0.99);
@@ -241,24 +273,6 @@ void ColorToComplexIor(float3 r, float3 g, inout float3 n, inout float3 k)
 
     float3 k2 = (r * (n + 1.0) * (n + 1.0) - (n - 1.0) * (n - 1.0)) / (1.0 - r);
     k = sqrt(max(k2, 0.0));
-}
-
-inline float3 SpecularEnvironment(float3 F, float roughness, float3 reflUVW, RefProbeData probe, float3 positionWS, float dotNV)
-{
-    // Unity BSDF
-    float realRoughness = roughness * roughness;
-    float perceptualRoughness = roughness;
-    float smoothness = 1.0 - perceptualRoughness;
-
-    half surfaceReduction;
-    #ifdef UNITY_COLORSPACE_GAMMA
-        surfaceReduction = 1.0 - 0.28 * realRoughness * perceptualRoughness;
-    #else
-        surfaceReduction = 1.0 / (realRoughness * realRoughness + 1.0);
-    #endif
-
-    float3 fresnel = F;
-    return IndirectSpecular(roughness, reflUVW, probe, positionWS) * surfaceReduction * fresnel;
 }
 
 // A Practical Extension to Microfacet Theory for the Modeling of Varying Iridescence

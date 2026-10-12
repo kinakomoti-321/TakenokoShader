@@ -1,4 +1,4 @@
-"""Check archive compatibility, package separation, and release version preservation."""
+"""Check archive compatibility, package separation, and obsolete asset cleanup."""
 
 import argparse
 from contextlib import redirect_stdout
@@ -8,7 +8,6 @@ from pathlib import Path
 import tarfile
 import tempfile
 import unittest
-import zipfile
 
 import build_packages
 
@@ -19,7 +18,7 @@ class PackageBuilderTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.project = Path(self.temporary.name)
         self.output = self.project / "output"
-        packages = (*build_packages.VPM_PACKAGES, build_packages.DEVELOPMENT_PACKAGE)
+        packages = (*build_packages.PUBLIC_PACKAGES, build_packages.DEVELOPMENT_PACKAGE)
         for number, name in enumerate(packages, start=1):
             directory = self.project / "Packages" / name
             directory.mkdir(parents=True)
@@ -40,23 +39,21 @@ class PackageBuilderTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-    def build(self, tag="v0.1.0", previous_index=None):
-        args = argparse.Namespace(
-            repository=build_packages.DEFAULT_REPOSITORY, tag=tag, project=self.project,
-            output=self.output, previous_index=previous_index, previous_index_url=None,
-        )
+    def build(self):
+        args = argparse.Namespace(project=self.project, output=self.output)
         with redirect_stdout(io.StringIO()):
             build_packages.build(args)
 
     def test_round_trip_preserves_assets_metadata_and_package_separation(self):
         self.build()
-        self.assertEqual(len(list(self.output.glob("*.zip"))), 2)
+        self.assertEqual(len(list(self.output.glob("*.zip"))), 0)
+        self.assertFalse((self.output / "index.json").exists())
         self.assertEqual(len(list(self.output.glob("*.unitypackage"))), 2)
         self.assertFalse(any(build_packages.DEVELOPMENT_PACKAGE in p.name for p in self.output.iterdir()))
-        for name in build_packages.VPM_PACKAGES:
+        for name in build_packages.PUBLIC_PACKAGES:
             install_path = build_packages.UNITY_INSTALL_PATHS[name]
-            with zipfile.ZipFile(self.output / f"{name}-0.1.0.zip") as vpm:
-                files = {relative: vpm.read(relative) for relative in vpm.namelist()}
+            files = dict(build_packages.package_files(self.project / "Packages" / name))
+            files["package.json"] = build_packages.json_bytes(json.loads(files["package.json"]))
             restored = {}
             with tarfile.open(self.output / f"{name}-0.1.0.unitypackage", "r:gz") as unity:
                 for member in unity.getmembers():
@@ -77,22 +74,46 @@ class PackageBuilderTests(unittest.TestCase):
                         self.assertIn(b"folderAsset: yes", meta)
             self.assertEqual(restored, files)
 
-    def test_rebuild_is_deterministic_and_keeps_published_urls(self):
+    def test_rebuild_is_deterministic(self):
         self.build()
         original = {p.name: p.read_bytes() for p in self.output.iterdir()}
-        previous = self.project / "previous-index.json"
-        previous.write_bytes(original["index.json"])
-        self.build(tag="v0.1.1", previous_index=previous)
+        self.build()
         self.assertEqual(original, {p.name: p.read_bytes() for p in self.output.iterdir()})
 
-    def test_modified_published_version_is_rejected(self):
+    def test_obsolete_outputs_are_removed_and_other_files_are_preserved(self):
+        self.output.mkdir()
+        stale = ["index.json", f"{build_packages.DEVELOPMENT_PACKAGE}-0.1.0.tgz"]
+        stale.extend(f"{name}-0.1.0.zip" for name in build_packages.PUBLIC_PACKAGES)
+        for name in [*stale, "other-package.zip"]:
+            (self.output / name).write_bytes(b"old archive")
         self.build()
-        previous = self.project / "previous-index.json"
-        previous.write_bytes((self.output / "index.json").read_bytes())
-        directory = self.project / "Packages" / build_packages.VPM_PACKAGES[0]
-        (directory / "Runtime/Test.cs").write_text("// Changed\n", encoding="utf-8")
-        with self.assertRaisesRegex(ValueError, "Published version is immutable"):
-            self.build(previous_index=previous)
+        for name in stale:
+            self.assertFalse((self.output / name).exists(), name)
+        self.assertEqual((self.output / "other-package.zip").read_bytes(), b"old archive")
+
+    def test_old_tag_metadata_is_removed_from_unitypackages(self):
+        for name in build_packages.PUBLIC_PACKAGES:
+            path = self.project / "Packages" / name / "package.json"
+            manifest = json.loads(path.read_text(encoding="utf-8"))
+            manifest.update(url="https://example.com/old.zip", vpmDependencies={"old.package": "1.x"}, zipSHA256="old")
+            path.write_text(json.dumps(manifest), encoding="utf-8")
+        self.build()
+        for archive in self.output.glob("*.unitypackage"):
+            with tarfile.open(archive, "r:gz") as unity:
+                for member in unity.getmembers():
+                    if member.name.endswith("/pathname") and unity.extractfile(member).read().endswith(b"/package.json"):
+                        guid = member.name.split("/")[0]
+                        manifest = json.load(unity.extractfile(f"{guid}/asset"))
+                        for field in ("url", "vpmDependencies", "zipSHA256"):
+                            self.assertNotIn(field, manifest)
+
+    def test_invalid_version_cannot_escape_output_directory(self):
+        path = self.project / "Packages" / build_packages.PUBLIC_PACKAGES[0] / "package.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifest["version"] = "../../escape"
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "Invalid package version"):
+            self.build()
 
     def test_invalid_missing_or_duplicate_metadata_is_rejected(self):
         for files, message in (

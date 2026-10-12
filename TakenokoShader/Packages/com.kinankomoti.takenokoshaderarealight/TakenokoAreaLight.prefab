@@ -107,7 +107,6 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 1589650010522536985}
-  isStatic: 0
   color: {r: 1, g: 1, b: 1, a: 1}
   texture: {fileID: 0}
 --- !u!114 &1589650010522536985

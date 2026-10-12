@@ -89,7 +89,7 @@ namespace Tempura
         }
     }
 
-    public static class TempuraGui
+    public static partial class TempuraGui
     {
         public static GUIStyle noMarginBox = InitializeBox(1, 0, 0, false);
         public static GUIStyle noMarginBoxB = InitializeBox(1, 0, 0, true);

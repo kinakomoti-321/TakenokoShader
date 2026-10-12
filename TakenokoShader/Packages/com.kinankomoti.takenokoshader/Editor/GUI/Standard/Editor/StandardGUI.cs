@@ -78,7 +78,7 @@ namespace Takenoko.Standard
                 $"{label} はリニアデータ用テクスチャです。Texture Import Settings の sRGB (Color Texture) を無効にしてください。",
                 MessageType.Warning);
 
-            if (GUILayout.Button("Fix now", EditorStyles.miniButton))
+            if (GUILayout.Button("Fix", EditorStyles.miniButton))
             {
                 foreach (TextureImporter importer in importers)
                 {
@@ -379,15 +379,13 @@ namespace Takenoko.Standard
                                 }
                                 else if (skyboxFogMode == SkyboxFogMode.Box)
                                 {
-                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogBoxSizeMin], new GUIContent("Skybox box size min"));
-                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogBoxSizeMax], new GUIContent("Skybox box size max"));
-                                    SkyboxFogSceneHandle.DrawEditButton(materials);
+                                    TempuraGui.BoxBound("Skybox box size",
+                                        props[ShaderProps.SkyboxFogBoxSizeMin], props[ShaderProps.SkyboxFogBoxSizeMax], materialEditor);
                                 }
                                 else if (skyboxFogMode == SkyboxFogMode.Sphere)
                                 {
-                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogSphereCenter], new GUIContent("Skybox sphere center"));
-                                    materialEditor.ShaderProperty(props[ShaderProps.SkyboxFogSphereRadius], new GUIContent("Skybox sphere radius"));
-                                    SkyboxFogSceneHandle.DrawEditButton(materials);
+                                    TempuraGui.SphereBound("Skybox sphere",
+                                        props[ShaderProps.SkyboxFogSphereCenter], props[ShaderProps.SkyboxFogSphereRadius], materialEditor);
                                 }
                             }
                         }
@@ -471,10 +469,24 @@ namespace Takenoko.Standard
                     Apply(mat);
                 }
 
-                if (SkyboxFogSceneHandle.IsEditing(material))
+                if (BoundHandle.IsEditing(material))
                 {
+                    var mode = (SkyboxFogMode)(int)props[ShaderProps.SkyboxFogMode].floatValue;
+                    if (mode == SkyboxFogMode.Box)
+                        BoundHandle.Begin(materials, BoundHandle.Shape.Box,
+                            props[ShaderProps.SkyboxFogBoxSizeMin].name, props[ShaderProps.SkyboxFogBoxSizeMax].name);
+                    else if (mode == SkyboxFogMode.Sphere)
+                        BoundHandle.Begin(materials, BoundHandle.Shape.Sphere,
+                            props[ShaderProps.SkyboxFogSphereCenter].name, props[ShaderProps.SkyboxFogSphereRadius].name);
                     SceneView.RepaintAll();
                 }
+            }
+
+            if (BoundHandle.IsEditing(material) &&
+                (!Cast(props[ShaderProps.SkyboxFog].floatValue) ||
+                 (SkyboxFogMode)(int)props[ShaderProps.SkyboxFogMode].floatValue == SkyboxFogMode.Distance))
+            {
+                BoundHandle.End();
             }
 
             if (!_initialized)
@@ -491,15 +503,20 @@ namespace Takenoko.Standard
 
         public override void OnClosed(Material material)
         {
-            if (SkyboxFogSceneHandle.IsEditing(material))
+            if (BoundHandle.IsEditing(material))
             {
-                SkyboxFogSceneHandle.End();
+                BoundHandle.End();
             }
             base.OnClosed(material);
         }
 
         private void Apply(Material material)
         {
+            if (material.GetTexture("_BumpMap") != null)
+                material.EnableKeyword("_NORMALMAP");
+            else
+                material.DisableKeyword("_NORMALMAP");
+
             var alphaMode = Cast<AlphaMode>(material, ShaderProps.AlphaMode.Name());
             var renderQueueOffset = material.GetInt(ShaderProps.RenderQueueOffset.Name());
             var transparentZwrite = material.GetInt(ShaderProps.TransparentZWrite.Name());

@@ -51,7 +51,11 @@ inline MaterialData GetMaterialData(MainTextureMapping mapping, float3x3 tbn)
     materialData.metallic = Standard_Metallic(mapping);
     materialData.occlusion = Standard_Occlusion(mapping);
     materialData.emission = Standard_Emission(mapping).rgb;
-    materialData.normalTS = Standard_Normal(mapping, tbn);
+    #if defined(_NORMALMAP)
+        materialData.normalTS = Standard_Normal(mapping, tbn);
+    #else
+        materialData.normalTS = float3(0.0, 0.0, 1.0);
+    #endif
 
 
     return materialData;
@@ -62,12 +66,12 @@ inline MaterialData GetMaterialData(MainTextureMapping mapping, float3x3 tbn)
 //---------------------------------------------------
 // #region Area Light
 #if defined(_AREALIGHT_ON)
-    void Takenoko_AreaLight(float3 N, float3 V, float3 basecolor, float3 F, float roughness, float dotNV, float3 positionWS, float2 lightmapUV, out float3 areaDiffuse, out float3 areaSpecular)
+    void Takenoko_AreaLight(float3 N, float3 V, float3 basecolor, float3 F0, float roughness, float dotNV, float3 positionWS, float2 lightmapUV, out float3 areaDiffuse, out float3 areaSpecular)
     {
         areaDiffuse = 0.0;
         areaSpecular = 0.0;
 
-        roughness = clamp(roughness, 0.001, 0.95);
+        roughness = clamp(roughness, 0.01, 0.95);
         const float2 lutUV = GetLtcTexcoord(dotNV, roughness);
         const float3x3 Minv = SampleLtcInverseMatrix(lutUV, _UdonLtcLut, sampler_LinearClamp);
         
@@ -77,7 +81,8 @@ inline MaterialData GetMaterialData(MainTextureMapping mapping, float3x3 tbn)
         }
 
         float2 fresnelUV = lutUV;
-        float3 fresnel = F;
+        float4 fresnelLut = TAKENOKO_SAMPLE_SAMPLER(_UdonFresnelLut, sampler_LinearClamp, fresnelUV);
+        float3 fresnel = F0 * fresnelLut.r + (1.0 - F0) * fresnelLut.g;
         float3 specular = 1.0;
         float3 diffuse = 1.0;
         float3 L[4];
@@ -91,13 +96,13 @@ inline MaterialData GetMaterialData(MainTextureMapping mapping, float3x3 tbn)
             float4 mask2 = 1.0;
         #endif
 
-        if (mask1.x >= 0.01)
+        if (_UdonIsActiveAreaLight1 > 0.5 && mask1.x >= 0.01)
         {
             L[0] = float3(_UdonLightVertex1[0], _UdonLightVertex1[1], _UdonLightVertex1[2]);
             L[1] = float3(_UdonLightVertex1[3], _UdonLightVertex1[4], _UdonLightVertex1[5]);
             L[2] = float3(_UdonLightVertex1[6], _UdonLightVertex1[7], _UdonLightVertex1[8]);
             L[3] = float3(_UdonLightVertex1[9], _UdonLightVertex1[10], _UdonLightVertex1[11]);
-            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_LinearClamp, diffuse, specular);
+            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_TrilinearClamp, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
             areaSpecular += specular * _UdonLightEmission1.xyz * mask1.x * _AreaLightIntensity1;
@@ -105,13 +110,13 @@ inline MaterialData GetMaterialData(MainTextureMapping mapping, float3x3 tbn)
         }
 
         lightTexture = _UdonLightTexture2;
-        if (mask1.y >= 0.01)
+        if (_UdonIsActiveAreaLight2 > 0.5 && mask1.y >= 0.01)
         {
             L[0] = float3(_UdonLightVertex2[0], _UdonLightVertex2[1], _UdonLightVertex2[2]);
             L[1] = float3(_UdonLightVertex2[3], _UdonLightVertex2[4], _UdonLightVertex2[5]);
             L[2] = float3(_UdonLightVertex2[6], _UdonLightVertex2[7], _UdonLightVertex2[8]);
             L[3] = float3(_UdonLightVertex2[9], _UdonLightVertex2[10], _UdonLightVertex2[11]);
-            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_LinearClamp, diffuse, specular);
+            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_TrilinearClamp, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
             areaSpecular += specular * _UdonLightEmission2.xyz * mask1.y * _AreaLightIntensity2;
@@ -119,13 +124,13 @@ inline MaterialData GetMaterialData(MainTextureMapping mapping, float3x3 tbn)
         }
 
         lightTexture = _UdonLightTexture3;
-        if (mask1.z >= 0.01)
+        if (_UdonIsActiveAreaLight3 > 0.5 && mask1.z >= 0.01)
         {
             L[0] = float3(_UdonLightVertex3[0], _UdonLightVertex3[1], _UdonLightVertex3[2]);
             L[1] = float3(_UdonLightVertex3[3], _UdonLightVertex3[4], _UdonLightVertex3[5]);
             L[2] = float3(_UdonLightVertex3[6], _UdonLightVertex3[7], _UdonLightVertex3[8]);
             L[3] = float3(_UdonLightVertex3[9], _UdonLightVertex3[10], _UdonLightVertex3[11]);
-            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_LinearClamp, diffuse, specular);
+            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_TrilinearClamp, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
             areaSpecular += specular * _UdonLightEmission3.xyz * mask1.z * _AreaLightIntensity3;
@@ -133,13 +138,13 @@ inline MaterialData GetMaterialData(MainTextureMapping mapping, float3x3 tbn)
         }
 
         lightTexture = _UdonLightTexture4;
-        if (mask1.w >= 0.01)
+        if (_UdonIsActiveAreaLight4 > 0.5 && mask1.w >= 0.01)
         {
             L[0] = float3(_UdonLightVertex4[0], _UdonLightVertex4[1], _UdonLightVertex4[2]);
             L[1] = float3(_UdonLightVertex4[3], _UdonLightVertex4[4], _UdonLightVertex4[5]);
             L[2] = float3(_UdonLightVertex4[6], _UdonLightVertex4[7], _UdonLightVertex4[8]);
             L[3] = float3(_UdonLightVertex4[9], _UdonLightVertex4[10], _UdonLightVertex4[11]);
-            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_LinearClamp, diffuse, specular);
+            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_TrilinearClamp, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
             areaSpecular += specular * _UdonLightEmission4.xyz * mask1.w * _AreaLightIntensity4;
@@ -147,13 +152,13 @@ inline MaterialData GetMaterialData(MainTextureMapping mapping, float3x3 tbn)
         }
 
         lightTexture = _UdonLightTexture5;
-        if (mask2.x >= 0.01)
+        if (_UdonIsActiveAreaLight5 > 0.5 && mask2.x >= 0.01)
         {
             L[0] = float3(_UdonLightVertex5[0], _UdonLightVertex5[1], _UdonLightVertex5[2]);
             L[1] = float3(_UdonLightVertex5[3], _UdonLightVertex5[4], _UdonLightVertex5[5]);
             L[2] = float3(_UdonLightVertex5[6], _UdonLightVertex5[7], _UdonLightVertex5[8]);
             L[3] = float3(_UdonLightVertex5[9], _UdonLightVertex5[10], _UdonLightVertex5[11]);
-            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_LinearClamp, diffuse, specular);
+            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_TrilinearClamp, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
             areaSpecular += specular * _UdonLightEmission5.xyz * mask2.x * _AreaLightIntensity5;
@@ -161,13 +166,13 @@ inline MaterialData GetMaterialData(MainTextureMapping mapping, float3x3 tbn)
         }
 
         lightTexture = _UdonLightTexture6;
-        if (mask2.y >= 0.01)
+        if (_UdonIsActiveAreaLight6 > 0.5 && mask2.y >= 0.01)
         {
             L[0] = float3(_UdonLightVertex6[0], _UdonLightVertex6[1], _UdonLightVertex6[2]);
             L[1] = float3(_UdonLightVertex6[3], _UdonLightVertex6[4], _UdonLightVertex6[5]);
             L[2] = float3(_UdonLightVertex6[6], _UdonLightVertex6[7], _UdonLightVertex6[8]);
             L[3] = float3(_UdonLightVertex6[9], _UdonLightVertex6[10], _UdonLightVertex6[11]);
-            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_LinearClamp, diffuse, specular);
+            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_TrilinearClamp, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
             areaSpecular += specular * _UdonLightEmission6.xyz * mask2.y * _AreaLightIntensity6;
@@ -175,13 +180,13 @@ inline MaterialData GetMaterialData(MainTextureMapping mapping, float3x3 tbn)
         }
 
         lightTexture = _UdonLightTexture7;
-        if (mask2.z >= 0.01)
+        if (_UdonIsActiveAreaLight7 > 0.5 && mask2.z >= 0.01)
         {
             L[0] = float3(_UdonLightVertex7[0], _UdonLightVertex7[1], _UdonLightVertex7[2]);
             L[1] = float3(_UdonLightVertex7[3], _UdonLightVertex7[4], _UdonLightVertex7[5]);
             L[2] = float3(_UdonLightVertex7[6], _UdonLightVertex7[7], _UdonLightVertex7[8]);
             L[3] = float3(_UdonLightVertex7[9], _UdonLightVertex7[10], _UdonLightVertex7[11]);
-            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_LinearClamp, diffuse, specular);
+            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_TrilinearClamp, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
             areaSpecular += specular * _UdonLightEmission7.xyz * mask2.z * _AreaLightIntensity7;
@@ -189,13 +194,13 @@ inline MaterialData GetMaterialData(MainTextureMapping mapping, float3x3 tbn)
         }
 
         lightTexture = _UdonLightTexture8;
-        if (mask2.w >= 0.01)
+        if (_UdonIsActiveAreaLight8 > 0.5 && mask2.w >= 0.01)
         {
             L[0] = float3(_UdonLightVertex8[0], _UdonLightVertex8[1], _UdonLightVertex8[2]);
             L[1] = float3(_UdonLightVertex8[3], _UdonLightVertex8[4], _UdonLightVertex8[5]);
             L[2] = float3(_UdonLightVertex8[6], _UdonLightVertex8[7], _UdonLightVertex8[8]);
             L[3] = float3(_UdonLightVertex8[9], _UdonLightVertex8[10], _UdonLightVertex8[11]);
-            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_LinearClamp, diffuse, specular);
+            EvaluateAreaLight(N, V, positionWS, L, Minv, lightTexture, sampler_TrilinearClamp, diffuse, specular);
             specular *= fresnel;
             diffuse *= basecolor;
             areaSpecular += specular * _UdonLightEmission8.xyz * mask2.w * _AreaLightIntensity8;
@@ -263,6 +268,7 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float roughness = materialData.roughness;
     float metallic = materialData.metallic;
     float occlusion = materialData.occlusion;
+    basecolor *= 1.0 - ReflectivityFromMetallic(metallic); // a correction for unity standard shader
 
     #if defined(_CHECKPARAMETER_ON)
         #if defined(_TAKENOKO_FOWARD_ADD)
@@ -278,7 +284,6 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     #endif
 
     float3 F0 = lerp(0.04, basecolor, metallic);
-    float3 F = ShlickFresnel(F0, dotNV);
     #if defined(_IRIDESCENCE_ON)
         float thinFilmIor = _ThinFilmIor;
         MainTextureMapping filmMapping = mapping;
@@ -292,17 +297,14 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
             bottomIor = lerp(1.0, bottomIor, metallic);
             bottomKappa = lerp(0.01, max(bottomKappa, 0.01), metallic);
 
-            float3 IridescenceF = IridescenceFresnel(dotLH, thinFilmThickness, 1.0, thinFilmIor, bottomIor, bottomKappa);
-            F = lerp(F, saturate(IridescenceF), smoothstep(0.0, 1.0, saturate(thinFilmThickness / 50.0)));
-        }
-        else
-        {
-            F = ShlickFresnel(F0, dotNV);
+            float3 iridescenceF = IridescenceFresnel(dotNV, thinFilmThickness, 1.0, thinFilmIor, bottomIor, bottomKappa);
+            float3 iridescenceF0 = EstimateF0(iridescenceF, dotNV);
+            F0 = lerp(F0, iridescenceF0, smoothstep(0.0, 1.0, saturate(thinFilmThickness / 50.0)));
         }
     #endif
 
     float3 lightDiffuse = DiffuseBRDF(basecolor, roughness, dotNH, dotNV, dotNL) * dotNL * lightColor;
-    float3 lightSpecular = SpecularBRDF(F, roughness, dotNH, dotNV, dotNL) * dotNL * lightColor;
+    float3 lightSpecular = SpecularBRDF(F0, roughness, dotNH, dotNV, dotNL, dotLH) * dotNL * lightColor;
     float3 lightSss = 0.0;
     #if defined(_SSS_ON)
         float3 sssColor = Standard_SssColor(mapping);
@@ -314,7 +316,7 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float3 lightCoat = 0.0;
     #if defined(_CLEARCOAT_ON)
         float clearcoat = saturate(_ClearCoatStrength * Standard_Clearcoat(mapping));
-        lightCoat += SpecularBRDF(ShlickFresnel(0.04, dotNV), 0.25, dotNH, dotNV, dotNL) * dotNL * lightColor * clearcoat;
+        lightCoat += SpecularBRDF(0.04, 0.25, dotNH, dotNV, dotNL, dotLH) * dotNL * lightColor * clearcoat;
     #endif
 
     float3 environmentSpecular = 0.0;
@@ -326,10 +328,10 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float3 reflUVW = reflect(-viewDirection, shadingNormal);
 
     #if defined(_TAKENOKO_FOWARD_BASE)
-        environmentSpecular += SpecularEnvironment(F, roughness, reflUVW, lightData.probe, positionWS, dotNV);
+        environmentSpecular += SpecularEnvironment(F0, metallic, roughness, reflUVW, lightData.probe, positionWS, dotNV);
 
         #if defined(_CLEARCOAT_ON)
-            environmentCoat += SpecularEnvironment(ShlickFresnel(0.04, dotNV), 0.25, reflUVW, lightData.probe, positionWS, dotNV) * clearcoat;
+            environmentCoat += SpecularEnvironment(0.04, 0.0, 0.25, reflUVW, lightData.probe, positionWS, dotNV, metallic) * clearcoat;
         #endif
 
         #if defined(LIGHTMAP_ON)
@@ -348,8 +350,9 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
 
             VRCLightVolume_EvaluateSH(positionWS, shadingNormal, lightVolumeDiffuse, lightVolumeLight);
 
-            environmentDiffuse += lightVolumeDiffuse * basecolor;
-            environmentLight = lightVolumeLight;
+            environmentDiffuse += EvaluateSH(shadingNormal, positionWS, environmentLight) * basecolor * _MaskLightProbe;
+            // environmentDiffuse += lightVolumeDiffuse * basecolor;
+            // environmentLight = lightVolumeLight;
         #else
             environmentDiffuse += EvaluateSH(shadingNormal, positionWS, environmentLight) * basecolor * _MaskLightProbe;
         #endif
@@ -359,11 +362,12 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
             float3 envHalfVector = Unity_SafeNormalize(envLightDirection + viewDirection);
             float envDotNL = saturate(dot(shadingNormal, envLightDirection));
             float envDotNH = saturate(dot(shadingNormal, envHalfVector));
+            float envDotLH = saturate(dot(envLightDirection, envHalfVector));
 
-            environmentSpecular += SpecularBRDF(F, roughness, envDotNH, dotNV, envDotNL) * envDotNL * environmentLight.color;
+            environmentSpecular += SpecularBRDF(F0, roughness, envDotNH, dotNV, envDotNL, envDotLH) * envDotNL * environmentLight.color;
 
             #if defined(_CLEARCOAT_ON)
-                environmentCoat += SpecularBRDF(ShlickFresnel(0.04, dotNV), 0.25, envDotNH, dotNV, envDotNL) * envDotNL * environmentLight.color * clearcoat;
+                environmentCoat += SpecularBRDF(0.04, 0.25, envDotNH, dotNV, envDotNL, envDotLH) * envDotNL * environmentLight.color * clearcoat;
             #endif
 
             #if defined(_SSS_ON)
@@ -378,7 +382,7 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float3 areaDiffuse = 0.0;
     float3 areaSpecular = 0.0;
     #if defined(_AREALIGHT_ON)
-        Takenoko_AreaLight(shadingNormal, viewDirection, basecolor, F, roughness, dotNV, positionWS, i.lightmapUV, areaDiffuse, areaSpecular);
+        Takenoko_AreaLight(shadingNormal, viewDirection, basecolor, F0, roughness, dotNV, positionWS, i.lightmapUV, areaDiffuse, areaSpecular);
     #endif
 
     //---------------------------------------------------

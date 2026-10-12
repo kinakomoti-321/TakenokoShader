@@ -4,9 +4,6 @@
 //--------------------------------------------
 // Texture Sample
 //--------------------------------------------
-
-SamplerState sampler_LinearClamp;
-
 #define TAKENOKO_TEXTURE2D(name) Texture2D name; SamplerState sampler_##name;
 #define TAKENOKO_SAMPLE(tex, uv) tex.Sample(sampler_##tex, uv)
 #define TAKENOKO_SAMPLE_LOD(tex, uv, lod) tex.SampleLevel(sampler_##tex, uv, lod)
@@ -95,8 +92,8 @@ float3 RGB2HSV(float3 rgb)
         return float3(0.0, 0.0, cmax);
 
     float hue = rgb.r == cmax ? (rgb.g - rgb.b) / chroma
-        : rgb.g == cmax ? 2.0 + (rgb.b - rgb.r) / chroma
-        : 4.0 + (rgb.r - rgb.g) / chroma;
+    : rgb.g == cmax ? 2.0 + (rgb.b - rgb.r) / chroma
+    : 4.0 + (rgb.r - rgb.g) / chroma;
 
     return float3(frac(hue / 6.0), chroma / cmax, cmax);
 }
