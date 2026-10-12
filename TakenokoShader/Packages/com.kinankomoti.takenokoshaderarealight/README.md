@@ -1,6 +1,6 @@
 # TakenokoShaderAreaLight
 
-TakenokoShader の VRChat ワールド向け UdonSharp エリアライトシステムです。
+TakenokoShader の VRChat ワールド専用 UdonSharp エリアライトシステムです。Avatar プロジェクトには対応していません。
 
 ## 依存パッケージ
 

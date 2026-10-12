@@ -3,9 +3,13 @@
   "displayName": "TakenokoShaderAreaLight",
   "version": "0.1.1",
   "unity": "2022.3",
-  "description": "UdonSharp area light system for TakenokoShader in VRChat worlds.",
+  "description": "Worlds-only UdonSharp area light system for TakenokoShader. Requires the VRChat Worlds SDK; not supported in Avatar projects.",
   "license": "MIT",
   "url": "https://github.com/kinakomoti-321/TakenokoShader/releases/download/v0.1.1/com.kinankomoti.takenokoshaderarealight-0.1.1.zip",
+  "vpmDependencies": {
+    "com.kinankomoti.takenokoshader": "0.1.x",
+    "com.vrchat.worlds": "3.10.x"
+  },
   "author": {
     "name": "kinankomoti",
     "email": "kinakomoti743@gmail.com"
@@ -14,6 +18,7 @@
     "unity",
     "shader",
     "vrchat",
+    "worlds",
     "udonsharp",
     "area-light"
   ]
