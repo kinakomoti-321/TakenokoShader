@@ -9,5 +9,11 @@
     "name": "kinankomoti",
     "email": "kinakomoti743@gmail.com"
   },
-  "keywords": ["unity", "shader", "vrchat", "udonsharp", "area-light"]
+  "keywords": [
+    "unity",
+    "shader",
+    "vrchat",
+    "udonsharp",
+    "area-light"
+  ]
 }
