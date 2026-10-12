@@ -25,23 +25,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  cleanup-development-assets:
+  cleanup-obsolete-assets:
     runs-on: ubuntu-latest
     steps:
-      - name: Remove ShaderBindingExporter tarballs from existing releases
+      - name: Remove obsolete VPM and development assets from existing releases
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
           gh api --paginate "repos/$RELEASE_REPOSITORY/releases" \
-            --jq '.[].assets[] | select(.name | startswith("com.kinankomoti.shaderbindingexporter-")) | select(.name | endswith(".tgz")) | .id' |
+            --jq '.[].assets[] | select(.name == "index.json" or ((.name | startswith("com.kinankomoti.takenokoshader-") or startswith("com.kinankomoti.takenokoshaderarealight-")) and (.name | endswith(".zip"))) or ((.name | startswith("com.kinankomoti.shaderbindingexporter-")) and (.name | endswith(".tgz")))) | .id' |
           while IFS= read -r asset_id; do
             gh api --method DELETE "repos/$RELEASE_REPOSITORY/releases/assets/$asset_id"
           done
   release:
     if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
-    needs: cleanup-development-assets
+    needs: cleanup-obsolete-assets
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,18 +58,12 @@ jobs:
           python-version: '3.13'
       - name: Verify package builder
         run: python -m unittest discover -s .release-tools/TakenokoShader/Tools~ -p 'test_*.py'
-      - name: Build packages and preserve previous versions
-        env:
-          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
-          RELEASE_REPOSITORY: ${{ github.repository }}
+      - name: Build unitypackages
         run: >-
           python .release-tools/TakenokoShader/Tools~/build_packages.py
           --project TakenokoShader
           --output TakenokoShader/Build/Packages
-          --tag "$RELEASE_TAG"
-          --repository "$RELEASE_REPOSITORY"
-          --previous-index-url "https://github.com/$RELEASE_REPOSITORY/releases/latest/download/index.json"
-      - name: Publish VPM packages and unitypackages
+      - name: Publish unitypackages
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
@@ -89,9 +83,6 @@ jobs:
             done
           else
             gh release create "$RELEASE_TAG" \
-              TakenokoShader/Build/Packages/com.kinankomoti.takenokoshader-*.zip \
-              TakenokoShader/Build/Packages/com.kinankomoti.takenokoshaderarealight-*.zip \
               "${unitypackages[@]}" \
-              TakenokoShader/Build/Packages/index.json \
               --repo "$RELEASE_REPOSITORY" --verify-tag --generate-notes --title "$RELEASE_TAG"
           fi
