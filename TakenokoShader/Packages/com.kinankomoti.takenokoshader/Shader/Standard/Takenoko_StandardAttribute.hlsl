@@ -1,7 +1,7 @@
 #ifndef TAKENOKO_STANDARD_COMMON_HLSL
 #define TAKENOKO_STANDARD_COMMON_HLSL
 
-#include "../Core/Takenoko_Utils.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Core/Takenoko_Utils.hlsl"
 
 #include "UnityCG.cginc"
 #include "Lighting.cginc"

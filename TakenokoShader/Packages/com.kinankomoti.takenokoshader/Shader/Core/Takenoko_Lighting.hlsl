@@ -1,7 +1,7 @@
 #ifndef _TAKENOKO_STANDARD_LIGHTING_HLSL
 #define _TAKENOKO_STANDARD_LIGHTING_HLSL
 
-#include "Takenoko_Lightmap.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Core/Takenoko_Lightmap.hlsl"
 
 //--------------------------------------------
 // Unity Lighting

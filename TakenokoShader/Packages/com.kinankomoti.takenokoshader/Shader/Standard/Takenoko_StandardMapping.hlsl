@@ -1,7 +1,7 @@
 #ifndef TAKENOKO_STANDARD_MAPPING_HLSL
 #define TAKENOKO_STANDARD_MAPPING_HLSL
 
-#include "../Core/Takenoko_Utils.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Core/Takenoko_Utils.hlsl"
 
 #if defined(_SECONDTEXTURE_ON)
 float2 SecondTexcoord(VertexOutput i)

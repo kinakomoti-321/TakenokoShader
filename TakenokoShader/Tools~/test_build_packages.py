@@ -80,6 +80,32 @@ class PackageBuilderTests(unittest.TestCase):
         self.build()
         self.assertEqual(original, {p.name: p.read_bytes() for p in self.output.iterdir()})
 
+    def test_shader_package_includes_use_unitypackage_install_paths(self):
+        name = build_packages.PUBLIC_PACKAGES[0]
+        directory = self.project / "Packages" / name
+        source = (
+            '#include "Packages/com.kinankomoti.takenokoshader/Shader/Core/Test.hlsl"\n'
+            '    #include "Packages/com.kinankomoti.takenokoshaderarealight/Test.hlsl"\n'
+            '#include "Packages/red.sim.lightvolumes/Shaders/LightVolumes.cginc"\n'
+            '#include "UnityCG.cginc"\n'
+            '#include "Relative.hlsl"\n'
+        )
+        expected = (
+            '#include "Assets/TakenokoShader/Shader/Core/Test.hlsl"\n'
+            '    #include "Assets/TakenokoShaderAreaLight/Test.hlsl"\n'
+            '#include "Packages/red.sim.lightvolumes/Shaders/LightVolumes.cginc"\n'
+            '#include "UnityCG.cginc"\n'
+            '#include "Relative.hlsl"\n'
+        )
+        guid = "f" * 32
+        (directory / "Test.shader").write_bytes(source.encode("utf-8"))
+        (directory / "Test.shader.meta").write_text(f"fileFormatVersion: 2\nguid: {guid}\n", encoding="utf-8")
+        self.build()
+        with tarfile.open(self.output / f"{name}-0.1.0.unitypackage", "r:gz") as unity:
+            self.assertEqual(unity.extractfile(f"{guid}/asset").read().decode("utf-8"), expected)
+            self.assertEqual(unity.extractfile(f"{guid}/pathname").read(), b"Assets/TakenokoShader/Test.shader")
+        self.assertEqual((directory / "Test.shader").read_text(encoding="utf-8"), source)
+
     def test_obsolete_outputs_are_removed_and_other_files_are_preserved(self):
         self.output.mkdir()
         stale = ["index.json", f"{build_packages.DEVELOPMENT_PACKAGE}-0.1.0.tgz"]

@@ -1,7 +1,7 @@
 #ifndef TAKENOKO_STANDARD_DEFINE_HLSL
 #define TAKENOKO_STANDARD_DEFINE_HLSL
 
-#include "../Core/Takenoko_Utils.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Core/Takenoko_Utils.hlsl"
 
 //--------------------------------------------
 // Shader Properties

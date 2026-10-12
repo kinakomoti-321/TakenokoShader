@@ -36,7 +36,7 @@ def package_files(directory):
 
 
 def write_unitypackage(archive, files, install_path):
-    """Preserve asset bytes and GUIDs in Unity's GUID/asset, meta, pathname format."""
+    """Write assets and GUIDs in Unity's GUID/asset, meta, pathname format."""
     root_guid = uuid.uuid5(uuid.NAMESPACE_URL, install_path).hex
     root_meta = (
         f"fileFormatVersion: 2\nguid: {root_guid}\nfolderAsset: yes\n"
@@ -61,6 +61,10 @@ def write_unitypackage(archive, files, install_path):
         asset = files.get(asset_path)
         if asset is None and not re.search(rb"^folderAsset: yes\s*$", data, re.MULTILINE):
             raise ValueError(f"Orphan .meta: {install_path}/{relative}")
+        if asset is not None and Path(asset_path).suffix in (".shader", ".hlsl", ".cginc", ".compute"):
+            for package_name, asset_directory in UNITY_INSTALL_PATHS.items():
+                pattern = rb'(?m)(^[ \t]*#[ \t]*include[ \t]+")Packages/' + re.escape(package_name.encode("utf-8")) + rb'/'
+                asset = re.sub(pattern, rb'\g<1>' + asset_directory.encode("utf-8") + b'/', asset)
         assets.append((guid, f"{install_path}/{asset_path}", data, asset))
 
     # Fixed headers make repeated builds byte-for-byte identical.

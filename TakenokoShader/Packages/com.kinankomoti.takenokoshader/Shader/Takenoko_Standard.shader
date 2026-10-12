@@ -243,8 +243,8 @@ Shader "Takenoko/Standard"
 
             #define _TAKENOKO_FOWARD_BASE
 
-            #include "Standard/Takenoko_StandardVertex.hlsl"
-            #include "Standard/Takenoko_StandardFragment.hlsl"
+            #include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardVertex.hlsl"
+            #include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardFragment.hlsl"
 
             ENDCG
         }
@@ -298,8 +298,8 @@ Shader "Takenoko/Standard"
 
             #define _TAKENOKO_FOWARD_ADD
 
-            #include "Standard/Takenoko_StandardVertex.hlsl"
-            #include "Standard/Takenoko_StandardFragment.hlsl"
+            #include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardVertex.hlsl"
+            #include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardFragment.hlsl"
 
             ENDCG
         }
@@ -330,7 +330,7 @@ Shader "Takenoko/Standard"
             #pragma fragment fragShadowCaster
 
             #if defined(_MAINTEX_TILING_TRIPLANAR)
-                #include "Standard/Takenoko_StandardTriplanarShadow.hlsl"
+                #include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardTriplanarShadow.hlsl"
             #else
                 #include "UnityStandardShadow.cginc"
             #endif
@@ -369,7 +369,7 @@ Shader "Takenoko/Standard"
             #pragma shader_feature EDITOR_VISUALIZATION
 
             #define _TAKENOKO_META
-            #include "Standard/Takenoko_StandardMeta.hlsl"
+            #include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardMeta.hlsl"
             ENDCG
         }
     }

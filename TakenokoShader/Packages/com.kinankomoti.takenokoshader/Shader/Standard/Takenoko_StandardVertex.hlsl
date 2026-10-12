@@ -1,8 +1,8 @@
 #ifndef TAKENOKO_STANDARD_VERTEX_HLSL
 #define TAKENOKO_STANDARD_VERTEX_HLSL
 
-#include "Takenoko_StandardDefinition.hlsl"
-#include "Takenoko_StandardAttribute.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardDefinition.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardAttribute.hlsl"
 
 VertexOutput Takenoko_VertexStandard(Attribute v)
 {

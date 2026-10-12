@@ -3,9 +3,9 @@
 
 #include "UnityCG.cginc"
 #include "UnityStandardUtils.cginc"
-#include "Takenoko_StandardDefinition.hlsl"
-#include "Takenoko_StandardAttribute.hlsl"
-#include "Takenoko_StandardMapping.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardDefinition.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardAttribute.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardMapping.hlsl"
 
 struct TriplanarShadowOutput
 {

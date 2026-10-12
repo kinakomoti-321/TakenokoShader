@@ -1,17 +1,17 @@
 #ifndef TAKENOKO_STANDARD_FRAGMENT_HLSL
 #define TAKENOKO_STANDARD_FRAGMENT_HLSL
 
-#include "../Core/Takenoko_Lightmap.hlsl"
-#include "../Core/Takenoko_Hash.hlsl"
-#include "../Core/Takenoko_Noise.hlsl"
-#include "../Core/Takenoko_Lighting.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Core/Takenoko_Lightmap.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Core/Takenoko_Hash.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Core/Takenoko_Noise.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Core/Takenoko_Lighting.hlsl"
 
-#include "Takenoko_StandardDefinition.hlsl"
-#include "Takenoko_StandardAttribute.hlsl"
-#include "Takenoko_StandardMapping.hlsl"
-#include "Takenoko_StandardAreaLight.hlsl"
-#include "../ThirdParty/Bakery.hlsl"
-#include "../ThirdParty/VRCLightVolume.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardDefinition.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardAttribute.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardMapping.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/Standard/Takenoko_StandardAreaLight.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/ThirdParty/Bakery.hlsl"
+#include "Packages/com.kinankomoti.takenokoshader/Shader/ThirdParty/VRCLightVolume.hlsl"
 
 struct MaterialData
 {
