@@ -1,4 +1,4 @@
-"""Build the two public unitypackages without running Unity."""
+"""Build VPM ZIPs and unitypackages for the two public packages without Unity."""
 
 import argparse
 import gzip
@@ -8,6 +8,8 @@ from pathlib import Path
 import re
 import tarfile
 import uuid
+import zipfile
+from urllib.parse import quote
 
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -16,6 +18,7 @@ PUBLIC_PACKAGES = (
     "com.kinankomoti.takenokoshaderarealight",
 )
 DEVELOPMENT_PACKAGE = "com.kinankomoti.shaderbindingexporter"
+DEFAULT_REPOSITORY = "kinakomoti-321/TakenokoShader"
 UNITY_INSTALL_PATHS = {
     "com.kinankomoti.takenokoshader": "Assets/TakenokoShader",
     "com.kinankomoti.takenokoshaderarealight": "Assets/TakenokoShaderAreaLight",
@@ -33,6 +36,15 @@ def package_files(directory):
             continue
         if path.is_file():
             yield relative.as_posix(), path.read_bytes()
+
+
+def write_zip(archive, files):
+    with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as output:
+        for relative, data in sorted(files.items()):
+            entry = zipfile.ZipInfo(relative)
+            entry.compress_type = zipfile.ZIP_DEFLATED
+            entry.external_attr = 0o100644 << 16
+            output.writestr(entry, data)
 
 
 def write_unitypackage(archive, files, install_path):
@@ -90,8 +102,6 @@ def build(args):
     args.output.mkdir(parents=True, exist_ok=True)
     # Remove obsolete distribution files left by earlier builder versions.
     stale_files = [args.output / "index.json"]
-    for name in PUBLIC_PACKAGES:
-        stale_files.extend(args.output.glob(f"{name}-*.zip"))
     stale_files.extend(args.output.glob(f"{DEVELOPMENT_PACKAGE}-*.tgz"))
     for stale_archive in stale_files:
         if stale_archive.is_file():
@@ -108,6 +118,14 @@ def build(args):
         if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?", version):
             raise ValueError(f"Invalid package version: {name} {version}")
         files = dict(package_files(directory))
+        release_tag = args.tag or f"v{version}"
+        zip_archive = args.output / f"{name}-{version}.zip"
+        vpm_manifest = dict(manifest)
+        vpm_manifest.pop("zipSHA256", None)
+        vpm_manifest["url"] = f"https://github.com/{args.repository}/releases/download/{quote(release_tag, safe='')}/{zip_archive.name}"
+        files["package.json"] = json_bytes(vpm_manifest)
+        write_zip(zip_archive, files)
+        print(f"Built {zip_archive}")
         # Older release tags may still contain obsolete distribution metadata.
         for field in ("url", "vpmDependencies", "zipSHA256"):
             manifest.pop(field, None)
@@ -121,6 +139,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--project", type=Path, default=PROJECT)
     parser.add_argument("--output", type=Path, default=PROJECT / "Build" / "Packages")
+    parser.add_argument("--tag")
+    parser.add_argument("--repository", default=DEFAULT_REPOSITORY)
     build(parser.parse_args())
 
 

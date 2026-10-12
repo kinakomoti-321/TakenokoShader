@@ -8,6 +8,7 @@ from pathlib import Path
 import tarfile
 import tempfile
 import unittest
+import zipfile
 
 import build_packages
 
@@ -40,13 +41,13 @@ class PackageBuilderTests(unittest.TestCase):
             )
 
     def build(self):
-        args = argparse.Namespace(project=self.project, output=self.output)
+        args = argparse.Namespace(project=self.project, output=self.output, tag="v0.1.1", repository="test-owner/test-repo")
         with redirect_stdout(io.StringIO()):
             build_packages.build(args)
 
     def test_round_trip_preserves_assets_metadata_and_package_separation(self):
         self.build()
-        self.assertEqual(len(list(self.output.glob("*.zip"))), 0)
+        self.assertEqual(len(list(self.output.glob("*.zip"))), 2)
         self.assertFalse((self.output / "index.json").exists())
         self.assertEqual(len(list(self.output.glob("*.unitypackage"))), 2)
         self.assertFalse(any(build_packages.DEVELOPMENT_PACKAGE in p.name for p in self.output.iterdir()))
@@ -73,6 +74,16 @@ class PackageBuilderTests(unittest.TestCase):
                     else:
                         self.assertIn(b"folderAsset: yes", meta)
             self.assertEqual(restored, files)
+            with zipfile.ZipFile(self.output / f"{name}-0.1.0.zip") as vpm:
+                self.assertIsNone(vpm.testzip())
+                self.assertEqual(set(vpm.namelist()), set(files))
+                for relative, data in files.items():
+                    if relative != "package.json":
+                        self.assertEqual(vpm.read(relative), data)
+                manifest = json.loads(vpm.read("package.json"))
+                self.assertEqual(manifest["name"], name)
+                self.assertEqual(manifest["version"], "0.1.0")
+                self.assertEqual(manifest["url"], f"https://github.com/test-owner/test-repo/releases/download/v0.1.1/{name}-0.1.0.zip")
 
     def test_rebuild_is_deterministic(self):
         self.build()
@@ -105,17 +116,34 @@ class PackageBuilderTests(unittest.TestCase):
             self.assertEqual(unity.extractfile(f"{guid}/asset").read().decode("utf-8"), expected)
             self.assertEqual(unity.extractfile(f"{guid}/pathname").read(), b"Assets/TakenokoShader/Test.shader")
         self.assertEqual((directory / "Test.shader").read_text(encoding="utf-8"), source)
+        with zipfile.ZipFile(self.output / f"{name}-0.1.0.zip") as vpm:
+            self.assertEqual(vpm.read("Test.shader").decode("utf-8"), source)
 
     def test_obsolete_outputs_are_removed_and_other_files_are_preserved(self):
         self.output.mkdir()
         stale = ["index.json", f"{build_packages.DEVELOPMENT_PACKAGE}-0.1.0.tgz"]
-        stale.extend(f"{name}-0.1.0.zip" for name in build_packages.PUBLIC_PACKAGES)
-        for name in [*stale, "other-package.zip"]:
+        preserved = ["other-package.zip", f"{build_packages.PUBLIC_PACKAGES[0]}-0.0.1.zip"]
+        for name in [*stale, *preserved]:
             (self.output / name).write_bytes(b"old archive")
         self.build()
         for name in stale:
             self.assertFalse((self.output / name).exists(), name)
-        self.assertEqual((self.output / "other-package.zip").read_bytes(), b"old archive")
+        for name in preserved:
+            self.assertEqual((self.output / name).read_bytes(), b"old archive")
+
+    def test_vpm_dependencies_are_preserved_and_download_url_is_updated(self):
+        name = build_packages.PUBLIC_PACKAGES[1]
+        path = self.project / "Packages" / name / "package.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        dependencies = {"com.vrchat.worlds": ">=3.0.0"}
+        manifest.update(url="https://example.com/old.zip", vpmDependencies=dependencies, zipSHA256="old")
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        self.build()
+        with zipfile.ZipFile(self.output / f"{name}-0.1.0.zip") as vpm:
+            result = json.loads(vpm.read("package.json"))
+            self.assertEqual(result["vpmDependencies"], dependencies)
+            self.assertEqual(result["url"], f"https://github.com/test-owner/test-repo/releases/download/v0.1.1/{name}-0.1.0.zip")
+            self.assertNotIn("zipSHA256", result)
 
     def test_old_tag_metadata_is_removed_from_unitypackages(self):
         for name in build_packages.PUBLIC_PACKAGES:
