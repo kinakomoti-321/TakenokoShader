@@ -1,7 +1,7 @@
 {
   "name": "com.kinankomoti.shaderbindingexporter",
   "displayName": "ShaderBindingExporter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "unity": "2022.3",
   "description": "Editor-only development tool for exporting shader property and keyword bindings as C# code.",
   "license": "MIT",

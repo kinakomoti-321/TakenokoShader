@@ -12,9 +12,9 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing release tag (for example v0.1.0)'
+        description: 'Existing release tag to publish to; builds the selected branch (for example v0.1.1)'
         required: true
-        default: 'v0.1.0'
+        default: 'v0.1.1'
         type: string
 
 permissions:
@@ -46,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag || github.ref_name }}
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.workflow_sha || github.ref_name }}
       - name: Check out packaging tools from the workflow revision
         uses: actions/checkout@v4
         with:
