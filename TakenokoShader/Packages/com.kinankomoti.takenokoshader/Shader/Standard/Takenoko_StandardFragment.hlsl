@@ -268,7 +268,8 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
     float roughness = materialData.roughness;
     float metallic = materialData.metallic;
     float occlusion = materialData.occlusion;
-    basecolor *= 1.0 - ReflectivityFromMetallic(metallic); // a correction for unity standard shader
+    float3 F0 = lerp(0.04, basecolor, metallic);
+    float3 diffuseReflectivity = basecolor * (1.0 - ReflectivityFromMetallic(metallic)); // a correction for unity standard shader
 
     #if defined(_CHECKPARAMETER_ON)
         #if defined(_TAKENOKO_FOWARD_ADD)
@@ -283,7 +284,6 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
         #endif
     #endif
 
-    float3 F0 = lerp(0.04, basecolor, metallic);
     #if defined(_IRIDESCENCE_ON)
         float thinFilmIor = _ThinFilmIor;
         MainTextureMapping filmMapping = mapping;
@@ -303,7 +303,7 @@ float4 Takenoko_FragmentStandard(VertexOutput i, bool isFrontFace : SV_ISFRONTFA
         }
     #endif
 
-    float3 lightDiffuse = DiffuseBRDF(basecolor, roughness, dotNH, dotNV, dotNL) * dotNL * lightColor;
+    float3 lightDiffuse = DiffuseBRDF(diffuseReflectivity, roughness, dotNH, dotNV, dotNL) * dotNL * lightColor;
     float3 lightSpecular = SpecularBRDF(F0, roughness, dotNH, dotNV, dotNL, dotLH) * dotNL * lightColor;
     float3 lightSss = 0.0;
     #if defined(_SSS_ON)
